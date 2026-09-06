@@ -1,6 +1,6 @@
 # Voice Studio and the embeddable JavaScript review library
 
-> Implementation update, 2026-09-06: Preview 0.2 now exists in `C:/Projects/agent-taskboard-devspace/voice-studio` (Angular, .NET, `@voice/review`). See the [current dossier section](operations/voice-concept-revision/index.html#voice-studio-current) for shipped behaviour, tests, source-adapter limits and model strategy. The design contract below is broader than this delivery; its proposed names and APIs are not the implemented package contract.
+> Implementation update, 2026-09-06: Preview 0.3 now exists in `C:/Projects/agent-taskboard-devspace/voice-studio` (Angular, .NET, `@voice/review`). See the [current dossier section](operations/voice-concept-revision/index.html#voice-studio-current) for shipped behaviour, explicit source tasks, the shared rule wiki, language-tool candidates, tests, source-adapter limits and model strategy. The design contract below is broader than this delivery; its proposed names and APIs are not the implemented package contract.
 
 Design status: proposed `design-0` extension, 2026-09-06. The implementation update above supersedes the earlier no-implementation status. This is the current delivery priority, ahead of the broad M0–M6 programme. The operator selected the Quality Studio website as the pilot.
 
