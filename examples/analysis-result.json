@@ -1,0 +1,313 @@
+{
+  "schema_version": "design-0",
+  "contract_status": "proposed",
+  "analysis_id": "design-example-analysis-1",
+  "response_projection": {
+    "include_suggestions": true,
+    "include_excerpts": true,
+    "include_evidence_text": false
+  },
+  "document": {
+    "document_id": "input-1",
+    "profile_id": "agent-orc-documentation",
+    "language": "de",
+    "document_format": "markdown",
+    "characters": 35
+  },
+  "summary": {
+    "analysis_status": "warning",
+    "policy_status": "pass",
+    "quality_score_status": "uncalibrated",
+    "quality_score": null,
+    "slop_risk_status": "uncalibrated",
+    "slop_risk": null,
+    "coverage": 1.0
+  },
+  "diagnostics": [],
+  "policy_evaluation": {
+    "fail_on": "error",
+    "minimum_coverage": 0.6,
+    "required_capabilities": [
+      "markup_style_rules",
+      "native_metrics"
+    ],
+    "required_dimensions": [
+      "clarity",
+      "voice_fit"
+    ],
+    "unmet_requirements": []
+  },
+  "targets": {
+    "quality_score": {
+      "warn_below": 70,
+      "status": "unavailable",
+      "reason_code": "score_uncalibrated"
+    },
+    "dimensions": {
+      "clarity": {
+        "warn_below": 75,
+        "status": "unavailable",
+        "reason_code": "score_uncalibrated"
+      },
+      "specificity": {
+        "warn_below": 70,
+        "status": "unavailable",
+        "reason_code": "score_uncalibrated"
+      },
+      "concision": {
+        "warn_below": 70,
+        "status": "unavailable",
+        "reason_code": "score_uncalibrated"
+      },
+      "information_density": {
+        "warn_below": 70,
+        "status": "unavailable",
+        "reason_code": "score_uncalibrated"
+      },
+      "voice_fit": {
+        "warn_below": 80,
+        "status": "unavailable",
+        "reason_code": "score_uncalibrated"
+      },
+      "rhythm": {
+        "warn_below": 60,
+        "status": "unavailable",
+        "reason_code": "score_uncalibrated"
+      },
+      "structure": {
+        "warn_below": 65,
+        "status": "unavailable",
+        "reason_code": "score_uncalibrated"
+      }
+    }
+  },
+  "dimensions": {
+    "clarity": {
+      "score": null,
+      "score_status": "uncalibrated",
+      "status": "warning",
+      "coverage": 1.0
+    },
+    "specificity": {
+      "score": null,
+      "score_status": "uncalibrated",
+      "status": "pass",
+      "coverage": 1.0
+    },
+    "concision": {
+      "score": null,
+      "score_status": "uncalibrated",
+      "status": "pass",
+      "coverage": 1.0
+    },
+    "information_density": {
+      "score": null,
+      "score_status": "uncalibrated",
+      "status": "pass",
+      "coverage": 1.0
+    },
+    "voice_fit": {
+      "score": null,
+      "score_status": "uncalibrated",
+      "status": "pass",
+      "coverage": 1.0
+    },
+    "rhythm": {
+      "score": null,
+      "score_status": "uncalibrated",
+      "status": "pass",
+      "coverage": 1.0
+    },
+    "structure": {
+      "score": null,
+      "score_status": "uncalibrated",
+      "status": "pass",
+      "coverage": 1.0
+    }
+  },
+  "measurements": [
+    {
+      "measurement_id": "document.characters",
+      "dimension": null,
+      "value": 35,
+      "unit": "unicode_code_points",
+      "status": "evaluated",
+      "reason_code": null,
+      "scope": "document",
+      "segment_id": null,
+      "engine_id": "native_metrics",
+      "engine_version": "0.1.0-design",
+      "method_version": "unicode-code-point-count-1"
+    }
+  ],
+  "findings": [
+    {
+      "schema_version": "design-0",
+      "finding_id": "design-example-finding-1",
+      "rule_id": "de.generic_opening.fast_world",
+      "category": "formulaic_opening",
+      "dimension": "clarity",
+      "severity": "warning",
+      "message": "The opening is generic and carries no project-specific information.",
+      "location": {
+        "position_encoding": "unicode_code_point",
+        "start_char": 0,
+        "end_char": 35,
+        "start_line": 1,
+        "start_column": 1,
+        "end_line": 1,
+        "end_column": 36
+      },
+      "excerpt": "In der heutigen schnelllebigen Welt",
+      "suggestion": "Start with the concrete claim.",
+      "engine_id": "vale",
+      "engine_version": "design-pinned-version",
+      "ruleset_version": "de-default-1-design",
+      "rule_origin": "builtin",
+      "policy_eligibility": "eligible",
+      "disposition": "active",
+      "disposition_detail": null
+    }
+  ],
+  "engine_runs": [
+    {
+      "engine_id": "vale",
+      "engine_version": "design-pinned-version",
+      "capabilities": [
+        "markup_style_rules"
+      ],
+      "execution_state": "evaluated",
+      "affects_coverage": true,
+      "coverage": 1.0,
+      "execution_provenance": {
+        "runtime_mode": "strict_offline",
+        "deployment_scope": "local_process",
+        "data_path": "on_device",
+        "recipient_id": "local_device",
+        "content_disclosure": null,
+        "loopback_transport": null,
+        "sidecar_egress_verification": "not_applicable"
+      },
+      "diagnostics": []
+    },
+    {
+      "engine_id": "native_metrics",
+      "engine_version": "0.1.0-design",
+      "capabilities": [
+        "native_metrics"
+      ],
+      "execution_state": "evaluated",
+      "affects_coverage": true,
+      "coverage": 1.0,
+      "execution_provenance": {
+        "runtime_mode": "strict_offline",
+        "deployment_scope": "in_process",
+        "data_path": "on_device",
+        "recipient_id": "local_device",
+        "content_disclosure": null,
+        "loopback_transport": null,
+        "sidecar_egress_verification": "not_applicable"
+      },
+      "diagnostics": []
+    },
+    {
+      "engine_id": "languagetool",
+      "engine_version": null,
+      "capabilities": [
+        "grammar"
+      ],
+      "execution_state": "not_run",
+      "reason_code": "not_selected",
+      "affects_coverage": false,
+      "coverage": null,
+      "execution_provenance": null,
+      "diagnostics": []
+    }
+  ],
+  "ai_origin_signal": {
+    "contract_version": "0.x",
+    "experimental": true,
+    "status": "not_run",
+    "risk_band": null,
+    "evidence_quality": "none",
+    "error_category": null,
+    "reason_codes": [
+      "disabled_by_default"
+    ],
+    "limitations": [
+      "result_is_not_proof_of_authorship"
+    ],
+    "language": null,
+    "domain_id": null,
+    "characters_evaluated": 0,
+    "tokens_evaluated": null,
+    "tokenizer_id": null,
+    "min_tokens_required": null,
+    "detector": null,
+    "calibration": null,
+    "execution_provenance": null
+  },
+  "judge": {
+    "run_status": "not_run",
+    "reason_code": "disabled_in_runtime",
+    "requested": {
+      "provider_config_id": null,
+      "provider_config_safety_digest": null,
+      "provider_id": null,
+      "route_id": null,
+      "model_id": null
+    },
+    "effective": {
+      "provider_config_id": null,
+      "provider_config_safety_digest": null,
+      "provider_id": null,
+      "route_id": null,
+      "route_maturity": null,
+      "model_id": null
+    },
+    "capabilities": [],
+    "document_budget": null,
+    "invocation_budget": null,
+    "process_session_budget": null,
+    "execution_provenance": [],
+    "fallback_transitions": [],
+    "fallback_used": false,
+    "diagnostics": []
+  },
+  "comparison": {
+    "status": "not_available",
+    "reason_codes": [
+      "score_uncalibrated",
+      "comparison_keys_incomplete"
+    ],
+    "keys": {
+      "profile_schema_version": 1,
+      "profile_hash": "sha256:09f22d5982efaaac5fd26099ca438dfd14096f673867a95af78616f7b5acb4a2",
+      "profile_hash_contract": "canonical-profile-json-1",
+      "ruleset_id": "voice-lint-de-default",
+      "ruleset_version": "de-default-1-design",
+      "parser_version": "markdown-source-map-0-design",
+      "source_map_contract": "unicode-code-point-half-open-design-0",
+      "analyzer_versions": {
+        "vale": "design-pinned-version",
+        "native_metrics": "0.1.0-design"
+      },
+      "semantic_contract": null,
+      "calibration_id": null,
+      "calibration_version": null,
+      "language": "de",
+      "language_variant": null,
+      "domain_id": null,
+      "length_bucket": null,
+      "aggregation_contract_version": null
+    }
+  },
+  "versions": {
+    "core": "0.1.0-design",
+    "parser": "markdown-source-map-0-design",
+    "source_map_contract": "unicode-code-point-half-open-design-0",
+    "ruleset": "de-default-1-design",
+    "rubric": null,
+    "calibration": null
+  }
+}

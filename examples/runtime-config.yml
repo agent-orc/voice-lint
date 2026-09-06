@@ -1,0 +1,79 @@
+schema_version: 1
+
+# Runtime configuration is user-controlled and must not be discovered in or
+# loaded from an untrusted repository. In CLI use, the default analysis mode
+# opens no sockets. When served, the authenticated API listener is the only
+# socket; analyzers and providers still open none.
+mode: strict_offline
+
+server:
+  host: 127.0.0.1
+  port: 4765
+  authentication: session_token
+  cors: disabled
+  allowed_hosts:
+    - 127.0.0.1:4765
+  allowed_origins: []
+  reject_null_origin: true
+  trust_forwarded_headers: false
+  limits:
+    max_body_bytes: 1048576
+    max_concurrent_analyses: 2
+    requests_per_minute: 60
+    analysis_timeout_seconds: 30
+
+# HTTP requests use these IDs; they never supply paths.
+profiles:
+  agent-orc-documentation:
+    # Relative runtime paths resolve from the runtime-config directory.
+    path: ./voice-profile.yml
+
+# File analysis over MCP is disabled until the user explicitly registers a
+# canonical root in this trusted file with `runtime mcp-root register`.
+mcp:
+  transport: stdio
+  roots: {}
+
+engines:
+  vale:
+    enabled: true
+  native_metrics:
+    enabled: true
+  languagetool:
+    enabled: false
+    endpoint: http://127.0.0.1:8010
+
+semantic:
+  enabled: false
+  provider: null
+  provider_config_id: null
+  provider_route: null
+  max_parallel: 1
+  max_documents_per_invocation: 0
+  max_requests_per_invocation: 0
+  max_requests_per_process_session: 0
+  quota_limits: []
+  quota_process_session_limits: []
+  fallback_targets: []
+  allow_provider_fallback: false
+  allow_paid_fallback: false
+  data_handling:
+    allow_local_client_history: false
+    allowed_provider_retention_modes:
+      - no_provider_storage
+    max_provider_retention_days: 0
+    allow_unknown_provider_retention: false
+    allow_provider_training_use: false
+    allow_provider_managed_telemetry: false
+
+cost:
+  allow_paid_primary: false
+  max_paid_cost_per_analysis: { currency: USD, scale: 6, units: "0" }
+  max_paid_cost_per_invocation: { currency: USD, scale: 6, units: "0" }
+  max_paid_cost_per_process_session: { currency: USD, scale: 6, units: "0" }
+  allow_paid_provider_verify: false
+  max_paid_cost_per_provider_verify: { currency: USD, scale: 6, units: "0" }
+
+cache:
+  mode: "off"
+  retention_days: 0

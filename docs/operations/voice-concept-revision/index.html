@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voice Lint concept revision</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-1: #fcfcfb;
+    --surface-2: #f2f1ee;
+    --surface-3: #e9e8e3;
+    --ink-1: #0b0b0b;
+    --ink-2: #52514e;
+    --ink-3: #8a8983;
+    --line: #d8d6cf;
+    --develop: #2a78d6;      /* lane: deterministic rules */
+    --taskbr: #4a3aa7;       /* lane: semantic judge */
+    --salvage: #eb6834;      /* lane: claims */
+    --rescue: #b58500;       /* lane: meta and time-bound */
+    --ok: #008300;           /* status good (always with icon and text) */
+    --bad: #c93736;          /* status problem (always with icon and text) */
+    --warn: #9a6b00;
+    --accent-soft: #eaf1fb;
+    --bad-soft: #fbecec;
+    --ok-soft: #eaf4ea;
+    --warn-soft: #f8f0dd;
+    /* chart series, categorical, fixed order: structure, claims, inflation, meta */
+    --c-structure: #2a78d6;
+    --c-claims: #eb6834;
+    --c-inflation: #4a3aa7;
+    --c-meta: #b58500;
+    /* sequential ramp for ordered sentence-length buckets */
+    --q1: #dbe7f7; --q2: #b7cff0; --q3: #8fb3e6; --q4: #6495db; --q5: #3f79cf; --q6: #235ba8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --surface-1: #1a1a19;
+      --surface-2: #232322;
+      --surface-3: #2c2c2a;
+      --ink-1: #ffffff;
+      --ink-2: #c3c2b7;
+      --ink-3: #8a8983;
+      --line: #3d3d3a;
+      --develop: #3987e5;
+      --taskbr: #9085e9;
+      --salvage: #e5723f;
+      --rescue: #d0a02a;
+      --ok: #4eae4e;
+      --bad: #e66767;
+      --warn: #d9a63f;
+      --accent-soft: #1e2a3a;
+      --bad-soft: #382222;
+      --ok-soft: #1f2f1f;
+      --warn-soft: #33301e;
+      --c-structure: #3987e5;
+      --c-claims: #d4602c;
+      --c-inflation: #9085e9;
+      --c-meta: #b08a1c;
+      --q1: #1f2c3f; --q2: #26405f; --q3: #2d5580; --q4: #356ba2; --q5: #4383c9; --q6: #6ea3e6;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-1: #1a1a19;
+    --surface-2: #232322;
+    --surface-3: #2c2c2a;
+    --ink-1: #ffffff;
+    --ink-2: #c3c2b7;
+    --ink-3: #8a8983;
+    --line: #3d3d3a;
+    --develop: #3987e5;
+    --taskbr: #9085e9;
+    --salvage: #e5723f;
+    --rescue: #d0a02a;
+    --ok: #4eae4e;
+    --bad: #e66767;
+    --warn: #d9a63f;
+    --accent-soft: #1e2a3a;
+    --bad-soft: #382222;
+    --ok-soft: #1f2f1f;
+    --warn-soft: #33301e;
+    --c-structure: #3987e5;
+    --c-claims: #d9642f;
+    --c-inflation: #9085e9;
+    --c-meta: #b8901f;
+    --q1: #1f2c3f; --q2: #26405f; --q3: #2d5580; --q4: #356ba2; --q5: #4383c9; --q6: #6ea3e6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0 0 80px;
+    background: var(--surface-1);
+    color: var(--ink-1);
+    font: 16px/1.6 system-ui, "Segoe UI", sans-serif;
+  }
+  main { max-width: 1080px; margin: 0 auto; padding: 0 28px; }
+  header.page {
+    border-bottom: 1px solid var(--line);
+    padding: 44px 0 26px; margin-bottom: 8px;
+  }
+  .kicker { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 10px; }
+  h1 { font-size: 34px; line-height: 1.2; margin: 0 0 12px; text-wrap: balance; }
+  .lede { font-size: 18px; color: var(--ink-2); max-width: 62ch; margin: 0; }
+  .meta { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 18px; font-size: 13px; color: var(--ink-3); }
+  .meta b { color: var(--ink-2); font-weight: 600; }
+  h2 { font-size: 24px; margin: 56px 0 6px; scroll-margin-top: 20px; text-wrap: balance; }
+  h2 .no { color: var(--ink-3); font-weight: 600; margin-right: 10px; }
+  h3 { font-size: 18px; margin: 34px 0 4px; }
+  p  { max-width: 76ch; }
+  p.dim { color: var(--ink-2); }
+  .box {
+    border: 1px solid var(--line); border-radius: 10px;
+    background: var(--surface-2); padding: 18px 22px; margin: 20px 0;
+  }
+  .box.accent { background: var(--accent-soft); border-color: color-mix(in srgb, var(--develop) 30%, var(--line)); }
+  .box.bad    { background: var(--bad-soft);    border-color: color-mix(in srgb, var(--bad) 30%, var(--line)); }
+  .box.ok     { background: var(--ok-soft);     border-color: color-mix(in srgb, var(--ok) 30%, var(--line)); }
+  .box.warn   { background: var(--warn-soft);   border-color: color-mix(in srgb, var(--warn) 35%, var(--line)); }
+  .box h4 { margin: 0 0 8px; font-size: 15px; }
+  .box p:last-child, .box ul:last-child { margin-bottom: 0; }
+  figure { margin: 26px 0; }
+  figure svg { width: 100%; height: auto; display: block; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-1); }
+  figcaption { font-size: 13.5px; color: var(--ink-2); margin-top: 10px; max-width: 86ch; }
+  figcaption b { color: var(--ink-1); }
+  table { border-collapse: collapse; width: 100%; margin: 18px 0; font-size: 14.5px; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+  td b { font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .table-wrap { overflow-x: auto; }
+  code, .mono { font: 13px/1.5 ui-monospace, Consolas, monospace; background: var(--surface-3); border-radius: 4px; padding: 1px 5px; }
+  pre { font: 13px/1.5 ui-monospace, Consolas, monospace; background: var(--surface-3); border-radius: 8px; padding: 14px 16px; overflow-x: auto; max-width: 100%; }
+  pre code { background: none; padding: 0; }
+  .legend { display: flex; gap: 22px; flex-wrap: wrap; font-size: 13.5px; color: var(--ink-2); margin: 10px 0 0; }
+  .legend span::before { content: ""; display: inline-block; width: 22px; height: 4px; border-radius: 2px; margin-right: 7px; vertical-align: middle; background: var(--c); }
+  .pill { display: inline-block; font-size: 12px; font-weight: 600; border-radius: 99px; padding: 2px 10px; vertical-align: 1px; }
+  .pill.done { background: var(--ok-soft); color: var(--ok); }
+  .pill.queued { background: var(--accent-soft); color: var(--develop); }
+  .pill.new { background: var(--warn-soft); color: var(--warn); }
+  .pill.part { background: var(--warn-soft); color: var(--warn); }
+  .pill.open { background: var(--bad-soft); color: var(--bad); }
+  ul { padding-left: 22px; }
+  li { margin: 5px 0; max-width: 76ch; }
+  .toc { columns: 2; gap: 40px; font-size: 14.5px; }
+  .toc a { color: var(--ink-2); text-decoration: none; }
+  .toc a:hover { color: var(--ink-1); text-decoration: underline; }
+  .toc li { break-inside: avoid; }
+  /* SVG roles */
+  .s-node   { fill: var(--surface-2); stroke: var(--line); rx: 8; }
+  .s-node2  { fill: var(--surface-3); stroke: var(--line); }
+  .s-label  { fill: var(--ink-1); font: 600 13px system-ui, sans-serif; }
+  .s-sub    { fill: var(--ink-2); font: 12px system-ui, sans-serif; }
+  .s-tiny   { fill: var(--ink-3); font: 11px system-ui, sans-serif; }
+  .s-flow   { stroke: var(--ink-3); stroke-width: 1.6; fill: none; }
+  .s-lane   { stroke: var(--line); stroke-dasharray: 4 5; stroke-width: 1; }
+  .badge-bad  { fill: var(--bad-soft); stroke: var(--bad); }
+  .badge-ok   { fill: var(--ok-soft); stroke: var(--ok); }
+  .badge-warn { fill: var(--warn-soft); stroke: var(--warn); }
+  .t-bad  { fill: var(--bad);  font: 600 12px system-ui, sans-serif; }
+  .t-ok   { fill: var(--ok);   font: 600 12px system-ui, sans-serif; }
+  .t-warn { fill: var(--warn); font: 600 12px system-ui, sans-serif; }
+  .lane-det { fill: var(--accent-soft); stroke: var(--develop); }
+  .lane-sem { fill: color-mix(in srgb, var(--taskbr) 12%, var(--surface-1)); stroke: var(--taskbr); }
+  .lane-claim { fill: color-mix(in srgb, var(--salvage) 12%, var(--surface-1)); stroke: var(--salvage); }
+  .t-det { fill: var(--develop); font: 600 12px system-ui, sans-serif; }
+  .t-sem { fill: var(--taskbr); font: 600 12px system-ui, sans-serif; }
+  .t-claim { fill: var(--salvage); font: 600 12px system-ui, sans-serif; }
+  .axis { stroke: var(--line); stroke-width: 1; }
+  .grid { stroke: var(--line); stroke-width: 1; stroke-dasharray: 2 4; }
+  .bar-structure { fill: var(--c-structure); }
+  .bar-claims { fill: var(--c-claims); }
+  .bar-inflation { fill: var(--c-inflation); }
+  .bar-meta { fill: var(--c-meta); }
+  .val { fill: var(--ink-2); font: 12px system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+  .stx { margin:10px 0 0; padding:7px 12px; border-radius:8px; font-size:13px; border:1px solid; }
+  .stx-ok { border-color:color-mix(in srgb, var(--ok) 35%, var(--line)); background:var(--ok-soft); color:var(--ok); }
+  .stx-part { border-color:color-mix(in srgb, var(--warn) 35%, var(--line)); background:var(--warn-soft); color:var(--warn); }
+  .stx-open { border-color:color-mix(in srgb, var(--bad) 35%, var(--line)); background:var(--bad-soft); color:var(--bad); }
+  .evidence-link { margin: 8px 0 0; font-size: 13px; color: var(--ink-2); }
+  /* specimen: marked spans in quoted copy */
+  .specimen { border: 1px solid var(--line); border-radius: 10px; background: var(--surface-1); padding: 22px 26px; margin: 20px 0; }
+  .specimen .sp-heading { font-size: 22px; font-weight: 600; margin: 0 0 10px; }
+  .specimen p { font-size: 16.5px; line-height: 1.9; margin: 0; max-width: none; }
+  .specimen mark { background: none; color: inherit; padding: 0 1px; border-bottom: 3px solid; border-radius: 0; }
+  .specimen mark.m-structure { border-color: var(--c-structure); }
+  .specimen mark.m-claims { border-color: var(--c-claims); }
+  .specimen mark.m-inflation { border-color: var(--c-inflation); }
+  .specimen mark.m-meta { border-color: var(--c-meta); }
+  .specimen sup { font: 600 11px system-ui, sans-serif; color: var(--ink-2); margin-left: 1px; }
+  .marklist { font-size: 14px; color: var(--ink-2); margin: 12px 0 0; padding-left: 0; list-style: none; }
+  .marklist li { display: flex; gap: 10px; align-items: baseline; max-width: none; }
+  .marklist b { color: var(--ink-1); font-weight: 600; min-width: 22px; }
+  .marklist i { display: inline-block; width: 14px; height: 4px; border-radius: 2px; flex: none; position: relative; top: -2px; }
+  .rewrite { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin: 20px 0; }
+  .rewrite .box { margin: 0; }
+  .rewrite .box p { font-size: 15px; }
+  @media (max-width: 760px) { .toc { columns: 1; } h1 { font-size: 27px; } .rewrite { grid-template-columns: 1fr; } }
+  /* decisions */
+  .decision { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-1); margin: 10px 0; }
+  .decision input { margin-top: 5px; flex: none; }
+  .decision label { max-width: 86ch; }
+  .decision label b { display: block; }
+  .decision label span { color: var(--ink-2); font-size: 14px; }
+  .decision input:focus-visible { outline: 2px solid var(--develop); outline-offset: 2px; }
+  a { color: inherit; }
+  .sources li { font-size: 13.5px; color: var(--ink-2); max-width: none; word-break: break-word; }
+  .sources a { color: var(--ink-2); }
+</style>
+</head>
+<body>
+<main>
+
+<header class="page">
+  <p class="kicker">Dossier · Voice Lint · VL-W1</p>
+  <h1>Voice Studio: review text in context</h1>
+  <p class="lede">Voice Studio opens your running website or a folder of Markdown files. Select passages, save feedback, and inspect proposed changes before applying them to the source. This dossier documents the workflow, source mapping, and semantic review.</p>
+  <div class="meta">
+    <span><b>Status:</b> 2026-09-06, Preview 0.2: live Angular/Markdown and Runner review</span>
+    <span><b>Trigger:</b> Quality Studio website copy of 2026-09-01, status section</span>
+    <span><b>Scope:</b> voice-lint (VL), public copy of WEB, AOW and QSW, runner prompts in AGT</span>
+    <span><b>Decisions:</b> <a href="#programme">§11</a></span>
+  </div>
+</header>
+
+<section class="box accent" aria-label="Current product direction">
+  <h4>2026-09-06: JavaScript library, local Voice Studio, websites and Markdown</h4>
+  <p>The current priority is a reusable JS library for developer-mode review,
+  and a small local Voice Studio host that opens a website or Markdown document.
+  Mark text, save feedback beside its source, review a proposal and verify the change.
+  The operator selected the Quality Studio website as the pilot.</p>
+  <p><a href="#on-page-review"><b>Read the revised tool, workflow and delivery order in §13</b></a>.
+  Sections 1–12 preserve the earlier research and programme. Their historical status
+  statements are dated 2026-09-03. The current implementation and verified boundaries are recorded below; the broader programme remains a design.</p>
+</section>
+
+<!-- voice-studio:current:start -->
+<section class="box accent" id="voice-studio-current">
+  <h4>2026-09-06: Voice Studio Preview 0.2 — live applications and source folders</h4>
+  <p>The operator's feedback changed the main workflow: stronger contrast and larger
+  controls, clearer reports, and browsing the real running website. Angular projects
+  now connect their original development server and associate routes with content
+  modules and component context. Markdown projects use folder navigation.</p>
+  <p>Open <a href="http://127.0.0.1:5188">Voice Studio</a>. The expanded
+  <a href="http://127.0.0.1:5189/index.html">Quality Studio example website</a>
+  runs on its own local origin with eleven HTML pages, original styles/scripts,
+  native navigation, FAQ, contact-form behaviour, a saved checklist and an imprint
+  for the local example. No fictional public business identity is claimed.</p>
+  <p>The real <a href="http://127.0.0.1:4184/?voice-studio=1">Agent Studio Angular
+  website</a> is also onboarded: 27 route mappings, original TypeScript content
+  modules and explicit shared-component context. Its copy is unchanged by onboarding.
+  Studio never treats a copied render as the editable Angular source.</p>
+</section>
+
+<h3>Two entry points and their sources</h3>
+<table><thead><tr><th>Project</th><th>What the user browses</th><th>What a fix changes</th></tr></thead><tbody>
+  <tr><td>Angular application</td><td>The original local development server, with routing, styles, scripts and normal interactions</td><td>The mapped TypeScript content literal or supported template source; component references stay attached to the review</td></tr>
+  <tr><td>Static website</td><td>The site's actual local HTTP responses and native links</td><td>The original HTML file, through a reviewed version-checked source diff</td></tr>
+  <tr><td>Markdown project</td><td>Folders, subfolders and the selected file's rendered content</td><td>The actual Markdown file; surrounding supported formatting and links are preserved</td></tr>
+</tbody></table>
+<p>The framework-independent <code>@voice/review</code> library is shared by these
+surfaces. Solid underlines show supplied findings; dotted underlines show human
+feedback. Selection works on unmarked, safely mapped text. The browser bridge uses
+an explicitly configured local project origin, exact sender-window checks and
+versioned page/review messages. Studio bearer credentials never cross into the site.</p>
+<p><code>voice.config.json</code> declares <code>liveUrl</code>, included
+<code>sourceFiles</code>, route-to-file mappings and <code>sourceContexts</code>.
+The Agent Studio pilot reads 30 TypeScript content files; a read-only adapter check
+found 1,770 prose units. Imports, code, technical strings and interpolated templates
+are excluded. Component context is explicit and bounded; this is not a complete
+automatically inferred Angular dependency graph.</p>
+
+<h3>Review, feedback and implementation</h3>
+<p>Browse → mark text → save feedback beside the source → inspect local or semantic
+findings → prepare a replacement → review the full source diff → explicitly apply
+→ verify the changed running app or file. File/project reports cover the supported
+source inventory and declare exclusions. Feedback, proposals and run history persist
+in project metadata; stale versions cannot silently overwrite newer source.</p>
+<p>The TypeScript adapter parses an AST without executing website code and preserves
+literal delimiters, escaping and Unicode. A source proposal remains one bounded
+file span. Syntax validation does not replace the website's Angular build/typecheck.
+Multi-file component changes remain a broader implementation task requiring their
+own affected-file plan and verification.</p>
+
+<h3>Semantic review uses the Coding-Agent-Runner</h3>
+<p><b>The tool boundary is implemented through <code>CodingAgentRunner</code> 0.7.0.</b>
+The explicit semantic-review action starts a configured local CLI route. The Runner
+receives a staged source snapshot, mapped units, feedback and bounded component
+context with read-only permission, clean context and delegation disabled. It returns
+structured findings with exact quote/span references and reasoning. It cannot apply
+source changes. Running, completed, failed, cancelled and stale results
+are stored and shown separately. Incomplete output fails validation and carries
+an explicit error instead of appearing as a complete review.</p>
+<p>There is no model call during page opening or ordinary lint. A configured route
+is visible before starting; semantic review can use the operator's existing CLI
+account. Execution is not an automatic claim of Voice qualification, cost approval
+by Token Economy or a proven best model. Integration tests use fake Runner streams;
+their success must not be presented as a real model benchmark.</p>
+
+<h3>Which models should Voice know?</h3>
+<p><b>Voice owns task-specific editorial qualification and preference.</b> Token
+Economy owns the existing catalogue, model identities, capacity/cost knowledge and
+routing policy. The host owns configuration, credentials, admission and execution.
+The Runner is the execution mechanism, not another model-quality catalogue.</p>
+<table><thead><tr><th>Role</th><th>Model requirement</th><th>Evidence</th></tr></thead><tbody>
+  <tr><td>Fixed rules, reports, feedback and manual proposals</td><td>No LLM</td><td>Concrete source spans and deterministic checks</td></tr>
+  <tr><td>Semantic review</td><td>Explicit provisional Runner route until qualified</td><td>Finding precision, useful reasoning, missed issues and factual preservation</td></tr>
+  <tr><td>Rewrite proposal</td><td>Qualify separately by language and voice profile</td><td>Blinded preference, preserved meaning and unsupported additions</td></tr>
+  <tr><td>Angular/source implementation</td><td>Existing host admission and correctness floors; may differ from the writing model</td><td>Affected source/components, diff and build/tests</td></tr>
+  <tr><td>Verification</td><td>Deterministic checks and human evidence; optional independent semantic review</td><td>A generator cannot certify its own output</td></tr>
+</tbody></table>
+<p>The existing host-policy baseline <code>gpt-5.6-sol / medium</code> is a starting
+comparison, not a Voice winner. Resolve exact candidate/model/effort routes through
+the catalogue; evaluate alternatives in held-out DE/EN comparisons. Prefer a cheaper
+qualified equivalent when evidence supports it. Measure cost and latency per accepted
+improvement, including retries. Qualification storage, benchmark execution and the
+tested Token Economy admission adapter remain planned.</p>
+<p>Token Economy's current benchmark-cohort selector does not universally certify
+every baseline or operator pin for Voice. A future Voice admission check must validate
+the selected route before launch. Pins remain explicit operator decisions; unqualified
+routes remain experiments. Voice does not silently override routing or fabricate
+complexity scores to force a preferred model.</p>
+
+<h3>The dossier's own introduction is a review case</h3>
+<p>The title “Voice Lint concept revision” and the paragraph beginning “Research and
+analysis behind a sober public voice…” produce <b>zero local-rule findings</b> in
+the current engine. That is not an editorial pass. The text foregrounds internal
+concepts, metrics and enforcement mechanisms before explaining what a reader can do.</p>
+<p>A user-facing alternative is <b>“Texte auf der Website prüfen und verbessern”</b>:
+“Voice Studio öffnet deine laufende Website. Du markierst Textstellen, speicherst
+Feedback und prüfst vorgeschlagene Änderungen, bevor sie in den Quelltext übernommen
+werden.” This is a proposed editorial rewrite, not a measured model result.</p>
+
+<h3>Verification and remaining boundaries</h3>
+<p id="voice-v02-verification">Verified on 2026-09-06: the Angular frontend and
+.NET backend build successfully; 22 library tests, 81 backend assertions,
+30 fake-Runner checks and 12 asynchronous UI-state checks pass. Integrated Chrome
+tests cover native website scripts/navigation/history, actual Angular SPA routing
+and source/component mapping, Markdown folders, durable feedback, reviewed source
+diffs, real-file application and reload. API checks cover authentication, origin
+rejection, Unicode, idempotency and stale-version rejection. Sixteen responsive
+screens at 1440, 736 and 360 pixels have no document overflow; measured normal
+Studio text meets 4.5:1 contrast. No real model was invoked. The real Angular
+project's 30 files load in about 3.3 seconds cold and 0.8 seconds warm on the local
+test machine; these are local observations, not a service guarantee.</p>
+<p>Live review is limited to configured local development servers. Sites that block
+iframe embedding need a development frame policy or ordinary browsing in their own
+tab. Ambiguous/dynamic text stays unassigned. Markdown remains a supported subset.
+Studio offsets are explicitly UTF-16; a future Voice Lint core adapter must convert
+the core's proposed code-point coordinates. Claims remain advisory and no numeric
+voice score is shown.</p>
+<p>Implementation and guides: <code>C:/Projects/agent-taskboard-devspace/voice-studio</code>,
+<code>docs/workflow.md</code>, <code>docs/runner-integration.md</code> and
+<code>docs/model-strategy.md</code>. Earlier dossier sections preserve historical
+research; this section is the current implementation record.</p>
+<!-- voice-studio:current:end -->
+
+<nav class="box" aria-label="Contents">
+  <h4>Contents</h4>
+  <ul class="toc">
+    <li><a href="#voice-studio-current">Current implementation, verification and LLM strategy</a></li>
+    <li><a href="#on-page-review">§13 Current: JS library and local Voice Studio</a></li>
+    <li><a href="#tldr">Key statements (2026-09-03)</a></li>
+    <li><a href="#specimen">§1 Specimen</a></li>
+    <li><a href="#measurement">§2 Measurement of the current copy</a></li>
+    <li><a href="#voice">§3 The voice, stated as rules</a></li>
+    <li><a href="#guides">§4 Style guides and enforcement practice</a></li>
+    <li><a href="#markers">§5 Markers of generated prose</a></li>
+    <li><a href="#tooling">§6 Tooling landscape</a></li>
+    <li><a href="#metrics">§7 Metrics and scoring</a></li>
+    <li><a href="#enforcement">§8 Enforcement: profile, prompts, gates</a></li>
+    <li><a href="#studio">§9 Voice Studio</a></li>
+    <li><a href="#revision">§10 Concept revision for voice-lint</a></li>
+    <li><a href="#programme">§11 Programme and decisions</a></li>
+    <li><a href="#sources">§12 Sources</a></li>
+  </ul>
+</nav>
+
+<section id="tldr" class="box accent">
+  <h4>Key statements</h4>
+  <p class="stx stx-open"><b>Status 2026-09-03:</b> Diagnosis complete, rules and metrics proposed,
+  programme ready for decision. Nothing in this dossier is implemented in voice-lint; the repository has
+  no commits.</p>
+  <ul>
+    <li><b>The Quality Studio page fails on structure, not on vocabulary.</b> The copy contains no
+        intensifier from any published word list. It does contain ten section headings that end with a
+        period, six of them without a verb, the word "never" eleven times in 1,221 words, and sixteen em
+        dashes that pivot sentences. A vocabulary blocklist would have passed the page (§2).</li>
+    <li><b>The status paragraph is the pattern in miniature.</b> It carries an over-precise non-fact
+        ("Founded 2026-07-11"), a vague claim ("covered by CI"), insider jargon, one antithesis and a
+        self-attestation ("This page describes what exists"). A rewrite of 36 words carries the same
+        information (§1).</li>
+    <li><b>Prompt-level enforcement exists and did not hold.</b> The canonical style guide has had a
+        "Public tone" section since July; fifteen runtime prompt templates point to it; the page still
+        shipped on 2026-09-01. Detection has to run on the text, not on the instruction (§8).</li>
+    <li><b>Voice Lint's design already carries the right contract:</b> findings with source spans,
+        no scalar gate, German and English, Vale plus native metrics. It lacks three things this problem
+        needs: a structural rule family, a claims dimension with a facts registry, and text classes with
+        per-class thresholds. Provider adapters and the AI-origin signal can wait (§10).</li>
+    <li><b>Voice Studio mirrors Quality Studio:</b> one sidecar statement per document, staleness by
+        content hash, runs with caps, a three-pane browser, a finding lifecycle and a handover to Agent
+        Studio. Its specific additions are span highlighting in the text, a profile and example editor,
+        and a claims ledger (§9).</li>
+    <li><b>Programme:</b> fourteen cards in four phases (§11). The first commit of the repository and
+        the copy fix on the Quality Studio page do not wait for tooling.</li>
+  </ul>
+</section>
+
+<h2 id="specimen"><span class="no">§1</span>Specimen</h2>
+<p class="stx stx-open"><b>Status 2026-09-03:</b> Live on agent-orchestrator.dev/quality/ since
+2026-09-01. Rewrite proposed below; no card exists yet.</p>
+<p>The trigger for this dossier is the status section of the Quality Studio product page. The
+operator's judgement was "too inaccurate and simply not good". The section is quoted in full with the
+findings a voice linter would raise. Each mark names a rule family from §3; the number refers to the list
+below the specimen.</p>
+
+<figure class="specimen" aria-label="Annotated status section of the Quality Studio website">
+  <p class="sp-heading"><mark class="m-structure">Open development.</mark><sup>1</sup></p>
+  <p><mark class="m-claims">Founded 2026-07-11.</mark><sup>2</sup>
+  Core library, CLI, review API, and the Angular browser ship from one repository and are
+  <mark class="m-claims">covered by CI</mark><sup>3</sup>.
+  Open research is labeled as research<mark class="m-structure">:</mark><sup>4</sup>
+  whether <mark class="m-inflation">a code graph joins as a graphical meta layer</mark><sup>5</sup>
+  is a time-boxed spike, <mark class="m-structure">not a decision</mark><sup>6</sup>.
+  <mark class="m-meta">This page describes what exists.</mark><sup>7</sup></p>
+  <ul class="marklist">
+    <li><b>1</b><i style="background:var(--c-structure)"></i>Heading as slogan: verbless fragment with a terminal period, abstract noun phrase. The section label "Status" already names the section.</li>
+    <li><b>2</b><i style="background:var(--c-claims)"></i>Over-precise non-fact. A repository has a first commit, not a founding. The date is correct (first commit 2026-07-11) and carries no information the reader acts on.</li>
+    <li><b>3</b><i style="background:var(--c-claims)"></i>Vague claim. "Covered" suggests test coverage; the repository has a build workflow. The verifiable statement is "a build workflow runs on GitHub Actions".</li>
+    <li><b>4</b><i style="background:var(--c-structure)"></i>Colon pivot: a general statement, then its illustration, in one sentence.</li>
+    <li><b>5</b><i style="background:var(--c-inflation)"></i>Insider vocabulary on a product page. A reader who does not know the project cannot evaluate "code graph as graphical meta layer" or "time-boxed spike".</li>
+    <li><b>6</b><i style="background:var(--c-structure)"></i>Antithesis ("a spike, not a decision"). Four of these occur on the page.</li>
+    <li><b>7</b><i style="background:var(--c-meta)"></i>Self-attestation. The sentence claims honesty for the page instead of stating a fact. The house rules already ban "honest" as a product adjective; this is the same move in a sentence.</li>
+  </ul>
+</figure>
+
+<h3>Fact check</h3>
+<table>
+  <thead><tr><th>Statement</th><th>What the repository shows (2026-09-03)</th><th>Verdict</th></tr></thead>
+  <tbody>
+    <tr><td>Founded 2026-07-11</td><td>First commit 2026-07-11 by the operator ("Found Code Quality: concept README, Apache-2.0, CQ-1 founding task")</td><td>Date correct, frame wrong. Not a fact a product page needs.</td></tr>
+    <tr><td>Core library, CLI, review API, Angular browser ship from one repository</td><td><code>src/AgentOrchestrator.CodeQuality</code>, <code>src/quality-cli</code>, <code>src/QualityStudio.Api</code>, <code>frontend/</code></td><td>Correct.</td></tr>
+    <tr><td>covered by CI</td><td><code>.github/workflows/build.yml</code>, <code>release-canary.yml</code>, <code>deploy-website.yml</code></td><td>Vague. "Covered" is not a verifiable predicate.</td></tr>
+    <tr><td>code graph … time-boxed spike, not a decision</td><td>Research box in the concept documents</td><td>Internal process note. Belongs in the repository, not on the page.</td></tr>
+    <tr><td>This page describes what exists</td><td>Not checkable</td><td>Self-attestation. Remove.</td></tr>
+  </tbody>
+</table>
+
+<h3>Rewrite</h3>
+<div class="rewrite">
+  <div class="box bad">
+    <h4>Current (53 words)</h4>
+    <p><b>Open development.</b><br>Founded 2026-07-11. Core library, CLI, review API, and the Angular browser ship from one repository and are covered by CI. Open research is labeled as research: whether a code graph joins as a graphical meta layer is a time-boxed spike, not a decision. This page describes what exists.</p>
+  </div>
+  <div class="box ok">
+    <h4>Proposed (36 words)</h4>
+    <p><b>Status</b><br>The repository contains the core library, the CLI, the review API and the Angular browser. A build workflow runs on GitHub Actions. No package is published. Repository and slice plan: github.com/agent-orc/quality-studio.</p>
+  </div>
+</div>
+<p class="dim">The proposal keeps every checkable statement of the original, drops the four rhetorical
+devices and the process note, and turns the heading into the section label that already exists. The
+German version follows the same cut ("Status. Das Repository enthält die Kernbibliothek, die CLI, die
+Review-API und den Angular-Browser. Ein Build-Workflow läuft auf GitHub Actions. Es ist kein Paket
+veröffentlicht.").</p>
+
+<h3>The same pattern in the ten section headings</h3>
+<p>Every section of the page has a small label and a large heading. All ten headings end with a period;
+six have no finite verb; two are antitheses. The labels already name the sections, so the headings add a
+slogan layer on top of a working structure. The operator rejected exactly this device on 2026-08-08 for
+the organisation website ("Each part does one job." was discarded as "not the sober language I want").</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Label (exists)</th><th>Heading (current)</th><th>Finding</th><th>Proposal</th></tr></thead>
+  <tbody>
+    <tr><td>The engineer room</td><td>Standing review statements, next to the code.</td><td>Fragment, period, metaphor in the label</td><td>Quality Studio stores agent review statements next to the code.</td></tr>
+    <tr><td>The workspace</td><td>A code browser, not a dashboard.</td><td>Antithesis, fragment</td><td>Code browser</td></tr>
+    <tr><td>Levels and kinds</td><td>Independent statements.</td><td>Aphorism</td><td>drop, keep label</td></tr>
+    <tr><td>Sidecars</td><td>The repository owns its review truth.</td><td>Personification ("owns", "truth")</td><td>Sidecar files</td></tr>
+    <tr><td>Review runs</td><td>Sweeps with caps and a ledger.</td><td>Fragment</td><td>drop, keep label</td></tr>
+    <tr><td>Change-set reviews</td><td>Change reviews cover one transition.</td><td>Acceptable sentence; period on a heading</td><td>Change reviews</td></tr>
+    <tr><td>Sensors and deterministic evidence</td><td>Sensor evidence, then agent judgment.</td><td>Fragment, sequence slogan</td><td>Deterministic sensors</td></tr>
+    <tr><td>Handover</td><td>Handover to Agent Studio.</td><td>Period on a noun phrase</td><td>Handover to Agent Studio</td></tr>
+    <tr><td>Standalone path</td><td>Package, CLI, API, reports.</td><td>Asyndetic list as slogan</td><td>Package, CLI, API and reports</td></tr>
+    <tr><td>Status</td><td>Open development.</td><td>Fragment, abstract</td><td>Status</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="measurement"><span class="no">§2</span>Measurement of the current copy</h2>
+<p class="stx stx-part"><b>Status 2026-09-03:</b> Heuristic script, regex-based, uncalibrated. Numbers
+are counts, not scores. Script and raw output are in this folder (<code>measure.py</code>,
+<code>measurements.md</code>).</p>
+<p>To test whether the specimen is representative, the complete English copy of the page (86 strings,
+1,221 words) was extracted from the i18n dictionary and run through a small pattern catalogue. Three
+comparison corpora were measured with the same script: the Quality Studio product README, the copy of
+the ecosystem hub page, and the voice-lint README. The catalogue has four families.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Family</th><th>Patterns counted</th><th>Detection</th></tr></thead>
+  <tbody>
+    <tr><td><b>Structure</b></td><td>slogan fragment (sentence of at most seven words without a finite verb), antithesis ("not X, but Y", "X, not Y", "instead of", "rather than"), em dash, colon pivot inside a sentence, list of three</td><td>regex and a small verb list; the fragment test needs a real tagger later</td></tr>
+    <tr><td><b>Claims</b></td><td>absolute quantifiers: every, always, never, zero, all, nothing, only</td><td>regex; the claim finder of §7 refines this</td></tr>
+    <tr><td><b>Inflation</b></td><td>intensifiers and marketing adjectives from the Google, GOV.UK and write-good lists plus the house list (honest, seamless, robust, effortless, simple, easy); puffery nouns (universe, journey, engine room, heart of)</td><td>word list</td></tr>
+    <tr><td><b>Meta and time</b></td><td>self-reference ("this page describes", "not a mockup"), "it's worth noting"; time-bound words (currently, new, soon, founded, planned)</td><td>regex</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure>
+<svg viewBox="0 0 1040 330" role="img" aria-label="Findings per 1,000 words by family for four corpora, stacked horizontal bars">
+  <!-- axis -->
+  <line class="axis" x1="250" y1="40" x2="250" y2="262"/>
+  <g class="val">
+    <text x="250" y="284" text-anchor="middle">0</text>
+    <text x="430" y="284" text-anchor="middle">20</text>
+    <text x="610" y="284" text-anchor="middle">40</text>
+    <text x="790" y="284" text-anchor="middle">60</text>
+    <text x="970" y="284" text-anchor="middle">80</text>
+  </g>
+  <line class="grid" x1="430" y1="40" x2="430" y2="262"/>
+  <line class="grid" x1="610" y1="40" x2="610" y2="262"/>
+  <line class="grid" x1="790" y1="40" x2="790" y2="262"/>
+  <line class="grid" x1="970" y1="40" x2="970" y2="262"/>
+  <text class="s-tiny" x="250" y="306">findings per 1,000 words · scale 9 px per unit</text>
+
+  <!-- QS website EN: structure 43.5, claims 13.9, inflation 4.1, meta 0.8 -->
+  <text class="s-label" x="20" y="66">Quality Studio website</text>
+  <text class="s-tiny" x="20" y="82">EN copy · 1,221 words</text>
+  <rect class="bar-structure" x="250" y="50" width="391" height="26"/>
+  <rect class="bar-claims" x="643" y="50" width="123" height="26"/>
+  <rect class="bar-inflation" x="768" y="50" width="35" height="26"/>
+  <rect class="bar-meta" x="805" y="50" width="6" height="26" rx="3"/>
+  <text class="val" x="818" y="68">62.2</text>
+
+  <!-- Hub page: structure 62.6, claims 11.4, inflation 0, meta 0 -->
+  <text class="s-label" x="20" y="122">Ecosystem hub page</text>
+  <text class="s-tiny" x="20" y="138">EN copy · 176 words · label text</text>
+  <rect class="bar-structure" x="250" y="106" width="563" height="26"/>
+  <rect class="bar-claims" x="815" y="106" width="101" height="26" rx="3"/>
+  <text class="val" x="923" y="124">73.9</text>
+
+  <!-- QS README: structure 32.0, claims 3.6, inflation 7.8, meta 0.7 -->
+  <text class="s-label" x="20" y="178">Quality Studio README</text>
+  <text class="s-tiny" x="20" y="194">1,404 words</text>
+  <rect class="bar-structure" x="250" y="162" width="288" height="26"/>
+  <rect class="bar-claims" x="540" y="162" width="32" height="26"/>
+  <rect class="bar-inflation" x="574" y="162" width="70" height="26"/>
+  <rect class="bar-meta" x="646" y="162" width="5" height="26" rx="2"/>
+  <text class="val" x="658" y="180">44.2</text>
+
+  <!-- voice-lint README: structure 14.2, claims 6.6, inflation 0, meta 4.4 -->
+  <text class="s-label" x="20" y="234">voice-lint README</text>
+  <text class="s-tiny" x="20" y="250">914 words · design document</text>
+  <rect class="bar-structure" x="250" y="218" width="128" height="26"/>
+  <rect class="bar-claims" x="380" y="218" width="59" height="26"/>
+  <rect class="bar-meta" x="441" y="218" width="40" height="26" rx="3"/>
+  <text class="val" x="488" y="236">25.2</text>
+</svg>
+<div class="legend">
+  <span style="--c:var(--c-structure)">Structure</span>
+  <span style="--c:var(--c-claims)">Claims</span>
+  <span style="--c:var(--c-inflation)">Inflation</span>
+  <span style="--c:var(--c-meta)">Meta and time</span>
+</div>
+<figcaption><b>Fig. 1: Findings per 1,000 words by family.</b> The Quality Studio page carries
+2.5 times the density of the voice-lint README, and the excess sits in the structure family. The hub
+page is an outlier for a different reason: it consists of card labels of the form "Name: purpose", which
+the colon rule counts. That is a text-class error of the script, not of the page, and the reason §7
+introduces text classes.</figcaption>
+</figure>
+
+<figure>
+<svg viewBox="0 0 1040 250" role="img" aria-label="Distribution of sentence length in words for three corpora, 100 percent stacked bars">
+  <!-- QS website: 40/12/22/15/18/4 of 111 -->
+  <text class="s-label" x="20" y="60">Quality Studio website</text>
+  <text class="s-tiny" x="20" y="76">111 sentences</text>
+  <rect x="250" y="44" width="259" height="26" style="fill:var(--q1)"/>
+  <rect x="511" y="44" width="76" height="26" style="fill:var(--q2)"/>
+  <rect x="589" y="44" width="141" height="26" style="fill:var(--q3)"/>
+  <rect x="732" y="44" width="95" height="26" style="fill:var(--q4)"/>
+  <rect x="829" y="44" width="115" height="26" style="fill:var(--q5)"/>
+  <rect x="946" y="44" width="24" height="26" style="fill:var(--q6)" rx="3"/>
+  <text class="val" x="380" y="62" text-anchor="middle" style="fill:var(--ink-1)">36%</text>
+  <text class="val" x="886" y="62" text-anchor="middle" style="fill:var(--surface-1)">16%</text>
+
+  <!-- voice-lint README: 18/4/16/17/11/3 of 69 -->
+  <text class="s-label" x="20" y="126">voice-lint README</text>
+  <text class="s-tiny" x="20" y="142">69 sentences</text>
+  <rect x="250" y="110" width="188" height="26" style="fill:var(--q1)"/>
+  <rect x="440" y="110" width="40" height="26" style="fill:var(--q2)"/>
+  <rect x="482" y="110" width="167" height="26" style="fill:var(--q3)"/>
+  <rect x="651" y="110" width="177" height="26" style="fill:var(--q4)"/>
+  <rect x="830" y="110" width="113" height="26" style="fill:var(--q5)"/>
+  <rect x="945" y="110" width="25" height="26" style="fill:var(--q6)" rx="3"/>
+  <text class="val" x="344" y="128" text-anchor="middle" style="fill:var(--ink-1)">26%</text>
+
+  <!-- hub: 9/10/5/2/1/0 of 27 -->
+  <text class="s-label" x="20" y="192">Ecosystem hub page</text>
+  <text class="s-tiny" x="20" y="208">27 sentences · label text</text>
+  <rect x="250" y="176" width="240" height="26" style="fill:var(--q1)"/>
+  <rect x="492" y="176" width="265" height="26" style="fill:var(--q2)"/>
+  <rect x="759" y="176" width="131" height="26" style="fill:var(--q3)"/>
+  <rect x="892" y="176" width="52" height="26" style="fill:var(--q4)"/>
+  <rect x="946" y="176" width="24" height="26" style="fill:var(--q5)" rx="3"/>
+  <text class="val" x="370" y="194" text-anchor="middle" style="fill:var(--ink-1)">33%</text>
+  <text class="val" x="624" y="194" text-anchor="middle" style="fill:var(--ink-1)">37%</text>
+
+  <line class="axis" x1="250" y1="30" x2="250" y2="212"/>
+  <text class="s-tiny" x="250" y="236">share of sentences by length bucket</text>
+</svg>
+<div class="legend">
+  <span style="--c:var(--q1)">1 to 4 words</span>
+  <span style="--c:var(--q2)">5 to 7</span>
+  <span style="--c:var(--q3)">8 to 12</span>
+  <span style="--c:var(--q4)">13 to 20</span>
+  <span style="--c:var(--q5)">21 to 30</span>
+  <span style="--c:var(--q6)">31 and more</span>
+</div>
+<figcaption><b>Fig. 2: Sentence length distribution.</b> The Quality Studio page has a bimodal
+shape: 47 percent of its sentences have seven words or fewer, and 20 percent have more than twenty. The
+short end is where the slogans live, the long end where the em dashes and colons join clauses. The
+1-to-4 bucket also contains navigation labels and badges; the script does not yet separate text
+classes.</figcaption>
+</figure>
+
+<h3>Readings</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Measure</th><th class="num">QS website</th><th class="num">QS README</th><th class="num">Hub page</th><th class="num">voice-lint README</th></tr></thead>
+  <tbody>
+    <tr><td>Words</td><td class="num">1,221</td><td class="num">1,404</td><td class="num">176</td><td class="num">914</td></tr>
+    <tr><td>Sentences of at most 7 words</td><td class="num">47%</td><td class="num">31%</td><td class="num">70%</td><td class="num">29%</td></tr>
+    <tr><td>Slogan fragments per 1,000 words</td><td class="num">7.4</td><td class="num">2.8</td><td class="num">5.7</td><td class="num">0.0</td></tr>
+    <tr><td>Antitheses per 1,000 words</td><td class="num">3.3</td><td class="num">0.7</td><td class="num">0.0</td><td class="num">1.1</td></tr>
+    <tr><td>Em dashes per 1,000 words</td><td class="num">13.1</td><td class="num">12.1</td><td class="num">5.7</td><td class="num">0.0</td></tr>
+    <tr><td>Colon pivots per 1,000 words</td><td class="num">8.2</td><td class="num">6.4</td><td class="num">39.8</td><td class="num">3.3</td></tr>
+    <tr><td>Lists of three per 1,000 words</td><td class="num">11.5</td><td class="num">10.0</td><td class="num">11.4</td><td class="num">9.8</td></tr>
+    <tr><td>Absolute quantifiers per 1,000 words</td><td class="num">13.9</td><td class="num">3.6</td><td class="num">11.4</td><td class="num">6.6</td></tr>
+    <tr><td>Intensifiers per 1,000 words</td><td class="num">0.0</td><td class="num">2.1</td><td class="num">0.0</td><td class="num">0.0</td></tr>
+    <tr><td>Puffery nouns per 1,000 words</td><td class="num">4.1</td><td class="num">5.7</td><td class="num">0.0</td><td class="num">0.0</td></tr>
+    <tr><td>Specificity markers (numbers, paths, identifiers) per 1,000 words</td><td class="num">16.4</td><td class="num">8.5</td><td class="num">11.4</td><td class="num">3.3</td></tr>
+    <tr><td>Headings ending with a period</td><td class="num">10 of 10</td><td class="num">n/a</td><td class="num">0 of 1</td><td class="num">0 of 12</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Four observations follow.</p>
+<ul>
+  <li><b>Vocabulary is clean; structure is not.</b> No word from the Kobak, Liang or Wikipedia lists
+      (§5) appears on the page. The rhetoric lives in sentence shape: fragments, pivots, antitheses,
+      absolutes. A linter built from word lists would report nothing.</li>
+  <li><b>"Never" as posture.</b> Eleven occurrences in 1,221 words. Each one is a defensible product
+      invariant ("never rewrites a meta file"). Together they turn a product description into a series of
+      vows. The rule in §3 therefore budgets absolutes per section instead of banning them.</li>
+  <li><b>Specificity is high.</b> Paths, commands and version numbers are frequent. The page is not
+      vague; it is inflated in form. Rewrites can keep the content and lose the shape.</li>
+  <li><b>The same author profile shows in the product README.</b> The README has fewer fragments and
+      more puffery ("engineer room", "universe", "wear the hat"). Both texts were produced under the same
+      prompts; the linter has to cover READMEs, websites and wiki pages with one profile and per-class
+      thresholds.</li>
+</ul>
+<div class="box warn">
+  <h4>Limits of this measurement</h4>
+  <p>The script is a regex catalogue written for this dossier. It has no tagger, so the fragment test
+  uses a verb list and misses some verbs; it does not separate text classes, so labels inflate the short
+  bucket; it counts every em dash, including legitimate ones; and the lists of three include real
+  enumerations. The numbers support a diagnosis of one page. They are not thresholds. §7 describes what
+  a calibrated version needs.</p>
+</div>
+
+<h2 id="voice"><span class="no">§3</span>The voice, stated as rules</h2>
+<p class="stx stx-part"><b>Status 2026-09-03:</b> The house rules exist in prose form in the canonical
+style guide (section "Public tone", six bullets). This section turns them and the operator's calibration
+examples into twelve checkable rules. Decision D1 in §11.</p>
+<p>The operator has calibrated the voice with examples over two months. The rules below are derived from
+the accepted and rejected examples, not from a general style guide, and then aligned with the guides in
+§4 where they agree.</p>
+<div class="rewrite">
+  <div class="box ok">
+    <h4>Accepted</h4>
+    <p>"Together they form the coding-agent management layer. Every repository versions and ships on its own; the task server API is the only coupling."<br><br>
+    "Every run leaves evidence."<br><br>
+    "Custom pipelines with multiple review steps."<br><br>
+    "Management layers on top of coding work."</p>
+  </div>
+  <div class="box bad">
+    <h4>Rejected</h4>
+    <p>"Each part does one job." (aphoristic heading)<br><br>
+    "buys the most for its tokens", "tackles the hard parts" (metaphor)<br><br>
+    "honest" as a product adjective; "X is the mechanism"; "not chat" contrasts<br><br>
+    "Five repositories" (number as display)<br><br>
+    Open source as a value claim</p>
+  </div>
+</div>
+<p>What separates the two columns is not sentence length or the presence of an absolute. "Every run
+leaves evidence." is four words with an absolute quantifier and was accepted. It is accepted because it
+is a checkable statement about the product, placed once. "Each part does one job." was rejected because
+it is a generalisation without a referent, placed as a heading. The rules therefore describe form and
+placement, and treat claims as a budget rather than a ban.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Rule</th><th>Statement</th><th>Check</th><th>Severity, classes</th></tr></thead>
+  <tbody>
+    <tr><td><b>R1 Headings</b></td><td>Headings are noun phrases or plain declarative sentences without a terminal period. No antithesis, no aphorism, no colon pivot.</td><td>regex on heading class: trailing period, "not … but", verbless with quantifier subject</td><td>error · heading</td></tr>
+    <tr><td><b>R2 Sentences</b></td><td>Body sentences have a finite verb. Fragments are allowed only in labels, badges, captions and list items.</td><td>tagger (spaCy or LanguageTool) or verb list as fallback</td><td>warning · body, intro, lede</td></tr>
+    <tr><td><b>R3 Length</b></td><td>One statement per sentence. Mean body sentence length at most 20 words; a sentence above 30 words is a finding.</td><td>native metric</td><td>warning · body</td></tr>
+    <tr><td><b>R4 Claim budget</b></td><td>A claim is a sentence with an absolute quantifier, a superlative or comparative, a number or date, or an evaluative adjective. At most one absolute claim per section; page density at most 3 per 1,000 words in copy classes (provisional).</td><td>claim finder (§7); density per class</td><td>warning · all copy classes</td></tr>
+    <tr><td><b>R5 Claim backing</b></td><td>Every claim maps to an entry in the facts registry of the repository, or the sentence names its source.</td><td>claim finder plus registry match (fuzzy, judge for ambiguous)</td><td>error · all copy classes</td></tr>
+    <tr><td><b>R6 Evaluation words</b></td><td>No intensifiers or marketing adjectives (Google, GOV.UK, write-good lists) and no house-banned words: honest, seamless, robust, powerful, effortless, simple, easy, truth, universe as a product frame.</td><td>Vale existence rule, vocabulary per profile</td><td>error · all</td></tr>
+    <tr><td><b>R7 Metaphor and persona</b></td><td>No metaphors, personification or role play ("the room you step into", "wear the engineer hat", "owns its truth").</td><td>house phrase list; judge for unlisted cases</td><td>warning · all copy classes</td></tr>
+    <tr><td><b>R8 Pivots</b></td><td>No antithesis ("not X, but Y"; "X, not Y"), no em dash as clause joint, no colon pivot in body text. Lists of three are allowed only for real enumerations.</td><td>regex; list-of-three as density metric only</td><td>warning · body, intro, lede, heading</td></tr>
+    <tr><td><b>R9 Self-reference</b></td><td>No meta commentary or self-attestation: "this page describes", "not a mockup", "real" or "honest" about the text's own evidence.</td><td>regex</td><td>error · all</td></tr>
+    <tr><td><b>R10 Time</b></td><td>No time-bound words in product copy: currently, new, now, soon, founded, planned, latest. Status sections carry a date stamp instead.</td><td>Vale existence rule (Google "timeless" list)</td><td>warning · body; info · status class</td></tr>
+    <tr><td><b>R11 Specificity</b></td><td>Names, versions, paths and commands appear where the reader acts on them. Numbers appear only when they change what the reader does; a number used as display is a finding.</td><td>positive marker density; judge for "display" numbers</td><td>info · all</td></tr>
+    <tr><td><b>R12 German</b></td><td>Rules R1 to R11 apply. In addition: no chains of nominalisations, no "nicht nur … sondern auch", no stock openers ("in der heutigen …") and no filler adjectives (nahtlos, ganzheitlich, essenziell, maßgeschneidert). Readability by Wiener Sachtextformel or LIX, not by English formulas.</td><td>Vale DE rules; native WSTF and LIX; LanguageTool in connected mode</td><td>as above · de</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="dim">Rules R1, R6, R8, R9 and R10 are regex-checkable today with Vale. R2, R3, R4 and R11
+need native metrics and text classes. R5 needs the facts registry and a matcher. R7 needs a judge for
+anything outside the phrase list. This split drives the milestone order in §10.</p>
+
+<h2 id="guides"><span class="no">§4</span>Style guides and enforcement practice</h2>
+<p class="stx stx-ok"><b>Status 2026-09-03:</b> Research complete; sources accessed on that date and
+listed in §12.</p>
+<p>The published developer style guides converge on the rules of §3. The convergence matters for two
+reasons: the rules are not a personal taste of the operator, and several of them already exist as
+machine-checkable Vale packages that a house style can layer on.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Guide</th><th>Rules relevant to a sober voice</th><th>Machine-checkable</th></tr></thead>
+  <tbody>
+    <tr><td><b>Google developer documentation</b></td><td>Avoid figurative language and metaphors. No exclamation points. Avoid "simply", "easy", "just", "quickly" in procedures. Do not document future features. Timeless documentation: eliminate "currently, new, now, soon, latest, eventually" outside release notes.</td><td>Yes, Vale package "Google", 36 rules, CC BY 4.0</td></tr>
+    <tr><td><b>Microsoft Writing Style Guide</b></td><td>"Shorter is always better." Sentence-case headings; noun phrases for headings that are not tasks; "Don't end headings with a period." Avoid "there is / there are".</td><td>Yes, Vale package "Microsoft", 47 rules</td></tr>
+    <tr><td><b>GOV.UK content design</b></td><td>Plain English is mandatory. Split sentences over 25 words. Active voice. Word list to avoid: deliver, leverage, empower, drive, unlock, deep dive, robust, key, landscape, ecosystem. "Avoid using metaphors: they do not say what you actually mean."</td><td>No dedicated package</td></tr>
+    <tr><td><b>Red Hat supplementary guide</b></td><td>Sentences at most 32 words on average. Flesch-Kincaid grade below 9. Passive voice as a warning with documented exceptions. Three severities: error, warning, suggestion.</td><td>Yes, "vale-at-red-hat", mandatory for Red Hat product docs</td></tr>
+    <tr><td><b>GitLab documentation</b></td><td>"Do not use words like easily or simply. Do not use marketing phrases like 'This feature will save you time and money.' Focus on facts and achievable goals." Example rewrite: "The build time can decrease when you use this feature."</td><td>Yes, custom "gitlab" style plus markdownlint in CI</td></tr>
+    <tr><td><b>Grafana Writers' Toolkit</b></td><td>Named checks: Simple (easy, simple, simply), Exclamation, GoogleWill (present tense), Please, Timeless, six readability indices with bands.</td><td>Yes, "Grafana" style, run locally and in CI</td></tr>
+    <tr><td><b>Mailchimp, Atlassian, IBM</b></td><td>"It's always more important to be clear than entertaining." Personality is subordinate to clarity in product and documentation copy. IBM: "persuasive not poetic, confident but not boastful."</td><td>No</td></tr>
+    <tr><td><b>Keep a Changelog, Common Changelog, kernel patches</b></td><td>Imperative mood, one change per entry, self-describing entries, exact versions ("Bump xml-parser from 6.x to 8.x"). The terse factual register the operator asks for already has a written standard in changelogs.</td><td>Partly (commit-message linters)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>How organisations enforce</h3>
+<p>GitLab, Red Hat, Grafana, Datadog and Elastic publish their rule sets and run them in CI. Four
+patterns recur.</p>
+<ul>
+  <li><b>Local equals CI.</b> Contributors install the same linter version the pipeline runs, so a
+      failure is reproducible before the push.</li>
+  <li><b>Three severities.</b> Error for terminology and formatting, warning for style and tone,
+      suggestion for readability. The graduated model avoids all-or-nothing gates over subjective calls.</li>
+  <li><b>Scoped escape hatches.</b> Inline disable and enable comments around a passage, a project
+      vocabulary for proper nouns, and a baseline for existing text. Never a global switch.</li>
+  <li><b>Foundation layering.</b> A thin house style on top of the Google or Microsoft package instead
+      of a rule set from scratch.</li>
+</ul>
+<p>Kubernetes is the counter-example: a published style guide with no enforcement, framed as "use your
+best judgment". The Agent Orchestrator repositories are in the Kubernetes position today.</p>
+
+<h3>Claims</h3>
+<p>The most useful outside frame for the claim rules comes from advertising law rather than from style
+guides. The FTC requires a "reasonable basis" for every express or implied claim before it is made, and
+exempts vague puffery ("unmatched quality") because no reader relies on it. Specificity creates the
+obligation. The sober voice inverts the marketing use of that rule: it drops the puffery because it is
+empty, and keeps only specific claims because they can be backed. That is why §3 budgets claims and ties
+each one to a registry entry instead of counting adjectives.</p>
+
+<h3>German</h3>
+<p>Two registers must not be confused. Leichte Sprache is an accessibility register with mandatory
+layout rules for readers with learning disabilities. Einfache Sprache is standard German with short
+sentences and no jargon. The voice of this dossier is Einfache Sprache in a technical vocabulary. The
+German-specific failure mode is Nominalstil, the burying of verbs in nouns ("die Durchführung der
+Prüfung" for "die Prüfung durchführen"); Wortliga and TextLab flag it, no English guide has an equivalent
+rule. The German readability index with public adoption is the Hohenheimer Verständlichkeitsindex (0 to
+20, web text at 16, specialist text at 12), a commercial composite of four validated formulas. Two of
+its components, Wiener Sachtextformel and LIX, are public closed-form formulas and can be implemented
+natively.</p>
+
+<h2 id="markers"><span class="no">§5</span>Markers of generated prose</h2>
+<p class="stx stx-ok"><b>Status 2026-09-03:</b> Research complete. The findings are used to decide
+which markers become rules, which become density metrics, and which stay with a human or a judge.</p>
+<p>The empirical literature on language-model prose has three strands, and they differ in how usable
+they are for a linter.</p>
+
+<h3>Vocabulary</h3>
+<p>Kobak et al. measured excess vocabulary in 14.2 million PubMed abstracts against a pre-2023 trend:
+"delves" at 25 times the expected rate, "showcasing" at 9, "underscores" at 9; 280 excess words in
+2024, two thirds of them verbs. Liang et al. found "meticulous" 35 times, "intricate" 11 times and
+"commendable" 10 times more frequent in peer reviews. Juzek and Ward identified 21 focal words. Wikipedia's
+WikiProject AI Cleanup tracks the list by model generation and notes that it shifts: the 2023 words
+(delve, tapestry, testament) gave way to 2025 words (highlighting, showcasing, enhance). A static list
+goes stale within a year. No study of this kind exists for German; the German lists (nahtlos,
+ganzheitlich, "in der heutigen schnelllebigen Welt") are practitioner folklore.</p>
+<p>For this project the vocabulary strand is necessary and insufficient. The Quality Studio page
+contains none of these words. Vocabulary rules catch a different author profile than the one at work
+here.</p>
+
+<h3>Structure</h3>
+<p>The structural catalogue of Wikipedia's "Signs of AI writing" matches the specimen almost item by
+item.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Marker (Wikipedia catalogue)</th><th>On the Quality Studio page</th><th>Detection</th></tr></thead>
+  <tbody>
+    <tr><td>Negative parallelism, antithesis ("not X, but Y")</td><td>4 occurrences: "not a dashboard", "not a promise", "not a decision", "instead of a clean pass"</td><td>regex, rule R8</td></tr>
+    <tr><td>Em dash overuse</td><td>16 in 1,221 words</td><td>count; weak signal, model-specific (Claude and Gemini use few, ChatGPT many)</td></tr>
+    <tr><td>Rule of three, asyndetic tricolon</td><td>14 lists of three; heading "Package, CLI, API, reports."</td><td>density only</td></tr>
+    <tr><td>Puffery and inflated significance</td><td>"engineer room", "universe", "owns its review truth"</td><td>phrase list plus judge</td></tr>
+    <tr><td>Copula avoidance ("serves as", "stands as")</td><td>not present</td><td>regex</td></tr>
+    <tr><td>Participial tails ("…, highlighting the importance of")</td><td>not present</td><td>regex</td></tr>
+    <tr><td>Meta commentary</td><td>"This page describes what exists", "not a mockup"</td><td>regex, rule R9</td></tr>
+    <tr><td>Sentence fragments as punch lines</td><td>9 in body copy, 10 of 10 headings</td><td>tagger, rule R1 and R2</td></tr>
+    <tr><td>Chat residue ("As an AI", "contentReference", "[cite: 1]")</td><td>not present</td><td>regex, near-zero false positives</td></tr>
+  </tbody>
+</table>
+</div>
+<p>The catalogue's own talk page warns that single markers are unreliable and that only cumulative
+evidence counts. The deterministic community tools take the same position: halans/ai-pattern-detection
+weights 46 patterns in six tiers from 15 points (self-disclosure) to 0.2 points (transition words) and
+classifies by total; defluff scores flagged-word density with a threshold of 8 percent and reports 1.00
+precision at 0.65 recall on its test set; anti-ai-tell adds a sentence-length coefficient of variation
+below 0.45 as "robotic uniformity" and a "concrete anchor deficit" for paragraphs without numbers or
+named entities. Two Vale packages exist for these tells (107 and 17 rules, MIT).</p>
+
+<h3>Statistics</h3>
+<p>Perplexity and burstiness (GPTZero), Binoculars, DetectGPT and Ghostbuster are document-level
+black boxes. They report a score, not a passage, and they carry a documented false-positive risk for
+non-native writers: Liang et al. found that more than half of TOEFL essays were classified as generated.
+Voice Lint's existing position is right: these methods do not become findings and do not enter CI. Three
+statistical measures are explainable and usable as metrics: nominalisation rate, lexical density with a
+register baseline, and the specificity proxy (numbers, dates, named entities per paragraph). Sentence
+length variance is computable without a model and stands in for burstiness.</p>
+
+<h3>What the alignment literature adds</h3>
+<p>RLHF training measurably produces longer, more repetitive and more detectable text, and rewriting by
+frontier models normalises voice: first-person pronouns and contractions decrease, word length and
+punctuation increase, even under prompts that ask to preserve voice. This is the mechanism behind the
+operator's complaint. Agents that write copy inherit a register, and an instruction in the prompt reduces
+the drift without removing its direction. That finding is the argument for detection after the fact
+rather than for better prompts alone.</p>
+
+<h2 id="tooling"><span class="no">§6</span>Tooling landscape</h2>
+<p class="stx stx-ok"><b>Status 2026-09-03:</b> Versions and licences verified on that date. The
+voice-lint research notes of 2026-08-09 already selected Vale and LanguageTool; this section confirms the
+selection and adds the pieces the revised concept needs.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Tool</th><th>State</th><th>German</th><th>Role in Voice Lint</th></tr></thead>
+  <tbody>
+    <tr><td><b>Vale</b> 3.20.0 (2026-09-02), MIT, org vale-cli</td><td>11 rule types incl. <code>metric</code> for formula checks and <code>script</code> (Tengo); JSON output; vale-action 3.0.0; vale-ls 0.5.1; packages Google, Microsoft, RedHat, proselint, write-good, ai-tells</td><td>Spelling via Hunspell only; no German style package in the hub</td><td>Primary rule engine for R1, R6, R8, R9, R10 in both languages (rules are regex, language-specific content)</td></tr>
+    <tr><td><b>LanguageTool</b> 6.8 (2026-05), LGPL-2.1 core</td><td>Self-hosted server, <code>/v2/check</code>, Docker images, n-gram data for DE and EN</td><td>About 5,300 German rules</td><td>Optional connected-mode grammar and tagging source for R2 in German; not in the offline core</td></tr>
+    <tr><td><b>textlint</b> 15.8.0, MIT</td><td>Rule ecosystem, first-party MCP server (<code>textlint --mcp</code>)</td><td>No German preset; Japanese-centric</td><td>Reference for the MCP tool shape; not a second engine</td></tr>
+    <tr><td><b>Harper</b> 2.9.1, Apache-2.0</td><td>Rust, LSP, WASM; very active</td><td>English only; German PR closed unmerged (2026-09-01)</td><td>None for now</td></tr>
+    <tr><td><b>proselint</b> (active), <b>write-good</b> (stale), <b>alex</b> (stale), <b>Joblint</b> (archived)</td><td>Available as Vale packages</td><td>No</td><td>Word lists for R6; import rule by rule with provenance</td></tr>
+    <tr><td><b>retext</b> (unified)</td><td>readability, passive, intensify, simplify plugins</td><td>English and Dutch parsers only</td><td>None; formulas misapply to German</td></tr>
+    <tr><td><b>textstat</b>, <b>TextDescriptives</b>, <b>spaCy de_core_news</b>, <b>HanTa</b>, <b>Pyphen</b></td><td>Python; textstat has DE variants of Flesch only</td><td>spaCy and HanTa give German tagging and lemmas</td><td>Development oracles for the native metrics; a tagger worker for R2 is a later ADR</td></tr>
+    <tr><td><b>DeepEval GEval</b>, <b>Prometheus 2</b>, <b>Ragas</b></td><td>Rubric-based judging with chain of thought; documented verbosity, position and self-preference bias; mitigation by randomised order, anchors, majority vote</td><td>Model-dependent</td><td>Pattern for the advisory judge on R7 and ambiguous R5 matches</td></tr>
+    <tr><td><b>reviewdog</b>, MIT</td><td>Linter output to PR comments and SARIF 2.1.0; filter mode "added"</td><td>n/a</td><td>SARIF bridge for GitHub code scanning; Vale has no native SARIF</td></tr>
+    <tr><td><b>Acrolinx</b> (now Markup AI)</td><td>Score = mean of goal scores; goal score = length / (length + issues); admin weights per goal</td><td>Deployment-dependent</td><td>Reference for a length-normalised score after calibration; not for 0.x</td></tr>
+    <tr><td><b>Writer</b>, <b>Grammarly Business</b></td><td>Voice profiles from examples, term banks, 30 tone classes, brand tones from a questionnaire</td><td>Grammarly: German clarity suggestions since 2026</td><td>Reference for the profile and example editor in Voice Studio</td></tr>
+    <tr><td><b>Hemingway</b></td><td>Five deterministic checks: adverbs, passive, hard sentences (20 and 30 words), complex words, ARI grade</td><td>English</td><td>Reference for the minimal explainable set; R3 thresholds</td></tr>
+    <tr><td><b>Wortliga</b>, <b>TextLab (HIX)</b></td><td>Nominalstil, passive, long sentences, filler words, modal verbs; HIX 0 to 20 from four validated formulas plus structure</td><td>German-first, commercial</td><td>Reference for R12 and the German readability band</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure>
+<svg viewBox="0 0 1040 430" role="img" aria-label="Analysis pipeline: sources, parser, four analyzer lanes, normalisation and policy, outputs, consumers">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/>
+    </marker>
+  </defs>
+  <!-- sources -->
+  <text class="s-label" x="20" y="30">Sources</text>
+  <rect class="s-node" x="20" y="44" width="170" height="40" rx="8"/>
+  <text class="s-sub" x="32" y="69">Website i18n JSON</text>
+  <rect class="s-node" x="20" y="96" width="170" height="40" rx="8"/>
+  <text class="s-sub" x="32" y="121">README, wiki Markdown</text>
+  <rect class="s-node" x="20" y="148" width="170" height="40" rx="8"/>
+  <text class="s-sub" x="32" y="173">HTML pages, prompts</text>
+  <path class="s-flow" d="M190 64 H230 V116 H190 M190 168 H230 V116 H250" marker-end="url(#arr)"/>
+
+  <!-- parser -->
+  <rect class="s-node" x="250" y="44" width="170" height="144" rx="8"/>
+  <text class="s-label" x="262" y="70">Parser, source map</text>
+  <text class="s-sub" x="262" y="94">prose regions</text>
+  <text class="s-sub" x="262" y="114">text classes</text>
+  <text class="s-sub" x="262" y="134">spans in the original</text>
+  <text class="s-sub" x="262" y="154">language per region</text>
+  <text class="s-tiny" x="262" y="176">code, URLs, markup excluded</text>
+  <path class="s-flow" d="M420 116 H450" marker-end="url(#arr)"/>
+
+  <!-- lanes -->
+  <rect class="lane-det" x="450" y="36" width="250" height="56" rx="8"/>
+  <text class="t-det" x="462" y="58">Vale rules</text>
+  <text class="s-sub" x="462" y="78">R1 R6 R8 R9 R10 · EN and DE style packs</text>
+  <rect class="lane-det" x="450" y="100" width="250" height="56" rx="8"/>
+  <text class="t-det" x="462" y="122">Native metrics</text>
+  <text class="s-sub" x="462" y="142">R2 R3 R4 R11 · WSTF, LIX, Flesch · lengths</text>
+  <rect class="lane-claim" x="450" y="164" width="250" height="56" rx="8"/>
+  <text class="t-claim" x="462" y="186">Claim finder and facts registry</text>
+  <text class="s-sub" x="462" y="206">R5 · claims matched to facts.yml</text>
+  <rect class="lane-sem" x="450" y="228" width="250" height="56" rx="8" stroke-dasharray="5 4"/>
+  <text class="t-sem" x="462" y="250">Judge, ambiguous spans only</text>
+  <text class="s-sub" x="462" y="270">R7 · unmatched claims · advisory, capped</text>
+  <path class="s-flow" d="M700 64 H730 V160 M700 128 H730 M700 192 H730 M700 256 H730 V160 H760" marker-end="url(#arr)"/>
+
+  <!-- normalize + policy -->
+  <rect class="s-node" x="760" y="60" width="120" height="96" rx="8"/>
+  <text class="s-label" x="772" y="84">Normalise</text>
+  <text class="s-sub" x="772" y="106">findings</text>
+  <text class="s-sub" x="772" y="124">measurements</text>
+  <text class="s-sub" x="772" y="142">de-duplicate</text>
+  <path class="s-flow" d="M820 156 V184" marker-end="url(#arr)"/>
+  <rect class="s-node" x="760" y="184" width="120" height="100" rx="8"/>
+  <text class="s-label" x="772" y="208">Policy</text>
+  <text class="s-sub" x="772" y="230">fail_on</text>
+  <text class="s-sub" x="772" y="248">coverage</text>
+  <text class="s-sub" x="772" y="266">class thresholds</text>
+  <path class="s-flow" d="M880 234 H910" marker-end="url(#arr)"/>
+
+  <!-- outputs -->
+  <rect class="s-node2" x="910" y="60" width="110" height="224" rx="8"/>
+  <text class="s-label" x="922" y="84">Outputs</text>
+  <text class="s-sub" x="922" y="110">exit code</text>
+  <text class="s-sub" x="922" y="132">JSON</text>
+  <text class="s-sub" x="922" y="154">SARIF via</text>
+  <text class="s-sub" x="922" y="170">reviewdog</text>
+  <text class="s-sub" x="922" y="196">loopback API</text>
+  <text class="s-sub" x="922" y="218">MCP tool</text>
+  <text class="s-sub" x="922" y="240">sidecar file</text>
+
+  <!-- consumers -->
+  <line class="s-lane" x1="20" y1="316" x2="1020" y2="316"/>
+  <text class="s-label" x="20" y="344">Consumers</text>
+  <rect class="s-node" x="140" y="330" width="190" height="40" rx="8"/>
+  <text class="s-sub" x="152" y="355">CI of the website repositories</text>
+  <rect class="s-node" x="350" y="330" width="190" height="40" rx="8"/>
+  <text class="s-sub" x="362" y="355">Agent Studio gate step</text>
+  <rect class="s-node" x="560" y="330" width="190" height="40" rx="8"/>
+  <text class="s-sub" x="572" y="355">Voice Studio</text>
+  <rect class="s-node" x="770" y="330" width="250" height="40" rx="8"/>
+  <text class="s-sub" x="782" y="355">Agents, self-check before completion</text>
+  <text class="s-tiny" x="20" y="404">Solid lanes run offline and deterministically. The dashed lane is optional, advisory and metered; its findings cannot block.</text>
+</svg>
+<figcaption><b>Fig. 3: Analysis pipeline.</b> The shape is the one voice-lint already documents.
+Three additions carry this dossier: text classes in the parser, the claim lane with a repository-owned
+facts registry, and the sidecar file as an output for Voice Studio. The judge lane stays where the
+existing scoring contract puts it: advisory, capped, never blocking.</figcaption>
+</figure>
+
+<h2 id="metrics"><span class="no">§7</span>Metrics and scoring</h2>
+<p class="stx stx-part"><b>Status 2026-09-03:</b> Metric catalogue and provisional bands proposed.
+No calibration exists; bands are starting points for the first dogfood run, to be replaced by measured
+thresholds (card VL-12).</p>
+<p>The operator asked three questions: how to attach metrics to a text, how to identify problematic
+texts, and what scoring is conceivable. The answers build on voice-lint's scoring contract, which already
+says that findings and raw measurements are useful before calibration and numeric scores are not.</p>
+
+<h3>Text classes</h3>
+<p>The same sentence is a slogan in a heading and a caption in a figure. Every metric below is computed
+per text class, and every threshold is set per class. The parser assigns the class from the source:
+HTML elements (h1 to h3, figcaption, alt, nav, footer, p), Markdown structure (heading, list item,
+paragraph, blockquote), and i18n dictionary keys by suffix convention (Title, Label, Intro, Caption,
+Badge). A string whose class cannot be determined gets the class "unknown" and a finding of its own.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Class</th><th>Examples</th><th>Fragments</th><th>Claim budget</th><th>Length rule</th></tr></thead>
+  <tbody>
+    <tr><td>label</td><td>nav items, badges, chips, table headers</td><td>allowed</td><td>none</td><td>none</td></tr>
+    <tr><td>heading</td><td>h1 to h3, i18n *Title</td><td>noun phrase allowed; sentence allowed; period is a finding</td><td>0 absolutes</td><td>at most 10 words</td></tr>
+    <tr><td>lede, intro</td><td>hero text, section intro, i18n *Intro</td><td>not allowed</td><td>1 absolute per section</td><td>mean at most 20</td></tr>
+    <tr><td>body</td><td>paragraphs, feature descriptions</td><td>not allowed</td><td>density band</td><td>mean at most 20, max 30</td></tr>
+    <tr><td>list item</td><td>bullets, feature lists</td><td>allowed if parallel</td><td>density band</td><td>at most 25</td></tr>
+    <tr><td>caption</td><td>figcaption, alt, i18n *Caption</td><td>allowed</td><td>no self-attestation</td><td>at most 30</td></tr>
+    <tr><td>status, changelog</td><td>status sections, release notes</td><td>allowed</td><td>facts only; date stamp required</td><td>at most 20</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Metric catalogue</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Metric</th><th>Definition</th><th>Level</th><th>Engine</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td><b>Family density</b></td><td>findings of a family (structure, claims, inflation, meta) per 1,000 words of a class</td><td>class, document</td><td>native, from findings</td><td>band → dimension status</td></tr>
+    <tr><td><b>Fragment share</b></td><td>sentences without finite verb / sentences, body classes only</td><td>class</td><td>tagger; verb list fallback</td><td>band</td></tr>
+    <tr><td><b>Heading period share</b></td><td>headings ending with a period / headings</td><td>document</td><td>regex</td><td>any &gt; 0 is a finding per heading</td></tr>
+    <tr><td><b>Sentence length</b></td><td>mean, p90, share above 30, coefficient of variation</td><td>class</td><td>native</td><td>band; CV below 0.45 as info</td></tr>
+    <tr><td><b>Claim density</b></td><td>claim sentences per 1,000 words; claim = absolute quantifier, superlative or comparative, number or date, evaluative adjective</td><td>class, section</td><td>claim finder</td><td>band; per-section budget</td></tr>
+    <tr><td><b>Unsupported claims</b></td><td>claims without a registry match or named source</td><td>document</td><td>matcher; judge for ambiguous</td><td>error finding each</td></tr>
+    <tr><td><b>Stale facts</b></td><td>registry entries past their check date that a claim relies on</td><td>document</td><td>registry</td><td>warning finding each</td></tr>
+    <tr><td><b>Specificity markers</b></td><td>numbers, versions, paths, identifiers, proper nouns per 1,000 words</td><td>class</td><td>regex, later NER</td><td>info; low value in body is a finding ("concrete anchor deficit")</td></tr>
+    <tr><td><b>Readability</b></td><td>EN: Flesch-Kincaid grade; DE: Wiener Sachtextformel 4 and Amstad-Flesch; both: LIX</td><td>document</td><td>native, Vale metric as cross-check</td><td>band (Red Hat: grade below 9; HIX web band as reference)</td></tr>
+    <tr><td><b>Lexical repetition</b></td><td>MTLD; repeated sentence openers</td><td>document</td><td>native</td><td>info</td></tr>
+    <tr><td><b>Nominalisation rate</b> (DE)</td><td>nouns derived from verbs (-ung, -keit, -heit, -ion) per 100 words</td><td>class</td><td>suffix rule, later tagger</td><td>band</td></tr>
+    <tr><td><b>Voice distance</b></td><td>embedding distance of a paragraph to the accepted reference corpus of the profile</td><td>paragraph</td><td>later, mStyleDistance or judge</td><td>advisory only</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Provisional bands</h3>
+<p>Bands are per 1,000 words of copy classes (heading, lede, body, list). They come from the four
+measurements in §2 and from the operator's accepted texts, which sit below every lower bound. They are
+uncalibrated and marked as such in the output.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Family</th><th class="num">pass</th><th class="num">warning</th><th class="num">fail</th><th class="num">QS website</th><th class="num">voice-lint README</th></tr></thead>
+  <tbody>
+    <tr><td>Structure (fragments, antitheses, em dashes, colon pivots)</td><td class="num">≤ 10</td><td class="num">10 to 25</td><td class="num">&gt; 25</td><td class="num">32.0 · fail</td><td class="num">4.4 · pass</td></tr>
+    <tr><td>Claims (absolutes, unsupported)</td><td class="num">≤ 4</td><td class="num">4 to 10</td><td class="num">&gt; 10</td><td class="num">13.9 · fail</td><td class="num">6.6 · warning</td></tr>
+    <tr><td>Inflation (intensifiers, puffery)</td><td class="num">0</td><td class="num">≤ 3</td><td class="num">&gt; 3</td><td class="num">4.1 · fail</td><td class="num">0 · pass</td></tr>
+    <tr><td>Meta and time-bound</td><td class="num">0</td><td class="num">≤ 2</td><td class="num">&gt; 2</td><td class="num">0.8 · warning</td><td class="num">4.4 · fail (design doc: "planned")</td></tr>
+    <tr><td>Headings with period</td><td class="num">0</td><td class="num">n/a</td><td class="num">any</td><td class="num">10 · fail</td><td class="num">0 · pass</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="dim">The structure row excludes lists of three, which the script cannot separate from real
+enumerations. The voice-lint README fails the time-bound band by design: it is a plan and says
+"planned". This is the case for a "design document" class with its own bands, or for restricting the
+time rule to product copy.</p>
+
+<figure>
+<svg viewBox="0 0 1040 300" role="img" aria-label="Roll-up from marked spans to findings, per-class densities, dimension status and policy, with a calibration loop from Voice Studio">
+  <!-- document -->
+  <rect class="s-node" x="20" y="40" width="150" height="150" rx="8"/>
+  <text class="s-label" x="32" y="64">Document</text>
+  <line x1="32" y1="84" x2="150" y2="84" stroke="var(--ink-3)" stroke-width="2"/>
+  <line x1="32" y1="100" x2="120" y2="100" stroke="var(--c-structure)" stroke-width="3"/>
+  <line x1="32" y1="116" x2="150" y2="116" stroke="var(--ink-3)" stroke-width="2"/>
+  <line x1="32" y1="132" x2="90" y2="132" stroke="var(--c-claims)" stroke-width="3"/>
+  <line x1="100" y1="132" x2="150" y2="132" stroke="var(--ink-3)" stroke-width="2"/>
+  <line x1="32" y1="148" x2="150" y2="148" stroke="var(--ink-3)" stroke-width="2"/>
+  <line x1="32" y1="164" x2="70" y2="164" stroke="var(--c-meta)" stroke-width="3"/>
+  <text class="s-tiny" x="32" y="184">spans with text class</text>
+  <path class="s-flow" d="M170 115 H200" marker-end="url(#arr)"/>
+  <!-- findings -->
+  <rect class="s-node" x="200" y="40" width="170" height="150" rx="8"/>
+  <text class="s-label" x="212" y="64">Findings</text>
+  <text class="s-sub" x="212" y="88">rule · family</text>
+  <text class="s-sub" x="212" y="106">severity · class</text>
+  <text class="s-sub" x="212" y="124">span · engine</text>
+  <text class="s-sub" x="212" y="142">explanation</text>
+  <text class="s-tiny" x="212" y="176">only these can block</text>
+  <path class="s-flow" d="M370 115 H400" marker-end="url(#arr)"/>
+  <!-- densities -->
+  <rect class="s-node" x="400" y="40" width="190" height="150" rx="8"/>
+  <text class="s-label" x="412" y="64">Densities per class</text>
+  <text class="s-sub" x="412" y="88">structure /1,000 w</text>
+  <text class="s-sub" x="412" y="106">claims /1,000 w</text>
+  <text class="s-sub" x="412" y="124">inflation, meta</text>
+  <text class="s-sub" x="412" y="142">lengths, readability</text>
+  <text class="s-tiny" x="412" y="176">measurements, not scores</text>
+  <path class="s-flow" d="M590 115 H620" marker-end="url(#arr)"/>
+  <!-- status -->
+  <rect class="s-node" x="620" y="40" width="180" height="150" rx="8"/>
+  <text class="s-label" x="632" y="64">Dimension status</text>
+  <rect class="badge-ok" x="632" y="78" width="156" height="22" rx="6" stroke-width="1.2"/>
+  <text class="t-ok" x="642" y="94">✓ pass · below band</text>
+  <rect class="badge-warn" x="632" y="106" width="156" height="22" rx="6" stroke-width="1.2"/>
+  <text class="t-warn" x="642" y="122">⚠ warning · in band</text>
+  <rect class="badge-bad" x="632" y="134" width="156" height="22" rx="6" stroke-width="1.2"/>
+  <text class="t-bad" x="642" y="150">✗ fail · above band</text>
+  <text class="s-tiny" x="632" y="176">score: null until calibrated</text>
+  <path class="s-flow" d="M800 115 H830" marker-end="url(#arr)"/>
+  <!-- policy -->
+  <rect class="s-node2" x="830" y="40" width="190" height="150" rx="8"/>
+  <text class="s-label" x="842" y="64">Policy</text>
+  <text class="s-sub" x="842" y="88">error findings → exit 1</text>
+  <text class="s-sub" x="842" y="106">band fail → warning</text>
+  <text class="s-sub" x="842" y="124">low coverage → incomplete</text>
+  <text class="s-sub" x="842" y="142">density alone never blocks</text>
+  <text class="s-tiny" x="842" y="176">voice-lint scoring contract</text>
+  <!-- calibration loop -->
+  <path class="s-flow" d="M710 190 V240 H495 V190" marker-end="url(#arr)" stroke-dasharray="5 4"/>
+  <rect class="s-node" x="440" y="226" width="320" height="30" rx="8"/>
+  <text class="s-sub" x="452" y="246">Voice Studio: accept, dismiss, waive → thresholds, dismissal rate</text>
+  <text class="s-tiny" x="20" y="284">Calibration data comes from human decisions on real findings, not from a model's confidence.</text>
+</svg>
+<figcaption><b>Fig. 4: From spans to policy.</b> Findings block, densities warn, scores stay null.
+Voice Studio closes the loop: every accept or dismiss on a finding is a labelled example, and the
+dismissal rate per rule is the precision measure that decides which rules keep their severity.</figcaption>
+</figure>
+
+<h3>Scoring</h3>
+<p>Three forms of score are conceivable. They are listed in the order in which they become
+defensible.</p>
+<ul>
+  <li><b>Status per dimension and per class</b> (pass, warning, fail, insufficient evidence). Available
+      from the first run. This is what a card gate and a CI check consume.</li>
+  <li><b>Length-normalised issue score</b> after the first calibration round, in the Acrolinx form:
+      words / (words + weighted issues) per family, weights from the dismissal rates. It orders documents
+      for review and shows trends. It does not gate.</li>
+  <li><b>Calibrated 0 to 100 voice score</b> only when the calibration package of the scoring contract
+      exists: a held-out set of human judgements per language and text class, a published mapping, a
+      regression test. For a single operator the honest expectation is that this stays null for a long
+      time, and that the status view is what gets used.</li>
+</ul>
+<p>Problematic texts are identified without any score: a document ranks by its count of error findings,
+then by the number of dimensions in fail, then by the structure density. That order surfaces the Quality
+Studio page first in every corpus measured here.</p>
+
+<h2 id="enforcement"><span class="no">§8</span>Enforcement: profile, prompts, gates</h2>
+<p class="stx stx-open"><b>Status 2026-09-03:</b> Only layer 1 exists (prompt pointer to the style
+guide). Layers 0, 2 and 3 are proposed. Cards VL-6, VL-7, VL-8, AGT-a and AGT-b in §11.</p>
+<p>The operator asked for a reliable way to enforce the voice "through the prompts, the API and the
+rules of the Voice project". The evidence of §1 sets the requirement: the Quality Studio page was
+written while the canonical style guide had a "Public tone" section and while fifteen runtime prompt
+templates instructed agents to treat that guide as authoritative. The instruction did not hold. The
+alignment research in §5 explains why it cannot hold alone. Enforcement therefore has four layers, and
+only layer 2 is a gate.</p>
+
+<figure>
+<svg viewBox="0 0 1040 400" role="img" aria-label="Four enforcement layers: source profile and facts, prevention through prompt contract, detection through CLI, CI and gate, review through Voice Studio, with a calibration loop back to the source">
+  <defs>
+    <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="var(--ink-3)"/>
+    </marker>
+  </defs>
+  <!-- layer 0 -->
+  <rect class="s-node" x="20" y="30" width="1000" height="66" rx="8"/>
+  <text class="s-label" x="34" y="54">Layer 0 · Source</text>
+  <text class="s-sub" x="34" y="76">Repository-owned, versioned: .voice-lint/profile.yml (rules, classes, bands, examples) and .voice-lint/facts.yml (claims with source and check date)</text>
+  <rect class="badge-warn" x="840" y="42" width="166" height="22" rx="6" stroke-width="1.2"/>
+  <text class="t-warn" x="850" y="58">proposed · VL-6, VL-7</text>
+
+  <!-- layer 1 -->
+  <rect class="s-node" x="20" y="116" width="1000" height="66" rx="8"/>
+  <text class="s-label" x="34" y="140">Layer 1 · Prevention</text>
+  <text class="s-sub" x="34" y="162">Voice contract block generated from the profile into runner and orchestrator prompts: 12 rules, 5 accepted and 5 rejected examples, claim budget, facts pointer</text>
+  <rect class="badge-bad" x="700" y="128" width="306" height="22" rx="6" stroke-width="1.2"/>
+  <text class="t-bad" x="710" y="144">✗ today: one-line pointer in 15 templates, page shipped anyway</text>
+
+  <!-- layer 2 -->
+  <rect class="lane-det" x="20" y="202" width="1000" height="90" rx="8"/>
+  <text class="t-det" x="34" y="226">Layer 2 · Detection (the gate)</text>
+  <rect class="s-node2" x="34" y="240" width="200" height="40" rx="6"/>
+  <text class="s-sub" x="46" y="265">pre-commit · voice-lint check</text>
+  <rect class="s-node2" x="254" y="240" width="230" height="40" rx="6"/>
+  <text class="s-sub" x="266" y="265">CI of WEB, AOW, QSW · SARIF, exit 1</text>
+  <rect class="s-node2" x="504" y="240" width="250" height="40" rx="6"/>
+  <text class="s-sub" x="516" y="265">Agent Studio gate step, publicCopy repos</text>
+  <rect class="s-node2" x="774" y="240" width="232" height="40" rx="6"/>
+  <text class="s-sub" x="786" y="265">MCP self-check before [[TASK_DONE]]</text>
+
+  <!-- layer 3 -->
+  <rect class="s-node" x="20" y="312" width="1000" height="66" rx="8"/>
+  <text class="s-label" x="34" y="336">Layer 3 · Review</text>
+  <text class="s-sub" x="34" y="358">Voice Studio: findings with spans, accept / dismiss / waive, claims ledger, sidecars with hash, handover "make this a task" into Agent Studio</text>
+  <rect class="badge-warn" x="840" y="324" width="166" height="22" rx="6" stroke-width="1.2"/>
+  <text class="t-warn" x="850" y="340">proposed · VL-10</text>
+
+  <!-- arrows -->
+  <path class="s-flow" d="M1030 63 V345" stroke-dasharray="5 4"/>
+  <path class="s-flow" d="M1030 345 H1022" marker-end="url(#arr2)"/>
+  <path class="s-flow" d="M12 345 V63" stroke-dasharray="5 4"/>
+  <path class="s-flow" d="M12 63 H18" marker-end="url(#arr2)"/>
+  <text class="s-tiny" x="20" y="396">Right edge: the profile feeds every layer. Left edge: review decisions feed back into rules, examples and bands.</text>
+</svg>
+<figcaption><b>Fig. 5: Enforcement layers.</b> Prevention lowers the finding count, detection
+decides, review calibrates. The profile is the single source; nothing in a prompt or a gate exists
+that is not derived from it.</figcaption>
+</figure>
+
+<h3>Layer 0: profile and facts registry</h3>
+<p>The profile format of voice-lint already carries language, terms, avoided phrases, rule severities,
+examples and policy. Three extensions: a <code>classes</code> section with per-class bands, a
+<code>rules</code> section that can enable the structural rules of §3, and a pointer to the facts
+registry. The registry is a new file. Each entry is one checkable statement with its source and a check
+date.</p>
+<pre><code># .voice-lint/facts.yml (proposed shape)
+- id: qs.repo.components
+  statement: "The repository contains the core library, the CLI, the review API and the Angular browser."
+  source: "src/, frontend/ in agent-orc/quality-studio"
+  checked: 2026-09-03
+  expires: 2026-12-03
+- id: qs.ci.build
+  statement: "A build workflow runs on GitHub Actions."
+  source: ".github/workflows/build.yml"
+  checked: 2026-09-03
+- id: qs.package.none
+  statement: "No package is published."
+  source: "NuGet search, 2026-09-03"
+  checked: 2026-09-03
+  expires: 2026-10-03</code></pre>
+<p>The claim finder marks claim sentences; the matcher looks for a registry statement that covers the
+claim (token overlap first, judge for the remainder). A claim without a match is an error finding
+"unsupported claim". A matched claim whose fact has expired is a warning "stale fact". The registry is
+deliberately narrow: it verifies that the project has written down what it claims and when it last
+checked. It does not verify the world. This keeps voice-lint's stated non-goal (no general fact
+checking) and still catches "Founded 2026-07-11" and "covered by CI", because neither would be in a
+registry.</p>
+
+<h3>Layer 1: prompt contract</h3>
+<p>The pointer "consult the style guide" is replaced by a generated block of at most 40 lines that the
+prompt composer inserts for tasks touching repositories flagged as public copy. The block is generated
+from the profile so that prompt and gate never diverge. It states the twelve rules in one line each,
+shows five accepted and five rejected sentences from the profile examples, states the claim budget, and
+names the facts file. It ends with the instruction to run the self-check tool before reporting
+completion. Prevention is worth doing because it lowers the number of findings a gate has to bounce;
+it is not worth trusting.</p>
+
+<h3>Layer 2: detection</h3>
+<ul>
+  <li><b>Pre-commit</b> in the website and documentation repositories runs <code>voice-lint check</code>
+      on changed files, the Vale pre-commit pattern.</li>
+  <li><b>CI</b> in WEB, AOW and QSW runs the same check on push and pull request, fails on error
+      findings, and publishes SARIF through reviewdog so findings appear as annotations. Vale's action
+      is the model; local and CI versions are pinned to the same release.</li>
+  <li><b>Agent Studio gate step.</b> Cards on repositories with <code>publicCopy: true</code> in the
+      registry get a post-step that runs the check on the card's diff scope. Error findings send the card
+      to review with the findings attached, the way test failures do today. The step reuses the existing
+      gate executor; it needs no new pipeline concept.</li>
+  <li><b>MCP self-check.</b> The voice-lint MCP tool (planned in the architecture) lets an agent lint its
+      own draft before completion. The prompt block asks for it; the gate does not rely on it.</li>
+</ul>
+
+<h3>Layer 3: review</h3>
+<p>Voice Studio is described in §9. Its role in enforcement is calibration and exceptions: a human
+accepts or dismisses findings, waives a rule for a passage with a reason, maintains the facts registry,
+and turns a finding into a card when the fix is not a one-line edit.</p>
+
+<div class="box accent">
+  <h4>Bounded rewrite loop for agents</h4>
+  <p>When a gate bounces a text, the agent receives the JSON findings, rewrites the affected spans, and
+  the check runs again. Two rounds are the cap. voice-lint's principle "analysis before rewriting"
+  stays intact: the linter never rewrites; the agent or the human does, and the linter measures the
+  result.</p>
+</div>
+
+<h2 id="studio"><span class="no">§9</span>Voice Studio</h2>
+<p class="stx stx-open"><b>Status 2026-09-03:</b> Concept. Nothing built. Slices S0 to S5 below;
+placement decision D3.</p>
+<p>The operator asked for a Voice Studio "like Quality Studio". Quality Studio has a documented shape:
+standing review statements per unit and kind, stored as sidecar files next to the code with the hash of
+the reviewed content; runs with caps and a ledger; a three-pane browser; a finding lifecycle; a handover
+into Agent Studio. Most of it transfers directly, because prose in a repository has the same properties
+as code in a repository: it has a path, a content hash, a history and an owner.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Quality Studio</th><th>Voice Studio</th><th>Note</th></tr></thead>
+  <tbody>
+    <tr><td>Hierarchy project → module → file → function</td><td>repository → document → section → paragraph; text class on every node</td><td>The class replaces the language-level type.</td></tr>
+    <tr><td>Review kinds: code, security, performance</td><td>Dimensions: structure, claims, inflation, meta, readability; language as a second axis</td><td>One sidecar per document, dimensions inside it.</td></tr>
+    <tr><td><code>.quality/reviews/files/&lt;file&gt;.&lt;hash&gt;.review-meta.&lt;kind&gt;.json</code></td><td><code>.voice-lint/reviews/&lt;doc&gt;.voice-meta.json</code> with <code>reviewedHash</code>, <code>profileHash</code>, <code>rulesetVersion</code>, findings with dispositions, measurements, status per dimension</td><td>voice-lint's comparison keys already define the compatibility fields.</td></tr>
+    <tr><td>fresh, stale, drift, missing</td><td>same: content hash mismatch is stale; profile or ruleset change is drift; no sidecar is missing</td><td>Missing is shown as absence, never as a fail.</td></tr>
+    <tr><td>Runs with token and cost caps, monthly ledger</td><td>Runs as sweeps over documents; caps apply to the judge lane only; ledger of judge tokens</td><td>Deterministic lanes are free and always run.</td></tr>
+    <tr><td>Finding lifecycle open, accepted, waived, false-positive, resolved</td><td>same, plus baseline-existing</td><td>Every disposition is a calibration label.</td></tr>
+    <tr><td>Grades A to F with rationale</td><td>not carried: status per dimension until a calibration exists</td><td>Scoring contract of voice-lint.</td></tr>
+    <tr><td>Three panes: explorer, editor with overlays, findings</td><td>documents, text with marked spans, findings</td><td>Same component family (studio tokens).</td></tr>
+    <tr><td>Scorecard per repository</td><td>documents by status, error findings, densities per class, stale sidecars, facts about to expire</td><td></td></tr>
+    <tr><td>Sensors first, agent second</td><td>deterministic lanes first, judge second</td><td>Same principle, same reason.</td></tr>
+    <tr><td>Handover "make this a task"</td><td>same, through the task mutation path of Agent Studio</td><td>Voice Studio calls Agent Studio, not the reverse.</td></tr>
+    <tr><td>url-preview-embed sender</td><td>same contract</td><td>Quality Studio is the reference sender.</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Four things are specific to prose and have no counterpart in Quality Studio.</p>
+<ul>
+  <li><b>Span marks in the text pane.</b> A finding underlines the exact words. voice-lint's finding
+      contract requires the span; the pane renders it. Filtering by family or rule changes the marks,
+      never the text.</li>
+  <li><b>Profile and example editor.</b> The profile lives in the repository and is edited as YAML. The
+      Studio shows it as rules with severities, class bands, and the accepted and rejected corpus, with a
+      "try text" field that lints a sentence live against the profile.</li>
+  <li><b>Claims ledger.</b> The facts registry as a table: statement, source, checked, expires, and the
+      claims in the corpus that rely on it. A queue of unmatched claims to register, rewrite or waive.</li>
+  <li><b>Rewrite diff.</b> When an agent loop or a human rewrites a flagged span, the Studio shows the
+      before and after with the findings of both versions. This is where the calibration examples come
+      from.</li>
+</ul>
+
+<figure>
+<svg viewBox="0 0 1040 470" role="img" aria-label="Voice Studio wireframe: top bar, three panes for documents, text with marked spans and findings, bottom tabs">
+  <!-- top bar -->
+  <rect class="s-node2" x="20" y="20" width="1000" height="36" rx="8"/>
+  <text class="s-label" x="34" y="43">Voice Studio</text>
+  <text class="s-sub" x="150" y="43">quality-studio-website · profile agent-orc-public-copy@3f2a · ruleset 0.3</text>
+  <rect class="badge-warn" x="700" y="27" width="130" height="22" rx="6" stroke-width="1.2"/>
+  <text class="t-warn" x="710" y="43">⚠ 3 documents stale</text>
+  <rect class="s-node" x="850" y="27" width="160" height="22" rx="6"/>
+  <text class="s-sub" x="862" y="43">Run check · judge off</text>
+
+  <!-- left pane -->
+  <rect class="s-node" x="20" y="68" width="240" height="330" rx="8"/>
+  <text class="s-label" x="34" y="92">Documents</text>
+  <g class="s-sub">
+    <text x="34" y="120">▾ index.html (en)</text>
+    <circle cx="44" cy="140" r="4" fill="var(--bad)"/><text x="56" y="144">hero · 2 findings</text>
+    <circle cx="44" cy="162" r="4" fill="var(--bad)"/><text x="56" y="166">status · 7 findings</text>
+    <circle cx="44" cy="184" r="4" fill="var(--warn)"/><text x="56" y="188">workspace · 3 findings</text>
+    <circle cx="44" cy="206" r="4" fill="var(--ok)"/><text x="56" y="210">handover · 0 findings</text>
+    <text x="34" y="238">▸ index.html (de)</text>
+    <circle cx="44" cy="258" r="4" fill="var(--ink-3)"/><text x="56" y="262">README.md · not reviewed</text>
+  </g>
+  <text class="s-tiny" x="34" y="300">chips: red error · amber warning · green pass</text>
+  <text class="s-tiny" x="34" y="316">grey not reviewed</text>
+  <rect class="s-node2" x="34" y="340" width="212" height="44" rx="6"/>
+  <text class="s-tiny" x="44" y="358">Scorecard</text>
+  <text class="s-sub" x="44" y="376">12 docs · 4 fail · 6 warn · 2 pass</text>
+
+  <!-- center pane -->
+  <rect class="s-node" x="280" y="68" width="470" height="330" rx="8"/>
+  <text class="s-label" x="294" y="92">index.html · en · section "status" · class: heading, intro</text>
+  <text class="s-sub" x="294" y="126" style="font-size:15px;font-weight:600">Open development.</text>
+  <line x1="294" y1="131" x2="416" y2="131" stroke="var(--c-structure)" stroke-width="3"/>
+  <text class="s-sub" x="294" y="158">Founded 2026-07-11. Core library, CLI, review API, and the</text>
+  <line x1="294" y1="163" x2="426" y2="163" stroke="var(--c-claims)" stroke-width="3"/>
+  <text class="s-sub" x="294" y="182">Angular browser ship from one repository and are covered by CI.</text>
+  <line x1="600" y1="187" x2="686" y2="187" stroke="var(--c-claims)" stroke-width="3"/>
+  <text class="s-sub" x="294" y="206">Open research is labeled as research: whether a code graph joins</text>
+  <line x1="502" y1="211" x2="512" y2="211" stroke="var(--c-structure)" stroke-width="3"/>
+  <text class="s-sub" x="294" y="230">as a graphical meta layer is a time-boxed spike, not a decision.</text>
+  <line x1="636" y1="235" x2="722" y2="235" stroke="var(--c-structure)" stroke-width="3"/>
+  <text class="s-sub" x="294" y="254">This page describes what exists.</text>
+  <line x1="294" y1="259" x2="504" y2="259" stroke="var(--c-meta)" stroke-width="3"/>
+  <rect class="s-node2" x="294" y="290" width="442" height="92" rx="6"/>
+  <text class="s-tiny" x="304" y="308">Rewrite (agent loop, round 1) · 36 words · 0 findings</text>
+  <text class="s-sub" x="304" y="330">Status. The repository contains the core library, the CLI, the</text>
+  <text class="s-sub" x="304" y="348">review API and the Angular browser. A build workflow runs on</text>
+  <text class="s-sub" x="304" y="366">GitHub Actions. No package is published.</text>
+
+  <!-- right pane -->
+  <rect class="s-node" x="770" y="68" width="250" height="330" rx="8"/>
+  <text class="s-label" x="784" y="92">Findings · 7</text>
+  <g>
+    <rect class="badge-bad" x="784" y="104" width="222" height="40" rx="6" stroke-width="1.2"/>
+    <text class="t-bad" x="794" y="120">R1 heading period · error</text>
+    <text class="s-tiny" x="794" y="136">"Open development." · Vale</text>
+    <rect class="badge-bad" x="784" y="150" width="222" height="40" rx="6" stroke-width="1.2"/>
+    <text class="t-bad" x="794" y="166">R5 unsupported claim · error</text>
+    <text class="s-tiny" x="794" y="182">"Founded 2026-07-11" · no fact</text>
+    <rect class="badge-bad" x="784" y="196" width="222" height="40" rx="6" stroke-width="1.2"/>
+    <text class="t-bad" x="794" y="212">R5 unsupported claim · error</text>
+    <text class="s-tiny" x="794" y="228">"covered by CI" · no fact</text>
+    <rect class="badge-warn" x="784" y="242" width="222" height="40" rx="6" stroke-width="1.2"/>
+    <text class="t-warn" x="794" y="258">R8 antithesis · warning</text>
+    <text class="s-tiny" x="794" y="274">"a spike, not a decision"</text>
+    <rect class="badge-bad" x="784" y="288" width="222" height="40" rx="6" stroke-width="1.2"/>
+    <text class="t-bad" x="794" y="304">R9 self-attestation · error</text>
+    <text class="s-tiny" x="794" y="320">"This page describes what exists."</text>
+  </g>
+  <rect class="s-node2" x="784" y="340" width="106" height="26" rx="6"/>
+  <text class="s-tiny" x="794" y="358">accept · dismiss · waive</text>
+  <rect class="s-node2" x="900" y="340" width="106" height="26" rx="6"/>
+  <text class="s-tiny" x="910" y="358">make this a task →</text>
+
+  <!-- bottom tabs -->
+  <rect class="s-node2" x="20" y="410" width="1000" height="36" rx="8"/>
+  <text class="s-sub" x="34" y="433">Text</text>
+  <text class="s-sub" x="90" y="433">Claims ledger · 3 unmatched</text>
+  <text class="s-sub" x="300" y="433">Profile and examples</text>
+  <text class="s-sub" x="470" y="433">Runs · #12</text>
+  <text class="s-sub" x="580" y="433">Scorecard</text>
+</svg>
+<figcaption><b>Fig. 6: Voice Studio, working state.</b> The specimen of §1 as it would appear:
+document tree with status chips, the text with marked spans and the agent's rewrite underneath, the
+findings with dispositions and the handover. The layout and tokens are those of Quality Studio; only
+the middle pane changes from code overlays to text marks.</figcaption>
+</figure>
+
+<h3>Architecture and placement</h3>
+<p>Voice Studio is a browser application over the voice-lint loopback API that the architecture already
+plans for M3. The API executes checks and runs, writes sidecars and serves the tree; the browser never
+starts a process, in line with Quality Studio. The recommended placement is inside the voice-lint
+repository as <code>apps/voice-studio</code>, the way Quality Studio keeps its frontend in the product
+repository: one version, one CI, one release. A separate repository would be justified only if the
+Studio outgrows the linter. Stack: Angular with the studio token family (Quality Studio's
+<code>DESIGN-KINSHIP</code> note documents the shared vocabulary), TypeScript core shared with the CLI.</p>
+
+<h3>Slices</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Slice</th><th>Delivers</th><th>Acceptance</th></tr></thead>
+  <tbody>
+    <tr><td><b>S0 Read-only browser</b></td><td>Loads the JSON of <code>voice-lint check --format json</code> for a repository; document tree with status chips; text pane with marks; findings pane</td><td>The Quality Studio website renders with the findings of this dossier; no persistence</td></tr>
+    <tr><td><b>S1 Sidecars and lifecycle</b></td><td>Writes <code>.voice-lint/reviews/*.voice-meta.json</code>; accept, dismiss, waive with reason; staleness by hash; baseline creation</td><td>A second run marks changed documents stale and keeps dispositions for unchanged spans</td></tr>
+    <tr><td><b>S2 Profile and examples</b></td><td>Profile view with rules, bands and corpus; "try text" live lint; edits written back to <code>profile.yml</code></td><td>Adding a rejected example changes the next run; the profile hash changes and marks drift</td></tr>
+    <tr><td><b>S3 Runs</b></td><td>Sweeps with the judge lane, caps, run history, token ledger</td><td>A capped run stops at the next document boundary and reports coverage</td></tr>
+    <tr><td><b>S4 Claims ledger</b></td><td>Facts editor; unmatched-claims queue; expiry warnings</td><td>Registering a fact resolves its unsupported-claim findings on the next run</td></tr>
+    <tr><td><b>S5 Handover and embed</b></td><td>"Make this a task" into Agent Studio; url-preview-embed sender; scorecard</td><td>A card is created through the task mutation path with the finding attached; the Studio reports its URL to the preview bar</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="revision"><span class="no">§10</span>Concept revision for voice-lint</h2>
+<p class="stx stx-part"><b>Status 2026-09-03:</b> Proposed changes to the design documents of
+2026-08-09. The documents are sound in contract and boundary; the revision changes priority and adds
+three concepts. Decisions D2, D5 and D6.</p>
+<p>The voice-lint design runs to 276 KB across nine documents and has not been committed. It is thorough
+on contracts, trust boundaries, provider safety and privacy. Measured against the operator's actual
+problem, its centre of gravity is in the wrong place: about two fifths of the architecture document
+concern provider adapters and subscription boundaries, while the rule corpus that would have flagged the
+specimen is a bullet list. The revision keeps the contracts and moves the effort.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Area</th><th>Current design (2026-08-09)</th><th>Revision</th><th>Reason</th></tr></thead>
+  <tbody>
+    <tr><td><b>Rule taxonomy</b></td><td>SLOP categories led by vocabulary: formulaic openings, generic transitions, empty intensifiers, vague attribution, repetition</td><td>Add a structure family as a first-class rule set: heading form, fragments, antithesis, pivots, self-attestation (R1, R2, R8, R9). Keep the vocabulary categories.</td><td>The specimen has zero vocabulary hits and 76 structural ones (§2).</td></tr>
+    <tr><td><b>Claims</b></td><td>Non-goal: "factual verification, citation validation"</td><td>Add a claims dimension backed by a repository-owned facts registry (R4, R5). Verification against the registry, not against the world. Keep the non-goal for the world.</td><td>The operator's complaint is a claims complaint ("inaccurate"). A registry catches it without a fact-checker.</td></tr>
+    <tr><td><b>Document model</b></td><td>Prose regions with source spans; Markdown and plain text</td><td>Add text classes on every region; add HTML and i18n JSON dictionaries as input formats.</td><td>Thresholds only make sense per class; the websites store copy as JSON.</td></tr>
+    <tr><td><b>Dimensions</b></td><td>clarity, specificity, concision, information density, voice fit, rhythm, structure</td><td>Keep. Map the families: structure → rhythm and structure; inflation → voice fit; meta → voice fit; claims → new dimension "claims".</td><td>The seven names are reasonable; one is missing.</td></tr>
+    <tr><td><b>First profile</b></td><td>Example profile <code>agent-orc-documentation</code> with five avoided phrases</td><td>A real profile <code>agent-orc-public-copy</code> (EN and DE) from the operator's accepted and rejected corpus, with class bands, applied to QSW, AOW, WEB and the organisation READMEs as the dogfood corpus.</td><td>Calibration needs a real corpus and a real user; both exist.</td></tr>
+    <tr><td><b>Milestones</b></td><td>M0 contracts → M1 offline core → M2 baselines, LanguageTool → M3 API → M4 judges → M5 scores → M6 AI-origin</td><td>M0 trimmed to the schemas of finding, profile, sidecar and facts → M1 structural rules, native metrics, classes, CLI → M2 claims, facts, CI, gate → M3 API, MCP, Voice Studio S0 to S2 → M4 advisory judge and calibration. LanguageTool, scores and AI-origin later, undated.</td><td>Deliver the gate before the adapters.</td></tr>
+    <tr><td><b>Provider adapters</b></td><td>Personal subscription adapters for Codex, Copilot, Gemini, Claude with capability probes, self-tests and billing classes</td><td>Defer. The first judge is a metered API key or a local model. Keep the documents as the later contract.</td><td>The operator runs a fleet with its own model routing; the linter does not need to reproduce it.</td></tr>
+    <tr><td><b>AI-origin signal</b></td><td>M6, local-only, abstaining, never gating</td><td>Defer indefinitely; keep the document.</td><td>Not part of the problem; the design already keeps it out of policy.</td></tr>
+    <tr><td><b>German</b></td><td>DE and EN parity from M1; LanguageTool for grammar</td><td>Parity for regex rules and native formulas (WSTF, LIX, Amstad) from M1; German tagging through LanguageTool in connected mode later.</td><td>No German style package exists anywhere; the native formulas are closed-form.</td></tr>
+    <tr><td><b>Repository</b></td><td>No commits; 276 KB of design documents</td><td>First commit as-is; add <code>docs/core-in-one-page.md</code>; mark deferred sections in place.</td><td>History before revision; a reader needs an entry point.</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="box ok">
+  <h4>What stays unchanged</h4>
+  <ul>
+    <li>Every finding has a rule, a category, a severity, an engine, an explanation and a span in the original source.</li>
+    <li>A scalar score never blocks; blocking needs concrete active findings; missing coverage is "incomplete", not a failure.</li>
+    <li>The repository profile cannot select providers, endpoints or credentials; the runtime configuration does.</li>
+    <li><code>strict_offline</code> is the default and the CI mode.</li>
+    <li>Vale is the rule engine; native TypeScript metrics run on the internal document model.</li>
+    <li>The linter explains and measures; it does not rewrite.</li>
+    <li>Apache-2.0, English documentation, provenance for every imported rule.</li>
+  </ul>
+</div>
+
+<h2 id="programme"><span class="no">§11</span>Programme and decisions</h2>
+<p class="stx stx-open"><b>Status 2026-09-03:</b> No card exists. Keys VL-n are proposed; AGT and QSW
+cards belong to their projects. Model tier follows the token policy: design work on the strong model,
+mechanical work on the small one.</p>
+<div class="box warn">
+  <h4>Two actions that do not wait for tooling</h4>
+  <p>The copy revision of the Quality Studio page (§1) is a content change with an operator review
+  before the push, because a push to main deploys. The first commit of the voice-lint repository
+  preserves the design state before the revision changes it. Both are one card each.</p>
+</div>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Phase</th><th>Card</th><th>Content</th><th>Tier</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td rowspan="2"><b>0 · now</b></td><td>QSW-a</td><td>Copy revision per §1: ten headings, status section, footer line, EN and DE; operator review; no push without GO</td><td>strong (copy) </td><td><span class="pill new">proposed</span></td></tr>
+    <tr><td>VL-1</td><td>First commit of voice-lint with the existing documents and this dossier; <code>core-in-one-page.md</code>; deferred sections marked</td><td>small</td><td><span class="pill new">proposed</span></td></tr>
+    <tr><td rowspan="5"><b>1 · offline core</b></td><td>VL-2</td><td>Document model with text classes; parsers for Markdown, HTML and i18n JSON; spans in the original</td><td>strong</td><td><span class="pill new">proposed</span></td></tr>
+    <tr><td>VL-3</td><td>Structure rule family as Vale style packs EN and DE (R1, R6, R8, R9, R10), fixtures from the specimen and the operator's corpus, provenance for imported lists</td><td>strong</td><td><span class="pill new">proposed</span></td></tr>
+    <tr><td>VL-4</td><td>Native metrics: fragments, lengths, densities, specificity markers, WSTF, LIX, Amstad, Flesch-Kincaid; provisional bands per class</td><td>strong</td><td><span class="pill new">proposed</span></td></tr>
+    <tr><td>VL-5</td><td>CLI <code>check</code> with text and JSON output, exit codes, pre-commit hook; M1 acceptance tests incl. the no-socket test</td><td>small</td><td><span class="pill new">proposed</span></td></tr>
+    <tr><td>VL-6</td><td>Profile <code>agent-orc-public-copy</code> EN and DE with class bands and example corpus; dogfood run over QSW, AOW, WEB and organisation READMEs; baseline files</td><td>strong</td><td><span class="pill new">proposed</span></td></tr>
+    <tr><td rowspan="4"><b>2 · claims and gates</b></td><td>VL-7</td><td>Facts registry schema, claim finder, matcher; registries seeded for Quality Studio and Agent Studio</td><td>strong</td><td><span class="pill new">proposed</span></td></tr>
+    <tr><td>VL-8</td><td>CI workflow for the website repositories: check on push and PR, SARIF via reviewdog, pinned versions</td><td>small</td><td><span class="pill new">proposed</span></td></tr>
+    <tr><td>AGT-a</td><td>Voice contract block generated from the profile into runner and orchestrator prompts for publicCopy repositories; replaces the one-line pointer</td><td>small</td><td><span class="pill new">proposed</span></td></tr>
+    <tr><td>AGT-b</td><td>Voice gate post-step in the card pipeline for publicCopy repositories; findings attached to the card; registry flag</td><td>strong</td><td><span class="pill new">proposed</span></td></tr>
+    <tr><td rowspan="3"><b>3 · API and Studio</b></td><td>VL-9</td><td>Loopback API with session token (M3 contract) and MCP tool <code>lint_text</code> for agent self-check</td><td>strong</td><td><span class="pill new">proposed</span></td></tr>
+    <tr><td>VL-10</td><td>Voice Studio S0 to S2 in <code>apps/voice-studio</code></td><td>strong</td><td><span class="pill new">proposed</span></td></tr>
+    <tr><td>VL-11</td><td>Advisory judge adapter (API key or local model) for R7 and unmatched claims; caps; Studio runs S3</td><td>strong</td><td><span class="pill new">proposed</span></td></tr>
+    <tr><td><b>4 · calibration</b></td><td>VL-12</td><td>Label set from Studio dispositions; dismissal rate per rule; bands v1; Studio S4 and S5</td><td>strong</td><td><span class="pill new">proposed</span></td></tr>
+  </tbody>
+</table>
+</div>
+<p class="dim">Dependencies: VL-2 before VL-3 and VL-4; VL-5 closes phase 1; VL-6 needs VL-5; VL-7 needs
+VL-2; AGT-a and AGT-b need VL-6; VL-9 needs VL-5; VL-10 needs VL-9; VL-11 needs VL-9; VL-12 needs VL-10.
+Phases 1 and 2 are the gate; phase 3 is the Studio.</p>
+
+<h3>Decisions</h3>
+<p>Six decisions are open for the operator. Each is a checkbox with the recommendation stated.</p>
+<div class="decision"><input type="checkbox" id="d1" data-decision-id="VL-W1-D1"><label for="d1"><b>D1 · Adopt the twelve rules of §3 as the profile <code>agent-orc-public-copy</code> v1.</b><span>Recommendation: yes. The rules are derived from the accepted and rejected examples and align with Google, Microsoft, GOV.UK and GitLab where those guides speak.</span></label></div>
+<div class="decision"><input type="checkbox" id="d2" data-decision-id="VL-W1-D2"><label for="d2"><b>D2 · Add the claims dimension with a facts registry to the voice-lint scope.</b><span>Recommendation: yes, narrow: registry-backed, no world fact checking. This is the only rule that catches "Founded 2026-07-11".</span></label></div>
+<div class="decision"><input type="checkbox" id="d3" data-decision-id="VL-W1-D3"><label for="d3"><b>D3 · Place Voice Studio inside the voice-lint repository as <code>apps/voice-studio</code>.</b><span>Recommendation: yes, following the Quality Studio precedent. Alternative: a separate repository with its own release cadence.</span></label></div>
+<div class="decision"><input type="checkbox" id="d4" data-decision-id="VL-W1-D4"><label for="d4"><b>D4 · Treat "Agent Orchestrator universe" and "engineer room" as banned frames, not as product terms.</b><span>Recommendation: ban both in copy classes. If "universe" stays as the family name, it enters the profile vocabulary as a term and the rule ignores it.</span></label></div>
+<div class="decision"><input type="checkbox" id="d5" data-decision-id="VL-W1-D5"><label for="d5"><b>D5 · Defer provider adapters (M4 subscription paths) and the AI-origin signal (M6) without a date.</b><span>Recommendation: yes. The first judge uses a metered key or a local model; the documents remain as the later contract.</span></label></div>
+<div class="decision"><input type="checkbox" id="d6" data-decision-id="VL-W1-D6"><label for="d6"><b>D6 · Make the first commit of voice-lint now, with the design documents as they are.</b><span>Recommendation: yes, before any revision edits them. The repository has existed without history since 2026-08-09.</span></label></div>
+
+<h2 id="sources"><span class="no">§12</span>Sources</h2>
+<p class="dim">All external sources accessed 2026-09-03. Internal evidence is named by path.</p>
+<h3>Internal evidence</h3>
+<ul class="sources">
+  <li>quality-studio-website/index.html, commits of 2026-09-01 (three commits incl. "verification-pass corrections"); i18n dictionary keys <code>stTitle</code>, <code>stIntro</code></li>
+  <li>agent-orc/quality-studio: first commit 2026-07-11; <code>.github/workflows/build.yml</code>, <code>release-canary.yml</code>, <code>deploy-website.yml</code>; <code>frontend/DESIGN-KINSHIP.md</code>; <code>docs/operations/*/workbench.json</code></li>
+  <li>agent-taskboard: <code>docs/start/contribution-and-style-guide.html</code> (section "Public tone"); <code>prompts/runtime/*.md</code> (15 templates referencing the guide)</li>
+  <li>voice-lint: <code>docs/scoring.md</code>, <code>docs/product-scope.md</code>, <code>docs/architecture.md</code>, <code>docs/research.md</code>, <code>docs/market-landscape.md</code>, <code>docs/implementation-plan.md</code>, <code>examples/voice-profile.yml</code> (all 2026-08-09, uncommitted)</li>
+  <li>Operator calibration: organisation profile rework 2026-07-22 ("Tone-of-Voice, verbindlich"); website copy round 2026-08-08 ("Each part does one job." rejected)</li>
+  <li>Measurement script and raw output: <code>measure.py</code>, <code>measurements.md</code> in this folder</li>
+</ul>
+<h3>Style guides and enforcement</h3>
+<ul class="sources">
+  <li><a href="https://developers.google.com/style/tone">developers.google.com/style/tone</a>, <a href="https://developers.google.com/style/word-list">/word-list</a>, <a href="https://developers.google.com/style/future">/future</a>, <a href="https://developers.google.com/style/timeless-documentation">/timeless-documentation</a></li>
+  <li><a href="https://learn.microsoft.com/en-us/style-guide/top-10-tips-style-voice">learn.microsoft.com/en-us/style-guide/top-10-tips-style-voice</a>, <a href="https://learn.microsoft.com/en-us/style-guide/scannable-content/headings">/scannable-content/headings</a></li>
+  <li><a href="https://guidance.publishing.service.gov.uk/writing-to-gov-uk-standards/writing-guidelines/clear-language/">guidance.publishing.service.gov.uk … clear-language</a>, <a href="https://guidance.publishing.service.gov.uk/writing-to-gov-uk-standards/style-guides/a-to-z-style-guide/">a-to-z-style-guide</a></li>
+  <li><a href="https://redhat-documentation.github.io/supplementary-style-guide/">redhat-documentation.github.io/supplementary-style-guide</a>, <a href="https://github.com/redhat-documentation/vale-at-red-hat">github.com/redhat-documentation/vale-at-red-hat</a></li>
+  <li><a href="https://docs.gitlab.com/development/documentation/styleguide/">docs.gitlab.com/development/documentation/styleguide</a>, <a href="https://docs.gitlab.com/development/documentation/testing/">/testing</a></li>
+  <li><a href="https://grafana.com/docs/writers-toolkit/review/lint-prose/rules/">grafana.com/docs/writers-toolkit/review/lint-prose/rules</a></li>
+  <li><a href="https://styleguide.mailchimp.com/voice-and-tone/">styleguide.mailchimp.com/voice-and-tone</a>, <a href="https://atlassian.design/foundations/content/voice-tone">atlassian.design/foundations/content/voice-tone</a>, <a href="https://www.ibm.com/brand/systems/developer/brand/voice">ibm.com/brand/systems/developer/brand/voice</a></li>
+  <li><a href="https://keepachangelog.com/en/1.1.0/">keepachangelog.com</a>, <a href="https://common-changelog.org">common-changelog.org</a>, <a href="https://docs.kernel.org/process/submitting-patches.html">docs.kernel.org/process/submitting-patches</a></li>
+  <li>FTC Policy Statement Regarding Advertising Substantiation, <a href="https://www.ftc.gov/legal-library/browse/ftc-policy-statement-regarding-advertising-substantiation">ftc.gov</a></li>
+  <li>German: <a href="https://wortliga.de/8-regeln-fur-die-textanalyse/">wortliga.de/8-regeln-fur-die-textanalyse</a>, <a href="https://wortliga.de/glossar/nominalstil/">wortliga.de/glossar/nominalstil</a>, <a href="https://klartext.uni-hohenheim.de/hix">klartext.uni-hohenheim.de/hix</a>, <a href="https://de.wikipedia.org/wiki/Lesbarkeitsindex">de.wikipedia.org/wiki/Lesbarkeitsindex</a> (Wiener Sachtextformel), <a href="https://en.wikipedia.org/wiki/Lix_(readability_test)">LIX</a></li>
+</ul>
+<h3>Markers of generated prose</h3>
+<ul class="sources">
+  <li>Kobak et al., excess vocabulary in PubMed abstracts: <a href="https://arxiv.org/abs/2406.07016">arxiv.org/abs/2406.07016</a>; Science Advances <a href="https://www.science.org/doi/10.1126/sciadv.adt3813">10.1126/sciadv.adt3813</a></li>
+  <li>Liang et al., peer reviews: <a href="https://arxiv.org/abs/2403.07183">arxiv.org/abs/2403.07183</a>; scientific papers: <a href="https://arxiv.org/abs/2404.01268">arxiv.org/abs/2404.01268</a></li>
+  <li>Juzek and Ward, focal words, COLING 2025: <a href="https://arxiv.org/abs/2412.11385">arxiv.org/abs/2412.11385</a>; 2026 full-text study: <a href="https://arxiv.org/abs/2608.10715">arxiv.org/abs/2608.10715</a></li>
+  <li><a href="https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing">Wikipedia: Signs of AI writing</a> and its <a href="https://en.wikipedia.org/wiki/Wikipedia_talk:Signs_of_AI_writing">talk page</a></li>
+  <li>Detectors: Binoculars <a href="https://arxiv.org/abs/2401.12070">2401.12070</a>; DetectGPT <a href="https://arxiv.org/abs/2301.11305">2301.11305</a>; Ghostbuster <a href="https://aclanthology.org/2024.naacl-long.95/">NAACL 2024</a>; non-native bias, Liang et al., Patterns 2023: <a href="https://arxiv.org/abs/2304.02819">2304.02819</a>; German detectability, KONVENS 2024: <a href="https://aclanthology.org/2024.konvens-main.27/">aclanthology 2024.konvens-main.27</a></li>
+  <li>Alignment effects: <a href="https://arxiv.org/abs/2503.17965">2503.17965</a> (RLHF and detectability); <a href="https://arxiv.org/abs/2604.22142">2604.22142</a> (Voice under revision); <a href="https://arxiv.org/abs/2510.05136">2510.05136</a> (linguistic characteristics survey); <a href="https://arxiv.org/abs/2509.19163">2509.19163</a> (Measuring AI slop)</li>
+  <li>Tools: <a href="https://github.com/tbhb/vale-ai-tells">tbhb/vale-ai-tells</a>, <a href="https://github.com/halans/ai-pattern-detection">halans/ai-pattern-detection</a>, <a href="https://github.com/ahmedak/defluff">ahmedak/defluff</a>, <a href="https://github.com/MikkoParkkola/anti-ai-tell">MikkoParkkola/anti-ai-tell</a>; Willison on "slop": <a href="https://simonw.substack.com/p/gpt-4o-a-new-version-of-llm-and-more">simonw.substack.com</a></li>
+</ul>
+<h3>Tooling</h3>
+<ul class="sources">
+  <li>Vale: <a href="https://github.com/vale-cli/vale/releases/tag/v3.20.0">v3.20.0</a>, <a href="https://docs.vale.sh/checks/metric">metric checks</a>, <a href="https://github.com/vale-cli/vale-action">vale-action</a>, <a href="https://github.com/vale-cli/vale-ls">vale-ls</a>, <a href="https://vale.sh/hub">package hub</a>, <a href="https://vale.sh/docs/integrations/pre-commit">pre-commit</a></li>
+  <li>LanguageTool: <a href="https://github.com/languagetool-org/languagetool">github.com/languagetool-org/languagetool</a>, <a href="https://community.languagetool.org/rule/list?lang=de">German rule list</a>, <a href="https://dev.languagetool.org/http-server.html">HTTP server</a></li>
+  <li>textlint MCP: <a href="https://textlint.org/docs/mcp/">textlint.org/docs/mcp</a>; Harper: <a href="https://github.com/Automattic/harper">github.com/Automattic/harper</a>, German PR <a href="https://github.com/Automattic/harper/pull/3402">#3402</a>; proselint: <a href="https://github.com/amperser/proselint">amperser/proselint</a></li>
+  <li>Readability: <a href="https://github.com/pablotheissen/wstf">pablotheissen/wstf</a>, <a href="https://github.com/textstat/textstat">textstat</a>, <a href="https://hlasse.github.io/TextDescriptives/">TextDescriptives</a>, <a href="https://spacy.io/models/de">spaCy German models</a></li>
+  <li>Judges: G-Eval <a href="https://arxiv.org/abs/2303.16634">2303.16634</a>; Prometheus 2 <a href="https://arxiv.org/abs/2405.01535">2405.01535</a>; <a href="https://github.com/confident-ai/deepeval">DeepEval</a>; <a href="https://github.com/explodinggradients/ragas">Ragas</a></li>
+  <li>Integration: <a href="https://github.com/reviewdog/reviewdog">reviewdog</a>; <a href="https://docs.github.com/en/code-security/code-scanning/integrating-with-code-scanning/sarif-support-for-code-scanning">GitHub SARIF support</a></li>
+  <li>Commercial references: <a href="https://support.markup.ai/hc/en-us/articles/10210995244178-The-Acrolinx-Score-Explained">Acrolinx score</a>; <a href="https://www.grammarly.com/business/learn/brand-tones/">Grammarly brand tones</a>; <a href="https://support.writer.com/articles/2607647594-customizing-your-team-s-style-guide">Writer style guide</a></li>
+</ul>
+
+<h2 id="on-page-review"><span class="no">§13</span>JavaScript library and local Voice Studio</h2>
+<p class="stx stx-part"><b>Design revision 2026-09-06:</b> User direction: reusable JS library,
+primarily local use, a Studio that hosts website review, and Markdown support. Pilot: Quality Studio website.
+This section supersedes the delivery priority in §9–11. Implementation is pending.</p>
+
+<h3>One library, two ways to work</h3>
+<p><b>Voice Review</b> is the proposed framework-independent JavaScript library. Embed it in an
+existing developer mode or mount it inside <b>Voice Studio</b>, a local web application with a source/address
+bar, website preview or Markdown renderer, and the same review panel. The overlay, annotations,
+analysis, proposals and storage contract are shared. Consumers can supply their own source and storage adapters.</p>
+<table>
+  <thead><tr><th>Entry point</th><th>Work surface</th><th>Source connection</th></tr></thead>
+  <tbody>
+    <tr><td>Embedded JS library</td><td>The existing website, with thin underlines and a developer panel</td><td>Host-provided adapter and authenticated review client</td></tr>
+    <tr><td>Local Voice Studio</td><td>A website preview or Markdown rendered/source view</td><td>Registered local site, dev server or Markdown document</td></tr>
+    <tr><td>Unconnected URL</td><td>Browse when the website permits embedding</td><td>Inspection needs a supported bridge; edits need a matching local source. Show unavailable capabilities explicitly.</td></tr>
+  </tbody>
+</table>
+<p>Studio cannot inspect every cross-origin frame or override a site's embedding policy. A blocked URL offers
+an external browser, local-source connection or document import. The local pilot does not require a browser extension.</p>
+
+<h3>Keep the Specimen underlines</h3>
+<figure class="specimen" aria-label="Proposed on-page review with a human note">
+  <p class="sp-heading"><mark class="m-structure">Open development.</mark><sup>1</sup></p>
+  <p>Core library, CLI, review API, and the Angular browser ship from one repository and are
+  <mark class="m-claims" style="border-bottom-style:dotted">covered by CI</mark><sup>2</sup>.</p>
+  <ul class="marklist">
+    <li><b>1</b>Structure · deterministic finding: heading ends with a period.</li>
+    <li><b>2</b>Your feedback · “Too vague. State which workflow runs and what it checks.”</li>
+  </ul>
+  <figcaption>Design example. A solid line denotes an analyzer finding; a dotted line denotes human feedback.
+  The panel also names the category and origin, so color alone carries no meaning.</figcaption>
+</figure>
+<p>Select marked or unmarked text. The panel shows the exact quote, explanation, feedback type and comment.
+Save feedback first; request a proposal next. A proposal has a before/after comparison, a reason and its
+factual basis. “Confirm finding”, “Preview on page” and “Apply to local source” are distinct actions.</p>
+
+<h3>The daily workflow</h3>
+<ol>
+  <li>Open a local website or Markdown file in Studio, or enable the embedded developer mode.</li>
+  <li>Analyze the current page or give feedback immediately. Manual review does not wait for an engine.</li>
+  <li>Select a phrase, state what should change, and save. Reload or restart: the note remains.</li>
+  <li>Request a focused suggestion, write your own replacement, or prepare a bounded agent request.</li>
+  <li>Compare before and after in context. Apply only to the registered source version that was reviewed.</li>
+  <li>Re-run checks, verify the meaning and rendering, then resolve the note. Publication follows the host workflow.</li>
+</ol>
+
+<h3>Metadata belongs to the content repository</h3>
+<p>One proposed <code>.voice-lint/reviews/&lt;document&gt;.&lt;locale&gt;.voice-meta.json</code> file holds
+stable annotation IDs, exact anchors, comments, editorial judgments, proposals and history. Saving is
+acknowledged only after a durable write. Revision conflicts, failed writes and stale proposals are visible.
+Browser storage is not the source of truth. Default analyzer logs remain content-free.</p>
+<p>For the pilot, use the existing <code>data-i18n</code> keys such as <code>stIntro</code>, plus locale and
+source version. Store exact quote/context as a second anchor. Markdown uses a parsed source map and stable
+block identities. Reordering paragraphs must preserve notes; ambiguous matches require reattachment.
+Code, link destinations and Markdown syntax are excluded from prose analysis.</p>
+
+<h3>Suggestions and factual questions</h3>
+<p>Simple rule fixes and human-authored proposals work without a model. Richer agent proposals consume a
+bounded request containing selected units, comments, facts and acceptance criteria. They return a diff;
+they do not publish. A source change invalidates old proposal preconditions. Feedback becomes a profile
+example only through an explicit review of that change.</p>
+<p><b>Correction to §7–8:</b> absence from a facts registry means “unverified”, not “false”. Token overlap
+cannot establish truth. Such findings remain advisory unless a validated concrete rule and explicit policy
+justify stronger handling. Editorial state is separate from analyzer disposition and publication status.</p>
+
+<h3>Deliver the usable loop first</h3>
+<table>
+  <thead><tr><th>Package</th><th>Delivery</th><th>Acceptance</th></tr></thead>
+  <tbody>
+    <tr><td>P1</td><td>JS library, small Studio shell, website and Markdown adapters</td><td>One library works in Studio and a standalone embed; EN/DE text maps exactly.</td></tr>
+    <tr><td>P2</td><td>Durable feedback and local session</td><td>Save, reload and restart without losing notes; no overwrite across tabs.</td></tr>
+    <tr><td>P3</td><td>Initial deterministic analysis and underlines</td><td>Concrete spans, text classes, declared exclusions and surviving human notes.</td></tr>
+    <tr><td>P4</td><td>Proposals, preview and guarded source edits</td><td>Apply, recheck and human verification; reject stale edits; preserve Markdown structure.</td></tr>
+    <tr><td>P5</td><td>Bounded improvement requests and optional Agent Studio handover</td><td>One request returns one reviewable result, with no duplicate dispatch.</td></tr>
+    <tr><td>P6</td><td>Feedback-to-profile review and rollout</td><td>Review at least ten real passages across both languages before expanding.</td></tr>
+  </tbody>
+</table>
+<p>P1–P2 provide the first feedback trial. P1–P4 provide the daily-use loop. A repository dashboard,
+extensive provider adapters, calibrated scores and CI rollout can follow. These are work packages,
+not created tasks or calendar commitments. The earlier table in §11 contains fifteen entries in phases
+0–4, despite its fourteen-card/four-phase summary; retain it as historical planning.</p>
+<p><a href="../../on-page-review.md">Full proposed library, Studio, persistence, source mapping and workflow contract</a>.
+Working EN/DE website and Markdown examples: <a href="#voice-studio-current">current implementation</a>.</p>
+
+</main>
+</body>
+</html>

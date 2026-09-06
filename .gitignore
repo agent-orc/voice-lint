@@ -1,0 +1,17 @@
+node_modules/
+dist/
+coverage/
+*.log
+
+# Local diagnostics may contain text-derived data.
+.voice-lint/cache/
+.voice-lint/diagnostics/
+.voice-lint/*.token
+
+# Runtime authority and credentials belong outside repositories. These patterns
+# are defense in depth for accidental local files, not a supported project layout.
+.env
+.env.*
+!.env.example
+.voice-lint/runtime.yml
+.voice-lint/runtime.yaml

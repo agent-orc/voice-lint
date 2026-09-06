@@ -1,0 +1,82 @@
+schema_version: 1
+id: agent-orc-documentation
+
+language:
+  allowed:
+    - de
+    - en
+  default: de
+
+targets:
+  clarity:
+    weight: 1.2
+    warn_below: 75
+  specificity:
+    weight: 1.4
+    warn_below: 70
+  concision:
+    weight: 1.0
+    warn_below: 70
+  information_density:
+    weight: 1.2
+    warn_below: 70
+  voice_fit:
+    weight: 1.5
+    warn_below: 80
+  rhythm:
+    weight: 0.7
+    warn_below: 60
+  structure:
+    weight: 0.8
+    warn_below: 65
+
+voice:
+  description: >
+    Direct, technically precise, calm, and concrete. Explain decisions and
+    limitations without inflated claims or ceremonial introductions.
+  prefer:
+    - concrete verbs
+    - short introductions
+    - explicit tradeoffs
+    - examples close to the relevant claim
+  avoid:
+    - "in der heutigen schnelllebigen Welt"
+    - "es ist wichtig zu beachten"
+    - "delve into"
+    - "game changer"
+    - "revolutionary"
+  terms:
+    preferred:
+      AI: AI
+      Open Source: open source
+    forbidden:
+      - bahnbrechend
+      - revolutionär
+  examples:
+    good:
+      - good-examples/
+    bad:
+      - bad-examples/
+
+rules:
+  generic_transition:
+    severity: warning
+  empty_intensifier:
+    severity: warning
+  vague_attribution:
+    severity: error
+  semantic_repetition:
+    severity: warning
+
+policy:
+  # Requirements can make policy not_evaluated, but cannot enable an engine.
+  required_capabilities:
+    - markup_style_rules
+    - native_metrics
+  required_dimensions:
+    - clarity
+    - voice_fit
+  fail_on: error
+  # Numeric targets are advisory and inactive until a compatible calibration exists.
+  warn_below_quality_score: 70
+  minimum_coverage: 0.60

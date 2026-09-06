@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "voice-concept-revision",
+  "title": "Voice Lint concept revision",
+  "summary": "Voice Studio Preview 0.2: live Angular applications with original content/component sources, Markdown folders and explicit Coding-Agent-Runner semantic review. Current implementation: local Angular frontend, .NET backend and embeddable @voice/review JavaScript library. Website and Markdown example projects, project/file reports, durable feedback and guarded source changes. Includes model roles, Voice-specific quality evidence and Token Economy routing responsibilities. Implementation status and verification are recorded at the top of the dossier; earlier research is preserved.",
+  "entrypoint": "index.html",
+  "status": "decision-pending",
+  "phase": "decision-ready",
+  "updatedAt": "2026-09-06T19:26:47.949Z",
+  "sourceTaskKeys": [],
+  "relatedTaskKeys": [
+    "AGT-2237",
+    "WEB-12",
+    "QS-80"
+  ],
+  "key": "VL-W1"
+}
