@@ -18,7 +18,7 @@ Studio and Library form the tool group in the header. Research, AI anti-patterns
 
 ## Build and preview
 
-Run from the Voice Studio workspace:
+Run from the root of the [Voice Lint repository](https://github.com/agent-orc/voice-lint):
 
 ```sh
 npm run website:build
@@ -109,15 +109,15 @@ Target: `https://agent-orchestrator.dev/voice/`. The first public release is pen
 
 | Role | Configuration |
 | --- | --- |
-| Source | [`RobertMischke/agent-taskboard-devspace`](https://github.com/RobertMischke/agent-taskboard-devspace), directory `voice-studio/` |
-| Static artifact | Branch `voice-deploy` in the same repository |
+| Source | [`agent-orc/voice-lint`](https://github.com/agent-orc/voice-lint), branch `main`, repository root |
+| Static artifact | Branch `deploy` in the same repository; only the contents of `website/dist/voice/` |
 | Central hosting | [`agent-orc/website`](https://github.com/agent-orc/website) |
 | Server mount | Caddy serves `/voice/*` from `/srv/sites/voice/current` |
 | Server update | The central updater polls the artifact branch every five minutes and switches the current release by symlink |
 
 [deployment-manifest.json](deployment-manifest.json) records the target, source, artifact branch, mount and route list. `website:build` and `website:verify-artifact` perform no remote publication.
 
-Build the intended committed source, validate it, then publish only `website/dist/voice/` to the artifact branch. Preserve its directory structure and the other ecosystem products. The local Studio backend is not part of this artifact.
+Build and validate the intended committed `main` source from the repository root, then publish only the contents of `website/dist/voice/` at the root of `deploy`. Preserve its directory structure and the other ecosystem products. The local Studio backend is not part of this artifact.
 
 After the server has updated, compare its public files with the exact local artifact:
 

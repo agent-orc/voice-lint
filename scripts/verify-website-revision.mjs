@@ -6,12 +6,12 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from '@playwright/test';
 
 // Deliberately requires --run: preparing this script must not launch the browser.
-// node scripts/verify-website-revision.mjs --run [--base http://127.0.0.1:4184]
+// node scripts/verify-website-revision.mjs --run --website PATH [--base http://127.0.0.1:4184]
 // Artifacts contain local website screenshots and source hashes, never Studio session data.
 const workspace = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 if (!args.includes('--run')) {
-  console.log('Prepared, not executed. Run after source application/HMR: node scripts/verify-website-revision.mjs --run [--base URL] [--website PATH] [--out WORKSPACE_PATH] [--scope mobile-journey]');
+  console.log('Prepared, not executed. Run after source application/HMR: node scripts/verify-website-revision.mjs --run --website PATH [--base URL] [--out WORKSPACE_PATH] [--scope mobile-journey]');
   process.exit(0);
 }
 function option(name, fallback) {
@@ -20,7 +20,9 @@ function option(name, fallback) {
   assert(args[i + 1] && !args[i + 1].startsWith('--'), `${name} needs a value`);
   return args[i + 1];
 }
-const website = path.resolve(option('--website', path.join(workspace, '../agent-studio-for-software-website/04-angular-static-final')));
+const websitePath = option('--website');
+assert(websitePath, 'Specify --website PATH for the local Agent Studio Angular website root.');
+const website = path.resolve(websitePath);
 const scope = option('--scope', 'all');
 assert(['all', 'mobile-journey'].includes(scope), 'Scope must be all or mobile-journey');
 const expectedRoutes = scope === 'all' ? 54 : 0, expectedJourneys = scope === 'all' ? 2 : 1, expectedEmbedded = scope === 'all' ? 1 : 0;

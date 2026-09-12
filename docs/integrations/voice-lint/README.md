@@ -1,21 +1,22 @@
 # Voice Lint dossier integration
 
-This integration maintains the Voice Studio section of dossier **VL-W1** in the
-separate Voice Lint repository. It is a documentation integration, not a runtime
-dependency of Studio or `@voice/review`.
+This integration maintains the product section of dossier **VL-W1** in
+[`docs/operations/voice-concept-revision/`](../../operations/voice-concept-revision/)
+within this Voice Lint repository. Studio and the libraries do not load the dossier
+at runtime.
 
 - `dossier-fragment.html` is the maintained implementation/evidence narrative.
 - `dossier.json` declares the target identity, public title, status text and summary.
-- The target checkout retains the full dossier and its lifecycle fields.
+- The dossier directory retains the full document and its lifecycle fields.
 
-From the Voice Studio workspace:
+From the Voice Lint repository root:
 
 ```sh
 # Compare only. Exit 1 means that an explicit synchronization is needed.
-npm run docs:dossier:check -- --repository C:/Projects/voice-lint
+npm run docs:dossier:check -- --repository .
 
 # Synchronize the marked section and declared presentation fields.
-npm run docs:dossier:sync -- --repository C:/Projects/voice-lint
+npm run docs:dossier:sync -- --repository .
 
 # Read the actually served dossier and check desktop/mobile layout.
 npm run test:dossier
@@ -30,22 +31,18 @@ The synchronizer requires the existing `voice-concept-revision` / `VL-W1`
 identity and unique section markers. It preserves status, phase, related task
 keys and all unrelated fields. It never commits, pushes or changes companion
 concept files. Missing markers or identity mismatch fail before writing. This
-tool targets a standalone checked-out documentation repository; it must not be
-pointed at centrally managed application metadata.
+tool updates the checked-out dossier files; it must not be pointed at centrally
+managed application metadata.
 
 The read-only verifier accepts `--api-base`, `--client-id`, `--project`, `--output`
 and `--skip-browser`. It checks the maintained content, not hardcoded historical
 test counts or Git commits. Its default API is the existing local Agent Studio
 reference service; it does not start that service or mutate its data.
 
-The older patch scripts also rewrote historical introductions, fixed one
-particular table or patched source strings. Those completed migrations are local
-maintenance history. They are not part of this reusable synchronizer.
-
 ## Separate application and documentation launch entries
 
 The local project sidebar exposes two explicit, startable entries. Both commands
-run in the operator’s Voice Studio checkout; the project host stores the resolved
+run at the Voice Lint repository root; the project host stores the resolved
 local working directory. The Studio application and the public documentation
 preview are separate processes and pages.
 

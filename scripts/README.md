@@ -15,8 +15,8 @@ requirements are in the [main README](../README.md).
 | `npm run website:verify-artifact` | Validate the static publication inventory, source hashes, Git revision, routes and public browser boundaries; requires a clean committed build | Read-only; `-- --allow-dirty` is limited to local preparation |
 | `npm run website:verify-deployment` | Compare the fixed public Voice target with the exact local artifact; verify routes, content types and hosting boundaries | Read-only public requests; report under `test-results/voice-deployment/` |
 | `npm run test:source-provenance -- --help` | Configurable source/hash/Git and optional task-provenance verification for a running local Studio | Compact report under ignored `test-results/`; no source-write/model request |
-| `npm run docs:dossier:check -- --repository PATH` | Compare the maintained VL-W1 section with its standalone Voice Lint checkout | No writes; nonzero exit when synchronization is needed |
-| `npm run docs:dossier:sync -- --repository PATH` | Synchronize maintained dossier content/presentation while preserving lifecycle fields | Explicit writes to that documentation checkout; no Git operation |
+| `npm run docs:dossier:check -- --repository .` | Compare the maintained VL-W1 section with the dossier in this checkout | No writes; nonzero exit when synchronization is needed |
+| `npm run docs:dossier:sync -- --repository .` | Synchronize maintained dossier content/presentation while preserving lifecycle fields | Explicit writes to this checkout’s dossier files; no Git operation |
 | `npm run test:dossier` | Verify the served dossier and desktop/mobile layout | `test-results/dossier-integration/`; no API mutation |
 | `npm run test:evidence` | Check all curated evidence manifests, path containment and file hashes | Read-only; does not rerun historical tests |
 | `npm run test:holistic-schema` | Validate the proposed JSON examples, references and hashes; reject malformed variants | Offline only; no repository/site review and no model |
@@ -57,6 +57,21 @@ VOICE_WEBSITE_URL=https://agent-orchestrator.dev/voice/ npm run test:writing-pat
 The allowed target is explicit. Public reports are separated from local preview reports; the checks use no Studio session and make no model requests.
 
 ## Scenario scripts
+
+The Agent Studio website pilot requires its actual local source root. Supply
+`--website PATH`; the scripts do not assume the website is beside this checkout.
+`PATH` must contain the configured Angular website and its `voice.config.json`.
+
+```sh
+npm run test:live -- --website PATH
+node scripts/verify-website-revision.mjs --run --website PATH
+node scripts/reconcile-website-review.mjs --website PATH --dry-run
+```
+
+The first two checks require the pilot website to be running; `test:live` also
+requires Studio and registers the supplied folder. Reconciliation requires the
+original audit/import records and matching website root; its dry run writes only
+a local plan. Applying that plan remains a separate, digest-checked operation.
 
 Existing `pilot-*.mjs`, `import-website-review.mjs` and
 `reconcile-website-review.mjs` are scenario-specific workflows with their own

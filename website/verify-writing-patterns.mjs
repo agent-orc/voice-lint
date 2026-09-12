@@ -11,6 +11,7 @@ import catalogue from '../packages/writing-rules/src/catalogue.json' with {type:
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const base=websiteVerificationBase;
+const origin=new URL(base).origin;
 
 const verificationSource=await fs.readFile(path.join(root,guides.find(item=>item.slug==='verification').source),'utf8');
 const expectedVerificationRecords=[];marked.walkTokens(marked.lexer(verificationSource),token=>{if(token.type==='link')expectedVerificationRecords.push(token.href);});
@@ -93,7 +94,7 @@ try{
  }
  assert(requests.every(request=>!new URL(request.url).pathname.includes('/writing-rules/')&&!request.url.includes('writing-playground')),'Public interactions must not load writing tooling');
  checks.push('Removed playground and executable writing-library routes return 404; public controls load no writing tools.');
- assert.deepEqual(errors,[]);assert(requests.every(request=>request.method==='GET'),'Public page controls must not send mutation or model requests');assert(requests.every(request=>new URL(request.url).origin===url.origin),'Public browsing loads no external resources');
+ assert.deepEqual(errors,[]);assert(requests.every(request=>request.method==='GET'),'Public page controls must not send mutation or model requests');assert(requests.every(request=>new URL(request.url).origin===origin),'Public browsing loads no external resources');
  checks.push('No browser exceptions, mutation requests or external uploads occurred.');
  const info=await(await context.request.get(new URL('build-info.json',base).href)).json();
  const output=path.join(root,'test-results/'+websiteVerificationDirectory);await fs.mkdir(output,{recursive:true});await fs.writeFile(path.join(output,'writing-patterns.json'),JSON.stringify({capturedAt:new Date().toISOString(),scope:'Actual built public website in local Chrome; no Studio sessions, source edits or model calls.',checks,build:{builtAt:info.builtAt,inputs:info.inputs}},null,2)+'\n');

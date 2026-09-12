@@ -7,13 +7,21 @@ import { readSession } from './session.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const base = 'http://127.0.0.1:5188';
+const args = process.argv.slice(2);
+if (args.includes('--help')) {
+  console.log('Usage: npm run test:live -- --website PATH\nPATH is the local Agent Studio Angular website root. Studio and that website must be running.');
+  process.exit(0);
+}
+const websiteIndex = args.indexOf('--website');
+const websitePath = websiteIndex >= 0 ? args[websiteIndex + 1] : undefined;
+assert(websitePath && !websitePath.startsWith('--'), 'Specify --website PATH for the local Agent Studio Angular website root.');
+const agentRoot = path.resolve(websitePath);
 const session = await readSession(root);
 async function api(route, method = 'GET', body) {
   const response = await fetch(base + route, { method, headers: { Authorization: `Bearer ${session.token}`, ...(body ? { 'Content-Type': 'application/json' } : {}) }, body: body ? JSON.stringify(body) : undefined });
   assert(response.ok, `${route}: ${response.status} ${await response.clone().text()}`);
   return response.status === 204 ? null : response.json();
 }
-const agentRoot = path.resolve(root, '../agent-studio-for-software-website/04-angular-static-final');
 const project = await api('/api/projects/register', 'POST', { path: agentRoot, name: 'Agent Studio · Angular-Website' });
 assert.equal(Object.keys(project.sourceRoutes).length, 27);
 const docs = await api(`/api/projects/${project.id}/documents`);

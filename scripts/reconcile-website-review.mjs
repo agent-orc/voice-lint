@@ -1,5 +1,5 @@
-/** One-time editorial audit reconciliation. Default: filesystem-only dry-run.
- * --apply --plan-digest <reviewed digest> uses only task-create/task-resolve APIs.
+/** One-time editorial audit reconciliation. Requires --website PATH matching the recorded audit root.
+ * Default: filesystem-only dry-run; --apply --plan-digest <reviewed digest> uses only task-create/task-resolve APIs.
  * No model start, proposal apply, feedback rewrite or website source write exists here.
  */
 import { createHash } from 'node:crypto';
@@ -7,6 +7,16 @@ import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileS
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+const args = process.argv.slice(2);
+if (args.includes('--help')) {
+  console.log('Usage: node scripts/reconcile-website-review.mjs --website PATH [--dry-run | --apply --plan-digest DIGEST]\nPATH must match the original audit website. Existing recorded source/version guards remain required.');
+  process.exit(0);
+}
+const websiteIndex = args.indexOf('--website');
+const websitePath = websiteIndex >= 0 ? args[websiteIndex + 1] : undefined;
+if (!websitePath || websitePath.startsWith('--')) throw new Error('Specify --website PATH matching the recorded audit website root.');
+const expectedRoot = path.resolve(websitePath);
+const operationArgs = args.filter((_, index) => index !== websiteIndex && index !== websiteIndex + 1);
 const home = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
 const auditPath = path.join(home, 'docs/reviews/agent-studio-website-2026-09-06.json');
 const importPath = path.join(home, '.voice-studio/imports/agent-studio-website-2026-09-06.json');
@@ -75,7 +85,6 @@ const followupDefinitions = [
 function inputs(strict = true) {
   const audit = json(auditPath), imported = json(importPath), applied = json(appliedPath), homeApplied = json(homeAppliedPath);
   const root = path.resolve(audit.websiteRoot);
-  const expectedRoot = path.resolve(home, '../agent-studio-for-software-website/04-angular-static-final');
   if (!equalPath(root, expectedRoot)) fail('Audit root is not the approved actual website.');
   if (audit.id !== imported.reviewId || audit.findings.length !== 36 || imported.findings.length !== 36 || imported.tasks.length !== 21) fail('Unexpected audit/import scope.');
   if (new Set(imported.tasks.map(t => t.taskId)).size !== 21 || new Set(imported.findings.map(f => f.id)).size !== 36) fail('Duplicate imported identity.');
@@ -205,7 +214,7 @@ if (process.argv.includes('--apply')) {
   const index = process.argv.indexOf('--plan-digest');
   await applyPlan(index >= 0 ? process.argv[index + 1] : undefined);
 } else {
-  if (process.argv.slice(2).some(arg => arg !== '--dry-run')) fail('Use --dry-run or --apply --plan-digest <reviewed digest>.');
+  if (operationArgs.some(arg => arg !== '--dry-run')) fail('Use --website PATH with --dry-run or --apply --plan-digest <reviewed digest>.');
   const plan = buildPlan();
   mkdirSync(path.dirname(planPath), {recursive: true});
   writeFileSync(planPath, JSON.stringify(plan, null, 2) + '\n');

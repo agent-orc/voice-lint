@@ -60,6 +60,52 @@ try
     Check(BrowserSessionService.IsAllowedHost(new("127.0.0.1:5188")) && !BrowserSessionService.IsAllowedHost(new("evil.example:5188")) && !BrowserSessionService.IsAllowedHost(new("127.0.0.1:5189")), "Host and preview-port boundaries remain unchanged.");
     Check(!BrowserSessionService.IsPublicSessionPath("/api/session/resume/extra") && !BrowserSessionService.IsPublicSessionPath("/api/projects"), "Only exact session routes are public; project operations still require bearer authentication.");
     Check(File.ReadAllText(source) == "# Unchanged source\n" && Directory.GetFiles(root).Length == 2, "Pairing, resume, expiry and logout never modify source or create review/proposal metadata.");
+
+    var oldHome = Path.Combine(root, "old-checkout");
+    var newHome = Path.Combine(root, "new-checkout");
+    var expectedDefault = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "VoiceStudio", "sessions", ProjectStore.Hash(OperatingSystem.IsWindows() ? oldHome.ToUpperInvariant() : oldHome)[..16]);
+    Check(SessionStorage.ResolveRoot(oldHome, null) == expectedDefault, "Without a host override the existing home-derived private path is unchanged.");
+    Check(SessionStorage.ResolveRoot(oldHome, null) != SessionStorage.ResolveRoot(newHome, null), "Different application homes still have separate default private state.");
+    foreach (var invalidRoot in new[] { "", " ", ".", "relative-session", Path.GetPathRoot(root)!, newHome, Path.Combine(newHome, ".voice-studio"), root + "\n" })
+    {
+        try { SessionStorage.ResolveRoot(newHome, invalidRoot); throw new Exception("Invalid host session path accepted"); }
+        catch (InvalidOperationException) { Check(true, "Empty, relative, filesystem-root, repository-local and control-character paths fail before storage creation."); }
+    }
+    if (OperatingSystem.IsWindows())
+    {
+        foreach (var invalidRoot in new[] { @"C:relative", "//server/share/sessions", @"\\server\share\sessions", @"\\?\C:\sessions" })
+        {
+            try { SessionStorage.ResolveRoot(newHome, invalidRoot); throw new Exception("Non-local or drive-relative session path accepted"); }
+            catch (InvalidOperationException) { Check(true, "Drive-relative, network and device paths are not private local session roots."); }
+        }
+    }
+    var preservedRoot = Path.Combine(root, "preserved-private-session");
+    Check(SessionStorage.ResolveRoot(oldHome, preservedRoot) == SessionStorage.ResolveRoot(newHome, preservedRoot + Path.DirectorySeparatorChar),
+        "The explicit host directory keeps an identical canonical identity across application moves.");
+    Check(!Directory.Exists(preservedRoot), "Resolving host paths does not create or copy session state.");
+
+    Directory.CreateDirectory(preservedRoot);
+    var beforeMove = new BrowserSessionService(SessionStorage.ResolveRoot(oldHome, preservedRoot), clock);
+    var beforeMoveContext = Browser(); var beforeMoveSession = beforeMove.Pair(beforeMoveContext, true);
+    var moveCookie = beforeMoveContext.Response.Headers.SetCookie.ToString().Split(';')[0];
+    var privateState = File.ReadAllText(Path.Combine(preservedRoot, "trusted-browsers.json"));
+    clock.Now = clock.Now.AddDays(1);
+    var afterMove = new BrowserSessionService(SessionStorage.ResolveRoot(newHome, preservedRoot), clock);
+    var restoredSession = afterMove.Resume(Browser(moveCookie));
+    Check(restoredSession is not null && restoredSession.Remembered && restoredSession.ExpiresAt == beforeMoveSession.ExpiresAt,
+        "Relaunch with another application home and the same explicit private root resumes the existing cookie without extending seven-day trust.");
+    Check(restoredSession!.Token != beforeMoveSession.Token && !afterMove.Authorizes(Browser(token: beforeMoveSession.Token)),
+        "Moving the application still rotates in-memory bearer credentials.");
+    Check(afterMove.Authorizes(Browser(token: restoredSession.Token)), "The resumed bearer authorizes the same local app origin after the move.");
+    Check(File.ReadAllText(Path.Combine(preservedRoot, "trusted-browsers.json")) == privateState,
+        "Resume after the move does not rewrite or replace trusted browser state.");
+    var copiedRoot = Path.Combine(root, "copied-private-session");
+    Directory.CreateDirectory(copiedRoot);
+    File.Copy(Path.Combine(preservedRoot, "trusted-browsers.json"), Path.Combine(copiedRoot, "trusted-browsers.json"));
+    Check(new BrowserSessionService(copiedRoot, clock).Resume(Browser(moveCookie)) is null,
+        "Copying the trust file to a differently named directory alone does not preserve the cookie identity.");
+
     Console.WriteLine($"Browser sessions: {checks} checks passed; isolated private-session fixture, no source mutations or model calls.");
 }
 finally

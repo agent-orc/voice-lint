@@ -36,6 +36,37 @@ profile, private browsing session, cleared site data or expired credential needs
 pairing again. Leaving the checkbox unchecked creates a temporary in-memory
 session: a page reload requires the code again.
 
+## Move the application directory
+
+Set `VOICE_STUDIO_SESSION_ROOT` in the host's startup environment to keep an
+existing private session directory when `VOICE_STUDIO_HOME` changes. Read its
+current location from `.voice-studio/session-location.json` in the old application
+directory. Use the directory containing `session.json`, not the file itself.
+
+The override must be an absolute local directory outside the application
+repository. Relative paths, filesystem roots, network/device paths on Windows,
+symlinks and junctions are rejected. Set it in a private launcher or service
+configuration; repository configuration and HTTP requests cannot select it.
+Without the variable, Studio keeps deriving its default private directory from
+the application path under the user's local application-data directory.
+
+Stop the previous Studio process before starting the moved application with the
+same private directory. The existing directory permissions and exclusive
+instance lock still apply. Keep the directory and app origin unchanged: the
+browser cookie name includes the private directory's identity. Copying
+`trusted-browsers.json` into another directory does not preserve that identity.
+A resumed browser keeps its original expiry and receives a new in-memory
+bearer. Startup writes a new `session-location.json` pointer in the new
+application directory.
+
+Move the separate project registry, `.voice-studio/projects.json`, while Studio
+is stopped. Preserve project IDs and update the roots of moved source projects
+before the first start. Their `.voice-lint/` directories contain the saved
+reviews, tasks and proposals and must stay with those sources. External source
+projects keep their current paths. Private check profiles in the retained
+session directory's `checks.json` use absolute `projectPath` values; update only
+the paths of projects that moved before restarting.
+
 ## HTTP contract
 
 | Request | Input and outcome |
@@ -59,7 +90,8 @@ guards prevent a late response from an older request from clearing a newer login
 ## Verification and scope
 
 The offline backend suite covers pairing, cookie restrictions, origin binding,
-absolute expiry, restart persistence and revocation. UI state tests exercise
+absolute expiry, restart persistence, revocation and a changed application home
+with the same explicit private session directory. UI state tests exercise
 resume, unauthorized-response handling and late-response races.
 
 ```sh

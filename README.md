@@ -125,15 +125,14 @@ then run `npm run onboard:website`. This registers the original JSON and Markdow
 sources selected in [voice.config.json](voice.config.json), including the HTML
 guides' Markdown sources.
 
-## Repositories and maintained files
+## Repository and maintained files
 
-**Product code is in this directory of
-[agent-taskboard-devspace](https://github.com/RobertMischke/agent-taskboard-devspace/tree/main/voice-studio).**
-Studio, library and public-website commits appear in that repository's history.
-The separate [voice-lint repository](https://github.com/agent-orc/voice-lint)
-contains the concept and **VL-W1 dossier**; its commit count does not describe
-product development. [Dossier synchronization](docs/integrations/voice-lint/README.md)
-updates its maintained product section separately.
+[agent-orc/voice-lint](https://github.com/agent-orc/voice-lint) contains the complete
+product at its repository root: Studio, both libraries, website, benchmarks,
+concept and **VL-W1 dossier**. Product changes and releases belong to this
+repository. The `main` branch holds source; `deploy` holds the generated public
+website snapshot. [Dossier synchronization](docs/integrations/voice-lint/README.md)
+updates the maintained product section in the same checkout.
 
 | Path | Maintained content |
 | --- | --- |
@@ -142,6 +141,7 @@ updates its maintained product section separately.
 | `packages/contracts/`, `knowledge/` | Shared transport types and Studio's local rules |
 | `website/` | Static product website, research records and HTML guide renderer |
 | `docs/`, `benchmarks/` | References, review records and reproducible evaluation methods |
+| `docs/operations/voice-concept-revision/` | VL-W1 dossier and its lifecycle metadata |
 | `examples/`, `scripts/` | Example projects and supported local commands |
 
 See [file ownership and retention](docs/maintaining.md) for generated builds,

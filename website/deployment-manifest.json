@@ -46,7 +46,7 @@
     "writingToolsHref": "/voice/guides/writing-tools/",
     "benchmarksHref": "/voice/guides/review-benchmarks/"
   },
-  "existingDeploymentPattern": "Static snapshot at the root of voice-deploy; Caddy mounts /srv/sites/voice/current under /voice/; the existing host timer pulls the artifact branch.",
+  "existingDeploymentPattern": "Static snapshot at the root of deploy; Caddy mounts /srv/sites/voice/current under /voice/; the existing host timer pulls the artifact branch.",
   "unresolvedHostInputs": [],
   "applicationUrl": "http://127.0.0.1:5188/",
   "publishApplicationBackend": false,
@@ -71,10 +71,10 @@
     "de"
   ],
   "hostingRepository": "https://github.com/agent-orc/website",
-  "sourceRepository": "https://github.com/RobertMischke/agent-taskboard-devspace",
-  "sourceDirectory": "voice-studio",
+  "sourceRepository": "https://github.com/agent-orc/voice-lint",
+  "sourceDirectory": ".",
   "sourceBranch": "main",
-  "deployBranch": "voice-deploy",
+  "deployBranch": "deploy",
   "deploymentMode": "Explicit static snapshot publication; existing host pull and symlink swap",
-  "automaticSourcePublication": "Not enabled; the proposed GitHub workflow requires separate approval"
+  "automaticSourcePublication": "Not enabled; publish a verified static snapshot explicitly."
 }
