@@ -41,8 +41,18 @@ response. It defaults to six public-docs rules and asks for at most five finding
 The count is a requested format, not a guaranteed inference budget. Audience and
 goal are trusted host configuration; source documents belong in separate input.
 
+Catalogue 0.2.1 applies research and editorial guidance to informational headings through
+the existing `word-choice`, `format-fit` and `meta-framing` rules. Their EN/DE prompts
+ask for the concrete subject or task, compare added interpretation with the brief,
+and preserve genuine reader questions, explanatory metaphors and accepted positioning.
+Select these IDs explicitly for this combined scope. Source records distinguish
+research context from editorial derivation. These are instructions for a contextual
+reviewer; the lexical scanner has no new heading detector.
+
 Selection is deterministic. Explicit IDs outside a selected profile throw rather
 than silently change the requested coverage. Public data and results are frozen.
 Provider advice, editorial choices and research context remain separately tagged.
 
 The complete usage contract is in [the maintained guide](../../docs/writing-rules.md).
+
+Agent tool integration is available through `@voice/writing-rules/tools`. See [LLM tool use](./TOOLS.md) for the four read-only tools, trusted host context, model-evidence contract and examples. `@voice/review` is the separate HTML visualization library.

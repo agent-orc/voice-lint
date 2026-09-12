@@ -129,9 +129,9 @@ public sealed partial class ProjectStore
                     if (!ExcludedDirectories.Contains(Path.GetFileName(path))) Visit(path, depth + 1);
                     continue;
                 }
-                if (!(new[] { ".html", ".htm", ".md", ".markdown", ".ts" }).Contains(Path.GetExtension(path).ToLowerInvariant())) continue;
+                if (!(new[] { ".html", ".htm", ".md", ".markdown", ".ts", ".json" }).Contains(Path.GetExtension(path).ToLowerInvariant())) continue;
                 var relative = Path.GetRelativePath(project.Root, path).Replace('\\', '/');
-                if (config is not null && !config.Includes(relative) || config is null && Path.GetExtension(path).Equals(".ts", StringComparison.OrdinalIgnoreCase)) continue;
+                if (config is not null && !config.Includes(relative) || config is null && new[] { ".ts", ".json" }.Contains(Path.GetExtension(path).ToLowerInvariant())) continue;
                 result.Add(new("doc-" + Hash(relative)[..16], relative, path));
                 if (result.Count > 2000) throw new ApiError(422, "Projekt enthält mehr als 2000 Dokumente. Bitte einen kleineren Projektordner registrieren.");
             }
@@ -157,7 +157,7 @@ public sealed partial class ProjectStore
     private void SaveReview(RegisteredProject project, SourceDocument document, ReviewFile review)
     {
         var source = ReadSource(document.FullPath).Source;
-        var format = Path.GetExtension(document.FullPath).ToLowerInvariant() switch { ".ts" => "typescript", ".html" or ".htm" => "html", _ => "markdown" };
+        var format = Path.GetExtension(document.FullPath).ToLowerInvariant() switch { ".json" => "json", ".ts" => "typescript", ".html" or ".htm" => "html", _ => "markdown" };
         review.UnitsFingerprint = UnitsFingerprint(DocumentParser.Parse(source, format).Units);
         AtomicWrite(MetadataPath(project, document), JsonSerializer.Serialize(review, Json));
     }
@@ -222,7 +222,7 @@ public sealed partial class ProjectStore
         var doc = knownDocument ?? Document(project, documentId);
         var (source, _) = ReadSource(doc.FullPath);
         var version = Hash(source);
-        var format = Path.GetExtension(doc.FullPath).Equals(".ts", StringComparison.OrdinalIgnoreCase) ? "typescript" : Path.GetExtension(doc.FullPath).StartsWith(".ht", StringComparison.OrdinalIgnoreCase) ? "html" : "markdown";
+        var format = Path.GetExtension(doc.FullPath).Equals(".json", StringComparison.OrdinalIgnoreCase) ? "json" : Path.GetExtension(doc.FullPath).Equals(".ts", StringComparison.OrdinalIgnoreCase) ? "typescript" : Path.GetExtension(doc.FullPath).StartsWith(".ht", StringComparison.OrdinalIgnoreCase) ? "html" : "markdown";
         var parsed = DocumentParser.Parse(source, format);
         var review = Review(project, doc);
         // Recovery may persist proposal state; retain the pre-recovery mapping
@@ -240,9 +240,10 @@ public sealed partial class ProjectStore
             "Lokale deterministische Regeln v0; kein vollständiges Voice-Profil und keine semantische KI-Prüfung.",
             "Aussagenprüfung ist advisory und bestätigt keine Fakten. Kein numerischer Voice-Score.",
             "Die statische Dokumentvorschau ist bereinigt. Im Live-Browser läuft die verbundene Website mit ihren eigenen Scripts; geprüft werden die unterstützten Textstellen der registrierten Quelldatei.",
-            "Quelltextbereiche und Auswahlpositionen zählen UTF-16-Codeeinheiten. Projektberichte umfassen HTML/Markdown sowie explizit konfigurierte TypeScript-Content-Dateien. Ausführbarer Frameworkcode und Übersetzungs-Dictionaries werden nicht analysiert.",
+            "Quelltextbereiche und Auswahlpositionen zählen UTF-16-Codeeinheiten. Projektberichte umfassen HTML/Markdown sowie explizit konfigurierte TypeScript- und JSON-Textquellen. Ausführbarer Frameworkcode und nicht freigegebene Dateien werden nicht analysiert.",
             "HTML-Attribute (z. B. alt/title) sind nicht Teil der Textprüfung; Markdown-Vorschau ist vereinfacht."
         };
+        if (format == "json") notes.Add("JSON-Quelladapter: Nur ausdrücklich freigegebene Dateien und benannte Textfelder werden geprüft. Technische IDs, URLs und Markup bleiben ausgeschlossen. Die Live-Zuordnung verlangt exakte sichtbare Textübereinstimmung.");
         if (format == "typescript") notes.Add("TypeScript-Quelladapter: Nur freigegebene Content-Dateien und Textliterale aus exportierten Objekt-/Arraywerten werden geprüft. Importierte Werte, Funktionen, interpolierte Templates, URLs und technische Schlüssel sind ausgeschlossen. Keine vollständige Komponenten- oder Laufzeitanalyse.");
         if (source.Contains("data-i18n", StringComparison.OrdinalIgnoreCase)) notes.Add("data-i18n erkannt: Der Quelltextbericht erfasst nur statische Fallback-Texte. Übersetzungs-Dictionaries werden nicht analysiert; Änderungen an gebundenen Textstellen sind gesperrt.");
         return new(doc.Id, doc.RelativePath, title, format, parsed.Language, version, parsed.Units.Sum(u => Regex.Matches(u.Text, @"\S+").Count), findings.Length, review.Feedback.Count(f => f.Status != "resolved"), source, parsed.Html, parsed.Units, findings, review.Feedback.ToArray(), review.Revision, new(parsed.Units.Length, parsed.Units.Length, parsed.ExcludedRegions, notes.ToArray()), CurrentDecisions(review, version, parsed.Units));
@@ -347,7 +348,7 @@ public sealed partial class ProjectStore
             var (span, replacement) = MapReplacement(detail, parsed, input.UnitId, input.Start, input.End, input.Replacement);
             var unit = detail.Units.First(u => u.Id == input.UnitId);
             var after = detail.Source[..span.Start] + replacement + detail.Source[span.End..];
-            if (detail.Format == "typescript") TypeScriptContentAdapter.Parse(after);
+            if (detail.Format is "typescript" or "json") DocumentParser.Parse(after, detail.Format);
             var doc = Document(project, documentId); var review = Review(project, doc);
             if (input.FeedbackId is not null && !review.Feedback.Any(f => f.Id == input.FeedbackId)) throw new ApiError(404, "Zugehöriges Feedback nicht gefunden.");
             var proposal = new Proposal(Guid.NewGuid().ToString("N"), documentId, unit.Text[input.Start..input.End], input.Replacement, input.Replacement, detail.Source, after, detail.Version, span, input.FeedbackId, "Manueller Textvorschlag; Anwendung erfolgt erst nach bestätigtem Quelldiff.", "pending");

@@ -1,0 +1,180 @@
+[
+  {
+    "id": "length-regularized-dpo",
+    "title": "Disentangling Length from Quality in Direct Preference Optimization",
+    "authors": [
+      "Ryan Park",
+      "Rafael Rafailov",
+      "Stefano Ermon",
+      "Chelsea Finn"
+    ],
+    "date": "2024-08",
+    "url": "https://aclanthology.org/2024.findings-acl.297/",
+    "kind": "strategy-evidence",
+    "method": "Pythia 2.8B wurde mit herkömmlichem und längenregularisiertem DPO auf Präferenzdaten für Dialoge und Zusammenfassungen trainiert. Pro Einstellung wurden 256 generierte Antworten anhand von GPT-4-Urteilen verglichen.",
+    "finding": "Die Regularisierung verkürzte die Antworten und verbesserte die Präferenzbewertungen gegenüber Einstellungen mit ähnlich langen Antworten. Unkontrollierte Präferenzoptimierung verstärkte die Ausführlichkeit.",
+    "limits": "Untersucht wurden eine Modellgröße und zwei Datensätze; die Bewertung übernahm ein Modell. Dieser Eingriff ins Training belegt nicht, dass ein Prompt mit der Aufforderung zur Kürze Dokumentation verbessert.",
+    "application": "Für Voice: Alternativen ähnlicher Länge vergleichen und die Erfüllung der Leseraufgabe gesondert bewerten. Textlänge ist ein Diagnosemerkmal; notwendige Erklärungen und Einschränkungen müssen erhalten bleiben.",
+    "readingDepth": "Im PDF des ACL-Tagungsbands gelesen: Methoden und Ergebnisse in den Abschnitten 3–4, Abbildung 3, Abschnitt 7 und Anhang C. Geprüft am 12.09.2026.",
+    "relatedRuleIds": [
+      "repetition",
+      "task-relevance",
+      "exhaustive-checklist",
+      "format-fit"
+    ],
+    "apiUse": {
+      "availableNow": [
+        {
+          "symbol": "composeWritingReviewPrompt",
+          "purpose": "Die Aufgabe der Leser benennen und Regeln zu Relevanz oder Wiederholungen auswählen."
+        }
+      ],
+      "currentUse": "Eine Host-Anwendung kann Alternativen anfordern, ohne Texte pauschal verkürzen zu lassen. Die API optimiert kein Modell, bewertet keine Aufgabenerfüllung und vergleicht keine Antwortlängen.",
+      "missingCapability": "Alternativen nach Aufgabenerfüllung, erhaltenen Einschränkungen und Länge vergleichen. Dafür werden Testfälle benötigt, die nützliche Erklärungen von unnötigen Erweiterungen unterscheiden.",
+      "releaseFunctionIds": [
+        "alternative-comparison",
+        "prompt-benchmarks"
+      ]
+    }
+  },
+  {
+    "id": "self-refine",
+    "title": "Self-Refine: Iterative Refinement with Self-Feedback",
+    "authors": [
+      "Aman Madaan",
+      "Niket Tandon",
+      "Prakhar Gupta",
+      "Skyler Hallinan",
+      "Luyu Gao",
+      "Sarah Wiegreffe",
+      "Uri Alon",
+      "Nouha Dziri",
+      "Shrimai Prabhumoye",
+      "Yiming Yang",
+      "Shashank Gupta",
+      "Bodhisattwa Prasad Majumder",
+      "Katherine Hermann",
+      "Sean Welleck",
+      "Amir Yazdanbakhsh",
+      "Peter Clark"
+    ],
+    "date": "2023",
+    "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/91edff07232fb1b55a505a9e9f6c0ff3-Paper-Conference.pdf",
+    "kind": "strategy-evidence",
+    "method": "Dasselbe Modell erzeugte, kritisierte und überarbeitete Ausgaben mit aufgabenspezifischen Prompts für sieben Aufgaben. Die Auswertung verband Aufgabenmetriken, Modellurteile und Urteile der Studienautoren, denen die Herkunft der Ausgaben verborgen blieb.",
+    "finding": "Die Überarbeitung verbesserte die Ergebnisse der untersuchten Aufgaben. Menschliche Bewertende bevorzugten die überarbeiteten Ausgaben bei Dialogen, der Umkehrung einer Textstimmung, der Bildung von Akronymen und der Lesbarkeit von Code.",
+    "limits": "Untersucht wurden englischsprachige Aufgaben und überwiegend proprietäre Modelle von 2023. Die menschliche Bewertung beruhte meist auf einem Urteil eines Studienautors pro Beispiel. Besser bewertete Dialoge können zugleich ausführlicher sein.",
+    "application": "Für Voice: Vor Alternativen eine konkrete, mit Belegen verknüpfte Kritik anfordern. Den Umfang der Überarbeitung begrenzen, sie mit dem Original vergleichen und das Beibehalten des Originals ermöglichen.",
+    "readingDepth": "Im NeurIPS-2023-Volltext gelesen: Abschnitte 2–3 und 6, Anhang C zur menschlichen Bewertung und Anhang P zu Dialogergebnissen. Geprüft am 12.09.2026.",
+    "relatedRuleIds": [
+      "reader-goal",
+      "repetition",
+      "claims-evidence",
+      "task-relevance"
+    ],
+    "apiUse": {
+      "availableNow": [
+        {
+          "symbol": "composeWritingReviewPrompt",
+          "purpose": "Eine inhaltlich begrenzte Kritik mit belegten Alternativen vorbereiten."
+        },
+        {
+          "symbol": "selectWritingRules",
+          "purpose": "Ein anschließendes Review auf die relevanten Regel-IDs begrenzen."
+        }
+      ],
+      "currentUse": "Die Host-Anwendung übermittelt die Prompts und steuert mögliche Überarbeitungsschleifen selbst. maxFindings fordert eine Obergrenze für Befunde an; der Parameter erzwingt weder deren Einhaltung noch eine Begrenzung der Modellkosten.",
+      "missingCapability": "Jede Kritik validieren und Reviews mit klar begrenztem Umfang und expliziten Verbrauchsbudgets zusammenstellen, bevor die Host-Anwendung eine weitere Runde startet.",
+      "releaseFunctionIds": [
+        "result-validation",
+        "review-batching",
+        "usage-budget"
+      ]
+    }
+  },
+  {
+    "id": "self-correction-counterevidence",
+    "title": "Large Language Models Cannot Self-Correct Reasoning Yet",
+    "authors": [
+      "Jie Huang",
+      "Xinyun Chen",
+      "Swaroop Mishra",
+      "Huaixiu Steven Zheng",
+      "Adams Wei Yu",
+      "Xinying Song",
+      "Denny Zhou"
+    ],
+    "date": "2024-03-14",
+    "url": "https://arxiv.org/html/2310.01798v2",
+    "kind": "strategy-evidence",
+    "method": "Die Experimente verglichen erste Antworten mit bis zu zwei Runden der Selbstkorrektur bei Schlussfolgerungsaufgaben. Dabei wurde zwischen Feedback mit bekannten richtigen Antworten und rein modellbasiertem Feedback unterschieden.",
+    "finding": "Ohne Kennzeichnung der richtigen Antworten änderten die untersuchten Modelle häufig korrekte Antworten in fehlerhafte. Bessere Ausgangsprompts verringerten zudem den vermeintlichen Nutzen der nachträglichen Überarbeitung.",
+    "limits": "Die ICLR-2024-Studie untersucht ältere Modelle und Schlussfolgerungsaufgaben. Die Autoren grenzen Stilpräferenzen ausdrücklich davon ab; bei diesen kann Selbstkorrektur hilfreich sein.",
+    "application": "Für Voice: Eine Modellkritik als Vorschlag behandeln. Geänderte Aussagen anhand der Quellen prüfen und das Original beibehalten, wenn die Kritik nicht ausreichend begründet ist.",
+    "readingDepth": "In Version 2 vom 14.03.2024 gelesen: Versuchsaufbau, Tabellen 2–6, Prompt-Vergleich in Abschnitt 5 und Grenzen in Abschnitt 7. Geprüft am 12.09.2026.",
+    "relatedRuleIds": [
+      "claims-evidence",
+      "reported-evidence",
+      "unsupported-causality",
+      "calibrated-uncertainty"
+    ],
+    "apiUse": {
+      "availableNow": [
+        {
+          "symbol": "composeWritingReviewPrompt",
+          "purpose": "Fehlende Belege und begründete Entscheidungen zum Beibehalten des Originals anfordern."
+        },
+        {
+          "symbol": "getWritingRule",
+          "purpose": "Die Anforderungen von claims-evidence und reported-evidence abrufen."
+        }
+      ],
+      "currentUse": "Diese Anweisungen können eine zweite Einschätzung anleiten. Die Library enthält aber keinen Faktenprüfer und kann nicht feststellen, ob eine überarbeitete Antwort besser ist.",
+      "missingCapability": "Jede vorgeschlagene Änderung einer Aussage anhand bereitgestellter Belege prüfen und die Überarbeitung vor der Annahme einer Korrektur mit dem Original vergleichen.",
+      "releaseFunctionIds": [
+        "claim-evidence",
+        "alternative-comparison",
+        "result-validation"
+      ]
+    }
+  },
+  {
+    "id": "coauthor-writer-control",
+    "title": "CoAuthor: Designing a Human-AI Collaborative Writing Dataset for Exploring Language Model Capabilities",
+    "authors": [
+      "Mina Lee",
+      "Percy Liang",
+      "Qian Yang"
+    ],
+    "date": "2022-01-25",
+    "url": "https://arxiv.org/html/2201.06796v2",
+    "kind": "strategy-evidence",
+    "method": "63 Schreibende absolvierten 1.445 englischsprachige Schreibsitzungen mit Vorschlägen von GPT-3. Die Oberfläche protokollierte Anfragen, Auswahl, Verwerfen und Bearbeitung; Befragungen erfassten das Gefühl eigener Urheberschaft und die Zufriedenheit.",
+    "finding": "Das Gefühl eigener Urheberschaft hing mit dem selbst geschriebenen Textanteil zusammen. Die Bearbeitungsaktivität allein zeigte kaum einen Zusammenhang damit. Wie die Zusammenarbeit verlief, unterschied sich deutlich zwischen den Schreibenden.",
+    "limits": "Dieser CHI-2022-Datensatz zeigt Zusammenhänge, liefert aber keinen randomisierten Test zum Erhalt der Autorenabsicht. Die Teilnehmenden waren qualifizierte Crowdworker, die kurze Geschichten und Essays nach vorgegebenen Aufgaben verfassten.",
+    "application": "Für Voice: Alternativen freiwillig anbieten und Entscheidungen zum Beibehalten, Annehmen oder Bearbeiten festhalten. Den Erhalt der Autorenabsicht direkt prüfen; eine hohe Annahmequote genügt nicht als Erfolgsmaß.",
+    "readingDepth": "In Version 2 vom 25.01.2022 gelesen: Oberfläche und Rekrutierung in Abschnitt 4, Analyse der empfundenen Urheberschaft in Abschnitt 5.2 und Diskussion in Abschnitt 6. Geprüft am 12.09.2026.",
+    "relatedRuleIds": [
+      "reader-goal",
+      "claims-evidence"
+    ],
+    "apiUse": {
+      "availableNow": [
+        {
+          "symbol": "mountVoiceReview",
+          "purpose": "Callbacks für Textauswahl und Befunde für die Review-Oberfläche der Host-Anwendung bereitstellen."
+        },
+        {
+          "symbol": "composeWritingReviewPrompt",
+          "purpose": "Freiwillige Alternativen oder eine begründete Entscheidung zum Beibehalten anfordern."
+        }
+      ],
+      "currentUse": "Die Host-Anwendung stellt das Auswahlpanel bereit und speichert die Entscheidungen. Das Einbinden der Library allein protokolliert weder Annahme noch Verwerfen oder Bearbeitungsverlauf.",
+      "missingCapability": "Autorenentscheidungen mit Quellversionen speichern und Alternativen mit der erklärten Absicht vergleichen, ohne die Anzahl angenommener Vorschläge als Qualitätsmaß zu verwenden.",
+      "releaseFunctionIds": [
+        "decision-preservation",
+        "alternative-comparison"
+      ]
+    }
+  }
+]

@@ -56,7 +56,12 @@
     "benchmark:writing-review": "npm run build:writing-rules && node benchmarks/writing-review/run.mjs",
     "benchmark:writing-review:retain": "node benchmarks/writing-review/retain.mjs",
     "benchmark:writing-review:prepare-models": "npm run build:writing-rules && node benchmarks/writing-review/prepare-model-comparison.mjs",
-    "test:writing-review-models": "npm run build:writing-rules && node benchmarks/writing-review/verify-model-comparison.mjs"
+    "test:writing-review-models": "npm run build:writing-rules && node benchmarks/writing-review/verify-model-comparison.mjs",
+    "test:writing-review-quality": "node --test benchmarks/writing-review/verify-model-quality.mjs",
+    "benchmark:writing-review:evaluate": "node benchmarks/writing-review/evaluate-model-quality.mjs",
+    "onboard:website": "node scripts/onboard-voice-website.mjs",
+    "test:split-layout": "node scripts/verify-split-layout.mjs",
+    "test:website-onboarding": "node scripts/verify-voice-website-onboarding.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1",

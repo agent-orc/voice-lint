@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "version": "voice-writing-rules/0.2.0",
+  "version": "voice-writing-rules/0.2.1",
   "reviewedAt": "2026-09-12",
   "purpose": "Contextual editorial review and prompt preparation. No authorship detection, automatic findings, source edits or model execution.",
   "sources": [
@@ -113,6 +113,36 @@
       "locator": "Assume an objective point of view; Don’t be sycophantic",
       "supports": "Describes evidence-proportionate treatment of viewpoints and constructive critique rather than reflexive agreement.",
       "limits": "A statement of intended behavior, not a measured account of model compliance or a mandate to choose a side when evidence is missing."
+    },
+    {
+      "id": "chakrabarty-writing-edits-2025",
+      "kind": "research",
+      "title": "Can AI writing be salvaged? Mitigating Idiosyncrasies and Improving Human-AI Alignment in the Writing Process through Edits",
+      "url": "https://arxiv.org/html/2409.14509v5",
+      "accessedAt": "2026-09-12",
+      "locator": "CHI 2025; arXiv v5 (2025-03-04), sections 4.4 and 8",
+      "supports": "Distinguishes distracting ornament, vague detail and awkward phrasing in expert edits.",
+      "limits": "Creative-writing study. Applying its categories to informational headings is an editorial derivation, not a measured heading detector."
+    },
+    {
+      "id": "furze-problem-patterns",
+      "kind": "editorial-guidance",
+      "title": "Problem Patterns in AI: Beyond Hallucinations",
+      "url": "https://leonfurze.com/2026/07/26/problem-patterns-in-ai-beyond-hallucinations/",
+      "accessedAt": "2026-09-12",
+      "locator": "2026-07-26; slide-heading example and faithfulness/communication categories",
+      "supports": "Practitioner examples distinguish requested information from added interpretation.",
+      "limits": "Editorial observations and an informal poll; no measured failure rates or established training causes."
+    },
+    {
+      "id": "shaib-slop-2025",
+      "kind": "research",
+      "title": "Measuring AI ‘Slop’ in Text",
+      "url": "https://arxiv.org/html/2509.19163v2",
+      "accessedAt": "2026-09-12",
+      "locator": "arXiv v2 (2026-01-24), sections 3–7",
+      "supports": "Reader judgments depend on relevance, information and structure in the evaluated domains.",
+      "limits": "English news and QA with a small expert panel. Context for review criteria, not proof that these prompts improve models."
     }
   ],
   "profiles": [
@@ -381,51 +411,60 @@
         "en": "Replace empty narration with information",
         "de": "Leere Ankündigungen durch Information ersetzen"
       },
-      "trigger": "A sentence announces its own clarity, importance or coverage while adding no information needed to interpret the next statement.",
+      "trigger": "Framing adds an interpretive premise or result promise unsupported by the supplied material, or announces importance without useful scope.",
       "cues": [
         "it is worth noting",
         "this section clearly explains",
         "the key thing to understand"
       ],
       "prompt": {
-        "en": "Identify framing that can disappear without losing orientation. State the useful fact directly, while retaining necessary scope definitions.",
-        "de": "Erkenne Einleitungen, deren Wegfall keine Orientierung kostet. Nenne die nützliche Aussage direkt und erhalte notwendige Angaben zum Geltungsbereich."
+        "en": "State the useful fact or task directly. Compare headings and introductions with the supplied brief: remove invented interpretive premises and result promises before evidence is available. Retain necessary scope, supported conclusions and accepted positioning; a framing choice requires a specific reader-impact reason to change.",
+        "de": "Nenne die nützliche Aussage oder Aufgabe direkt. Vergleiche Überschriften und Einleitungen mit dem Auftrag: Entferne hinzuerfundene Deutungen und Ergebnisversprechen, bevor Belege vorliegen. Erhalte notwendige Eingrenzungen, belegte Schlussfolgerungen und akzeptierte Positionierung; begründe eine Änderung an ihrer konkreten Wirkung auf Leser."
       },
       "falsePositives": [
-        "A short scope sentence can distinguish a protocol reference from a tutorial or identify excluded versions."
+        "A short scope sentence can distinguish a protocol reference from a tutorial or identify excluded versions.",
+        "A result heading can state a supported conclusion. An accepted positioning headline is not automatically an unsupported factual claim."
       ],
       "examples": {
         "en": {
-          "before": "It is worth noting that this section explains how a decision is stored.",
-          "after": "A decision is stored with its source version.",
+          "before": "Model choice: why the smartest route changes everything.",
+          "after": "Choose a model for the review.",
           "keep": "This reference covers protocol version 1.",
-          "condition": "The storage fact is established and the scope sentence adds nothing."
+          "condition": "The section gives model-selection steps; the supplied material does not support a wider outcome claim."
         },
         "de": {
-          "before": "Es ist wichtig zu betonen, dass dieser Abschnitt die Speicherung erklärt.",
-          "after": "Eine Entscheidung wird mit ihrer Quellversion gespeichert.",
+          "before": "Modellwahl: Warum der klügste Weg alles verändert.",
+          "after": "Wähle ein Modell für das Review.",
           "keep": "Diese Referenz behandelt Protokollversion 1.",
-          "condition": "Die Speicherung ist belegt; die Ankündigung trägt keine eigene Information."
+          "condition": "Der Abschnitt erklärt die Modellauswahl; das Material belegt keine weitergehende Wirkung."
         }
       },
       "evidence": [
         {
           "sourceId": "openai-style",
           "relation": "prompt-strategy"
+        },
+        {
+          "sourceId": "furze-problem-patterns",
+          "relation": "editorial-derivation"
+        },
+        {
+          "sourceId": "shaib-slop-2025",
+          "relation": "research-context"
         }
       ],
       "antiPattern": {
         "name": {
-          "en": "Empty importance prefaces",
-          "de": "Leere Wichtigkeitsfloskeln"
+          "en": "Unnecessary interpretive framing",
+          "de": "Unnötige deutende Einleitungen"
         },
         "symptom": {
-          "en": "A sentence announces that the next point is important or clear without adding scope or useful information.",
-          "de": "Ein Satz kündigt die Wichtigkeit oder Klarheit des nächsten Punkts an, ohne Geltungsbereich oder nützliche Information zu ergänzen."
+          "en": "A heading or introduction adds significance, interpretation or a result promise that the supplied material does not establish.",
+          "de": "Eine Überschrift oder Einleitung ergänzt Bedeutung, Deutung oder ein Ergebnisversprechen, das das Material nicht belegt."
         },
         "readerCost": {
-          "en": "The useful statement arrives later and competes with its own announcement.",
-          "de": "Die nützliche Aussage kommt später und konkurriert mit ihrer eigenen Ankündigung."
+          "en": "Readers must separate the actual information from added interpretation.",
+          "de": "Leser müssen die eigentliche Information von ergänzter Deutung trennen."
         }
       }
     },
@@ -880,31 +919,32 @@
         "en": "Let structure support reading",
         "de": "Struktur auf das Lesen ausrichten"
       },
-      "trigger": "Every sentence becomes a heading, badge or bullet, or necessary steps and comparisons are compressed into undifferentiated prose.",
+      "trigger": "Structure obscures a sequence, comparison or explanation, or an informational heading fails to identify the section's topic or reader task.",
       "cues": [
         "one-sentence subsections",
         "nested lists without hierarchy",
         "bold labels on every sentence"
       ],
       "prompt": {
-        "en": "Choose the format for the relationship: sequence, comparison or explanation. Use a small amount of structure that exposes that relationship.",
-        "de": "Wähle die Form passend zu Abfolge, Vergleich oder Erklärung. Verwende so viel Struktur, dass dieser Zusammenhang sichtbar wird."
+        "en": "Choose structure for the relationship: sequence, comparison or explanation. Check that informational headings name the section's topic or reader task. Keep genuine reader questions when the section answers them. Distinguish an informational heading from an accepted positioning headline before proposing a change.",
+        "de": "Wähle die Struktur passend zu Abfolge, Vergleich oder Erklärung. Prüfe, ob Informationsüberschriften Thema oder Leseraufgabe des Abschnitts benennen. Erhalte echte Leserfragen, die der Abschnitt beantwortet. Unterscheide eine Informationsüberschrift von einer akzeptierten Positionierungsüberschrift, bevor du eine Änderung vorschlägst."
       },
       "falsePositives": [
-        "Long references need navigation; procedures need steps; comparison tables can reduce rather than add reading work."
+        "Long references need navigation; procedures need steps; comparison tables can reduce rather than add reading work.",
+        "A question heading is useful when readers ask that question and the section answers it. An accepted positioning headline can prioritize tone and memorability."
       ],
       "examples": {
         "en": {
-          "before": "Summary: Save. Detail: The file is saved. Benefit: It remains available.",
-          "after": "Save the file to keep it available for the next review.",
-          "keep": "1. Select the file. 2. Review the diff. 3. Apply the change.",
-          "condition": "A short explanation needs one sentence; a dependent procedure keeps its sequence."
+          "before": "Quality: More than a score. Cost: A question of value.",
+          "after": "Review quality and cost",
+          "keep": "How do I compare review models?",
+          "condition": "One section compares quality and cost. The question remains useful as a heading for instructions that answer it."
         },
         "de": {
-          "before": "Übersicht: Speichern. Detail: Die Datei wird gespeichert. Vorteil: Sie bleibt verfügbar.",
-          "after": "Speichere die Datei, damit sie beim nächsten Review verfügbar ist.",
-          "keep": "1. Datei wählen. 2. Diff prüfen. 3. Änderung übernehmen.",
-          "condition": "Die kurze Erklärung braucht einen Satz; die abhängige Anleitung behält ihre Reihenfolge."
+          "before": "Qualität: Mehr als ein Wert. Kosten: Eine Frage des Nutzens.",
+          "after": "Review-Qualität und Kosten",
+          "keep": "Wie vergleiche ich Review-Modelle?",
+          "condition": "Ein Abschnitt vergleicht Qualität und Kosten. Die Frage ist als Überschrift für eine Anleitung sinnvoll, die sie beantwortet."
         }
       },
       "evidence": [
@@ -915,6 +955,14 @@
         {
           "sourceId": "anthropic-prompts",
           "relation": "prompt-strategy"
+        },
+        {
+          "sourceId": "shaib-slop-2025",
+          "relation": "research-context"
+        },
+        {
+          "sourceId": "furze-problem-patterns",
+          "relation": "editorial-derivation"
         }
       ],
       "antiPattern": {
@@ -1006,51 +1054,56 @@
         "en": "Prefer a precise operation to ornamental wording",
         "de": "Eine präzise Operation statt Schmuckwörter nennen"
       },
-      "trigger": "Inflated verbs or modifiers replace an operation that the reader could identify directly.",
+      "trigger": "Ornamental wording obscures the subject or operation, or asks readers to interpret a metaphor without useful explanatory detail.",
       "cues": [
         "facilitate the execution of",
         "robust seamless workflow",
         "powerful mechanism"
       ],
       "prompt": {
-        "en": "Name the supported operation in familiar terms. Keep specialist terminology when it carries a precise meaning for this audience.",
-        "de": "Benenne den unterstützten Vorgang mit vertrauten Wörtern. Erhalte Fachbegriffe, wenn sie für diese Zielgruppe eine präzise Bedeutung tragen."
+        "en": "Name the supported subject or operation in familiar terms. In informational headings, compare an ornamental phrase with a concrete description and explain any loss of orientation. Keep precise technical terms, explanatory metaphors and accepted positioning language when they serve the audience; flag no phrase solely for its style.",
+        "de": "Benenne den belegten Gegenstand oder Vorgang mit vertrauten Wörtern. Vergleiche schmückende Informationsüberschriften mit einer konkreten Beschreibung und begründe einen möglichen Orientierungsverlust. Erhalte präzise Fachbegriffe, erklärende Metaphern und akzeptierte Positionierung, wenn sie der Zielgruppe dienen; beanstande keine Formulierung allein wegen ihres Stils."
       },
       "falsePositives": [
-        "A defined technical adjective or an approved quotation can be exact and useful; word-list membership is not a defect."
+        "A defined technical adjective or an approved quotation can be exact and useful; word-list membership is not a defect.",
+        "An explanatory metaphor can make a mechanism easier to understand; accepted positioning may deliberately use rhythm or figurative wording."
       ],
       "examples": {
         "en": {
-          "before": "The mechanism facilitates the execution of local validation.",
-          "after": "Run the configured local check.",
-          "keep": "The robust estimator limits the influence of outliers.",
-          "condition": "The page describes a check action; the estimator example uses a technical term."
+          "before": "Which model and prompt earn their cost?",
+          "after": "Model selection and prompt structure",
+          "keep": "A cache works like a short-term memory for responses.",
+          "condition": "The informational heading introduces a comparison without established results. The cache metaphor is useful when explaining response reuse to this audience."
         },
         "de": {
-          "before": "Der Mechanismus ermöglicht die Durchführung lokaler Validierung.",
-          "after": "Starte die konfigurierte lokale Prüfung.",
-          "keep": "Der robuste Schätzer begrenzt den Einfluss von Ausreißern.",
-          "condition": "Die Seite beschreibt eine Prüfaktion; der Schätzer verwendet einen Fachbegriff."
+          "before": "Welches Modell und welcher Prompt verdienen ihre Kosten?",
+          "after": "Modellauswahl und Promptstruktur",
+          "keep": "Ein Cache funktioniert wie ein Kurzzeitgedächtnis für Antworten.",
+          "condition": "Die Informationsüberschrift führt einen Vergleich ohne feststehende Ergebnisse ein. Die Cache-Metapher hilft dieser Zielgruppe, die Wiederverwendung von Antworten zu verstehen."
         }
       },
       "evidence": [
         {
           "sourceId": "microsoft-words",
           "relation": "normative-guidance"
+        },
+        {
+          "sourceId": "chakrabarty-writing-edits-2025",
+          "relation": "editorial-derivation"
         }
       ],
       "antiPattern": {
         "name": {
-          "en": "Inflated action words",
-          "de": "Aufgeblähte Tätigkeitswörter"
+          "en": "Ornamental wording",
+          "de": "Schmückende Formulierungen"
         },
         "symptom": {
-          "en": "Decorative modifiers and abstract verb phrases surround an operation that could be named directly.",
-          "de": "Schmückende Zusätze und abstrakte Verbgruppen umgeben einen Vorgang, der sich direkt benennen ließe."
+          "en": "Decorative phrases obscure a subject or operation that readers could identify directly.",
+          "de": "Schmückende Formulierungen verdecken einen Gegenstand oder Vorgang, den Leser direkt erkennen könnten."
         },
         "readerCost": {
-          "en": "The wording grows while the actionable information stays the same.",
-          "de": "Der Text wächst, während die handlungsrelevante Information gleich bleibt."
+          "en": "Readers interpret the flourish before finding the subject or action.",
+          "de": "Leser müssen die Ausschmückung deuten, bevor sie Gegenstand oder Handlung erkennen."
         }
       }
     },

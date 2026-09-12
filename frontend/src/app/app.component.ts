@@ -37,6 +37,7 @@ import { ProjectChecksComponent } from './project-checks.component';
 import { SelectionReviewComponent } from './selection-review.component';
 import { SourceContextComponent } from './source-context.component';
 import { I18nService, TranslatePipe } from './i18n.service';
+import { clampFocusToolsPosition, clampReviewWidth, filesCollapsedStorageKey, focusToolsPositionStorageKey, projectsCollapsedStorageKey, reviewWidthBounds, reviewWidthStorageKey, savedCollapsedSection, savedFocusToolsPosition, savedReviewWidth, savedSidebarWidth, sidebarWidthBounds, sidebarWidthStorageKey, type FocusToolsPosition } from './workspace-layout';
 
 type NavigationMode = 'full' | 'compact' | 'focus';
 function savedNavigation(): NavigationMode {
@@ -50,6 +51,7 @@ type StudioTab = "preview" | "source" | "file" | "project";
   standalone: true,
   imports: [CommonModule, FormsModule, TranslatePipe, SourceContextComponent, SelectionReviewComponent, LiveBrowserComponent, SemanticReviewComponent, KnowledgeWikiComponent, SourceTasksComponent, ProjectChecksComponent],
   templateUrl: "./app.component.html",
+  styleUrl: "./app.component.css",
   host: { '[class.compact-navigation]': 'navigationMode() === "compact"', '[class.focus-navigation]': 'focusNavigation()', '[class.navigation-open]': 'navigationOpen()' },
 })
 export class AppComponent implements OnDestroy, OnInit {
@@ -59,22 +61,244 @@ export class AppComponent implements OnDestroy, OnInit {
   readonly focusNavigation = computed(() => this.connected() && this.navigationMode() === 'focus' && this.tab() === 'preview');
   @ViewChild(LiveBrowserComponent) liveBrowser?: LiveBrowserComponent;
   private returnNavigationFocus: HTMLElement | null = null;
+
+  readonly preferredReviewWidth = signal(savedReviewWidth());
+  readonly workspaceWidth = signal(window.innerWidth);
+  readonly reviewBounds = computed(() => reviewWidthBounds(this.workspaceWidth()));
+  readonly reviewWidth = computed(() => clampReviewWidth(this.preferredReviewWidth(), this.workspaceWidth()));
+  readonly viewportWidth = signal(window.innerWidth);
+  readonly preferredSidebarWidth = signal(savedSidebarWidth());
+  readonly sidebarHeight = signal<number | null>(null);
+  readonly sidebarBounds = computed(() => sidebarWidthBounds(this.viewportWidth(), this.focusNavigation()));
+  readonly sidebarWidth = computed(() => Math.round(Math.min(this.sidebarBounds().maximum, Math.max(this.sidebarBounds().minimum, this.preferredSidebarWidth()))));
+  readonly projectsCollapsed = signal(savedCollapsedSection(projectsCollapsedStorageKey));
+  readonly filesCollapsed = signal(savedCollapsedSection(filesCollapsedStorageKey));
+  readonly focusToolsPosition = signal(savedFocusToolsPosition());
+  readonly resizingPane = signal<'review' | 'sidebar' | null>(null);
+  readonly movingFocusTools = signal(false);
+  private sidebarElement?: HTMLElement;
+  private sidebarObserver?: ResizeObserver;
+  private sidebarHeightRequest = 0;
+  private readonly sidebarViewportChanged = () => this.scheduleSidebarHeight();
+  private workspaceElement?: HTMLElement;
+  private toolsElement?: HTMLElement;
+  private workspaceObserver?: ResizeObserver;
+  private toolsObserver?: ResizeObserver;
+  private resizeGesture: { kind: 'review' | 'sidebar'; pointerId: number; element: HTMLElement; startX: number; startWidth: number; originalWidth: number } | null = null;
+  private toolsGesture: { pointerId: number; element: HTMLElement; startX: number; startY: number; position: FocusToolsPosition } | null = null;
+
+  @ViewChild('projectSidebar') set projectSidebar(value: ElementRef<HTMLElement> | undefined) {
+    this.sidebarObserver?.disconnect();
+    this.sidebarElement = value?.nativeElement;
+    const element = this.sidebarElement;
+    if (!element) return;
+    this.zone.runOutsideAngular(() => {
+      this.sidebarObserver = new ResizeObserver(this.sidebarViewportChanged);
+      this.sidebarObserver.observe(element);
+      const header = element.closest('voice-studio')?.querySelector('.studio-header');
+      if (header) this.sidebarObserver.observe(header);
+      this.scheduleSidebarHeight();
+    });
+  }
+
+  private scheduleSidebarHeight(): void {
+    if (this.sidebarHeightRequest || !this.sidebarElement) return;
+    this.sidebarHeightRequest = requestAnimationFrame(() => {
+      this.sidebarHeightRequest = 0;
+      const element = this.sidebarElement;
+      if (!element?.isConnected || !element.getClientRects().length) return;
+      const viewport = window.visualViewport;
+      const visibleTop = Math.max(0, element.getBoundingClientRect().top - (viewport?.offsetTop ?? 0));
+      const height = Math.max(1, Math.floor((viewport?.height ?? window.innerHeight) - visibleTop - 8));
+      if (this.sidebarHeight() !== height) this.zone.run(() => this.sidebarHeight.set(height));
+    });
+  }
+
+  @ViewChild('documentWorkspace') set documentWorkspace(value: ElementRef<HTMLElement> | undefined) {
+    this.workspaceObserver?.disconnect();
+    this.workspaceElement = value?.nativeElement;
+    const element = this.workspaceElement;
+    if (!element) return;
+    const measure = () => { if (this.workspaceElement === element) this.workspaceWidth.set(element.clientWidth); };
+    this.workspaceObserver = new ResizeObserver(measure);
+    this.workspaceObserver.observe(element);
+    queueMicrotask(measure);
+  }
+
+  @ViewChild('focusTools') set focusTools(value: ElementRef<HTMLElement> | undefined) {
+    this.toolsObserver?.disconnect();
+    this.toolsElement = value?.nativeElement;
+    const element = this.toolsElement;
+    if (!element) return;
+    const measure = () => { if (this.toolsElement === element) this.boundFocusTools(); };
+    this.toolsObserver = new ResizeObserver(measure);
+    this.toolsObserver.observe(element);
+    queueMicrotask(measure);
+  }
+
+  @HostListener('window:blur') cancelLayoutDragOnBlur(): void { this.cancelLayoutGesture(); }
+
+  @HostListener('window:resize') layoutViewportChanged(): void {
+    this.viewportWidth.set(document.documentElement.clientWidth || window.innerWidth);
+    if (this.workspaceElement) this.workspaceWidth.set(this.workspaceElement.clientWidth);
+    this.boundFocusTools();
+    this.scheduleSidebarHeight();
+  }
+
+  toggleSidebarSection(section: 'projects' | 'files'): void {
+    const state = section === 'projects' ? this.projectsCollapsed : this.filesCollapsed;
+    state.update(value => !value);
+    this.saveLayoutPreference(section === 'projects' ? projectsCollapsedStorageKey : filesCollapsedStorageKey, String(state()));
+  }
+
+  toggleProjectRegistration(): void {
+    this.registrationOpen.update(value => !value);
+    if (this.registrationOpen()) { this.projectsCollapsed.set(false); this.saveLayoutPreference(projectsCollapsedStorageKey, 'false'); }
+  }
+
+  beginPaneResize(kind: 'review' | 'sidebar', event: PointerEvent): void {
+    if (event.button !== 0 || !event.isPrimary || this.resizeGesture || this.toolsGesture) return;
+    const element = event.currentTarget as HTMLElement;
+    event.preventDefault();
+    element.focus({ preventScroll: true });
+    this.resizeGesture = { kind, pointerId: event.pointerId, element, startX: event.clientX, startWidth: kind === 'review' ? this.reviewWidth() : this.sidebarWidth(), originalWidth: kind === 'review' ? this.preferredReviewWidth() : this.preferredSidebarWidth() };
+    element.setPointerCapture(event.pointerId);
+    this.resizingPane.set(kind);
+  }
+
+  movePaneResize(event: PointerEvent): void {
+    const gesture = this.resizeGesture;
+    if (!gesture || event.pointerId !== gesture.pointerId) return;
+    event.preventDefault();
+    const direction = gesture.kind === 'review' ? -1 : 1;
+    this.setPaneWidth(gesture.kind, gesture.startWidth + direction * (event.clientX - gesture.startX));
+  }
+
+  finishPaneResize(event?: PointerEvent, save = true): void {
+    const gesture = this.resizeGesture;
+    if (!gesture || (event && event.pointerId !== gesture.pointerId)) return;
+    this.resizeGesture = null;
+    this.resizingPane.set(null);
+    if (gesture.element.hasPointerCapture(gesture.pointerId)) gesture.element.releasePointerCapture(gesture.pointerId);
+    if (save) this.savePaneWidth(gesture.kind);
+  }
+
+  paneResizeKeydown(kind: 'review' | 'sidebar', event: KeyboardEvent): void {
+    const bounds = kind === 'review' ? this.reviewBounds() : this.sidebarBounds();
+    const current = kind === 'review' ? this.reviewWidth() : this.sidebarWidth();
+    const step = event.shiftKey ? 80 : 20;
+    const direction = kind === 'review' ? -1 : 1;
+    let next: number;
+    switch (event.key) {
+      case 'ArrowLeft': next = current - direction * step; break;
+      case 'ArrowRight': next = current + direction * step; break;
+      case 'Home': next = bounds.minimum; break;
+      case 'End': next = bounds.maximum; break;
+      default: return;
+    }
+    event.preventDefault();
+    this.setPaneWidth(kind, next);
+    this.savePaneWidth(kind);
+  }
+
+  private setPaneWidth(kind: 'review' | 'sidebar', value: number): void {
+    const bounds = kind === 'review' ? this.reviewBounds() : this.sidebarBounds();
+    const state = kind === 'review' ? this.preferredReviewWidth : this.preferredSidebarWidth;
+    state.set(Math.round(Math.min(bounds.maximum, Math.max(bounds.minimum, value))));
+  }
+
+  private savePaneWidth(kind: 'review' | 'sidebar'): void {
+    this.saveLayoutPreference(kind === 'review' ? reviewWidthStorageKey : sidebarWidthStorageKey, String(kind === 'review' ? this.preferredReviewWidth() : this.preferredSidebarWidth()));
+  }
+
+  beginFocusToolsMove(event: PointerEvent): void {
+    if (event.button !== 0 || !event.isPrimary || this.resizeGesture || this.toolsGesture) return;
+    const element = event.currentTarget as HTMLElement;
+    event.preventDefault();
+    element.focus({ preventScroll: true });
+    this.toolsGesture = { pointerId: event.pointerId, element, startX: event.clientX, startY: event.clientY, position: this.focusToolsPosition() };
+    element.setPointerCapture(event.pointerId);
+    this.movingFocusTools.set(true);
+  }
+
+  moveFocusTools(event: PointerEvent): void {
+    const gesture = this.toolsGesture;
+    if (!gesture || event.pointerId !== gesture.pointerId) return;
+    event.preventDefault();
+    this.setFocusToolsPosition({ x: gesture.position.x + event.clientX - gesture.startX, y: gesture.position.y + event.clientY - gesture.startY });
+  }
+
+  finishFocusToolsMove(event?: PointerEvent, save = true): void {
+    const gesture = this.toolsGesture;
+    if (!gesture || (event && event.pointerId !== gesture.pointerId)) return;
+    this.toolsGesture = null;
+    this.movingFocusTools.set(false);
+    if (gesture.element.hasPointerCapture(gesture.pointerId)) gesture.element.releasePointerCapture(gesture.pointerId);
+    if (save) this.saveLayoutPreference(focusToolsPositionStorageKey, JSON.stringify(this.focusToolsPosition()));
+  }
+
+  focusToolsKeydown(event: KeyboardEvent): void {
+    const position = this.focusToolsPosition();
+    const step = event.shiftKey ? 40 : 10;
+    let next: FocusToolsPosition;
+    switch (event.key) {
+      case 'ArrowLeft': next = { ...position, x: position.x - step }; break;
+      case 'ArrowRight': next = { ...position, x: position.x + step }; break;
+      case 'ArrowUp': next = { ...position, y: position.y - step }; break;
+      case 'ArrowDown': next = { ...position, y: position.y + step }; break;
+      case 'Home': next = { x: 8, y: 8 }; break;
+      case 'End': next = { x: window.innerWidth, y: window.innerHeight }; break;
+      default: return;
+    }
+    event.preventDefault();
+    this.setFocusToolsPosition(next);
+    this.saveLayoutPreference(focusToolsPositionStorageKey, JSON.stringify(this.focusToolsPosition()));
+  }
+
+  private boundFocusTools(): void { if (this.toolsElement) this.setFocusToolsPosition(this.focusToolsPosition()); }
+  private setFocusToolsPosition(position: FocusToolsPosition): void {
+    const element = this.toolsElement;
+    if (!element) return;
+    const next = clampFocusToolsPosition(position, document.documentElement.clientWidth || window.innerWidth, window.innerHeight, element.offsetWidth, element.offsetHeight);
+    const previous = this.focusToolsPosition();
+    if (next.x !== previous.x || next.y !== previous.y) this.focusToolsPosition.set(next);
+  }
+  private saveLayoutPreference(key: string, value: string): void {
+    try { localStorage.setItem(key, value); } catch { /* Layout controls also work without browser storage. */ }
+  }
+
+  private cancelLayoutGesture(): boolean {
+    if (this.resizeGesture) {
+      const gesture = this.resizeGesture;
+      (gesture.kind === 'review' ? this.preferredReviewWidth : this.preferredSidebarWidth).set(gesture.originalWidth);
+      this.finishPaneResize(undefined, false);
+      return true;
+    }
+    if (this.toolsGesture) {
+      this.setFocusToolsPosition(this.toolsGesture.position);
+      this.finishFocusToolsMove(undefined, false);
+      return true;
+    }
+    return false;
+  }
+
   setNavigationMode(value: string): void {
     if (value !== 'full' && value !== 'compact' && value !== 'focus') return;
     this.navigationMode.set(value); this.navigationOpen.set(false);
-    if (value === 'focus') { this.sidebarCollapsed.set(true); this.reviewOpen.set(false); }
+    if (value === 'focus') this.sidebarCollapsed.set(true);
     try { localStorage.setItem('voice-studio:navigation', value); } catch { /* Optional UI preference. */ }
   }
   toggleNavigation(): void {
     if (this.navigationOpen()) { this.closeNavigation(); return; }
     this.returnNavigationFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    this.navigationOpen.set(true); this.reviewOpen.set(false);
+    this.navigationOpen.set(true);
     setTimeout(() => document.querySelector<HTMLElement>('#workspace-navigation button')?.focus());
   }
   closeNavigation(): void { this.navigationOpen.set(false); this.returnNavigationFocus?.focus(); }
   toggleProjects(): void { this.sidebarCollapsed.update(value => !value); this.navigationOpen.set(false); }
   openFocusAddress(address: string): void { if (this.liveBrowser) { this.liveBrowser.address = address; this.liveBrowser.openAddress(); this.closeNavigation(); } }
   @HostListener('document:keydown.escape') escapeOverlay(): void {
+    if (this.cancelLayoutGesture()) return;
     if (!this.focusNavigation()) return;
     if (this.navigationOpen()) this.closeNavigation(); else { this.reviewOpen.set(false); this.sidebarCollapsed.set(true); }
   }
@@ -176,7 +400,14 @@ export class AppComponent implements OnDestroy, OnInit {
     { id: "meta", label: "Meta & Kontext" },
   ];
 
-  ngOnInit(): void { void this.restoreSession(); }
+  ngOnInit(): void {
+    this.zone.runOutsideAngular(() => {
+      window.addEventListener('scroll', this.sidebarViewportChanged, { passive: true });
+      window.visualViewport?.addEventListener('resize', this.sidebarViewportChanged, { passive: true });
+      window.visualViewport?.addEventListener('scroll', this.sidebarViewportChanged, { passive: true });
+    });
+    void this.restoreSession();
+  }
 
   private async restoreSession(): Promise<void> {
     this.resumingSession.set(true);
@@ -664,7 +895,12 @@ export class AppComponent implements OnDestroy, OnInit {
     }
   }
 
-  isLiveWebsite(): boolean { return this.document()?.format !== 'markdown'; }
+  isLiveWebsite(): boolean {
+    const document = this.document();
+    if (!document || document.format !== 'markdown') return !!document;
+    const project = this.selectedProject();
+    return !!project?.liveUrl && Object.values(project.sourceRoutes ?? {}).includes(document.path);
+  }
   parentFolder(): void { this.folderPath.update(folder => folder.split('/').slice(0, -1).join('/')); }
   componentContexts(): string[] { return this.selectedProject()?.sourceContexts?.[this.document()?.path ?? ''] ?? []; }
 
@@ -878,6 +1114,16 @@ export class AppComponent implements OnDestroy, OnInit {
     this.detachPreviewLinks = null;
   }
   ngOnDestroy(): void {
+    cancelAnimationFrame(this.sidebarHeightRequest);
+    this.sidebarObserver?.disconnect();
+    this.sidebarElement = undefined;
+    window.removeEventListener('scroll', this.sidebarViewportChanged);
+    window.visualViewport?.removeEventListener('resize', this.sidebarViewportChanged);
+    window.visualViewport?.removeEventListener('scroll', this.sidebarViewportChanged);
+    this.workspaceObserver?.disconnect();
+    this.toolsObserver?.disconnect();
+    this.finishPaneResize(undefined, false);
+    this.finishFocusToolsMove(undefined, false);
     this.disposeReview();
   }
 }

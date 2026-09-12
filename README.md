@@ -66,7 +66,7 @@ actual local Studio screenshot and a complete typed mount/dispose example.
 It explains both Git repositories and ordinary source folders.
 
 Six product pages have English and German navigation and introductions; the
-Research analysis is in English. Sixteen technical guides are
+Research analysis is available in English and German. Eighteen technical guides are
 rendered as HTML from an explicit source catalogue, with code examples,
 navigation, section links and optional source downloads. Guide bodies remain
 English; the surrounding controls support EN/DE. Start with:
@@ -167,7 +167,8 @@ Neither function calls a model, changes source or determines authorship.
 `npm run test:writing-rules` checks rules, composition, signals and consumers.
 The [writing-patterns website](http://127.0.0.1:5187/voice/writing-patterns/)
 uses the actual package for its local check and prompt composer. See the
-[API guide](docs/writing-rules.md) and [AI-text research](docs/ai-text-signals.md).
+[API guide](docs/writing-rules.md), [LLM tools](packages/writing-rules/TOOLS.md),
+[quality benchmarks](benchmarks/writing-review/quality-evaluation.md) and [AI-text research](docs/ai-text-signals.md).
 
 Studio's existing backend continues to use its four local rules and configured
 Runner prompts. It does not automatically load the new writing catalogue.

@@ -10,7 +10,7 @@ public sealed partial class ProjectStore
         if (detail.Format == "html" && (unit.Text.Contains("{{") || unit.Text.Contains("}}") || HasDynamicBinding(detail.Source, span)))
             throw new ApiError(422, "Dynamisch gebundener Fallback-Text benötigt einen unterstützten Quelladapter.");
         var escaped = detail.Format == "html" ? System.Net.WebUtility.HtmlEncode(text)
-            : detail.Format == "typescript" ? TypeScriptContentAdapter.EscapeReplacement(text, detail.Source[unit.SourceSpan.Start - 1])
+            : detail.Format is "typescript" or "json" ? TypeScriptContentAdapter.EscapeReplacement(text, detail.Source[unit.SourceSpan.Start - 1])
             : EscapeMarkdown(text);
         return (span, escaped);
     }
@@ -59,7 +59,7 @@ public sealed partial class ProjectStore
             var after = detail.Source;
             foreach (var edit in mapped.Reverse()) after = after[..edit.Span.Start] + edit.Replacement + after[edit.Span.End..];
             if (after == detail.Source) throw new ApiError(422, "Der Agent hat keine Textänderung vorgeschlagen.");
-            if (detail.Format == "typescript") TypeScriptContentAdapter.Parse(after);
+            if (detail.Format is "typescript" or "json") DocumentParser.Parse(after, detail.Format);
             var proposal = new Proposal(id, documentId, string.Join("\n", edits.Select(e => e.Quote)), string.Join("\n", edits.Select(e => e.Replacement)),
                 string.Join("\n", edits.Select(e => e.Replacement)), detail.Source, after, detail.Version,
                 new(mapped[0].Span.Start, mapped[^1].Span.End), null, "Agent-Task: " + string.Join("; ", edits.Select(e => e.Reason)),

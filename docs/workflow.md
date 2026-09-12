@@ -72,6 +72,39 @@ must allow its development Studio parent, or be opened in its own tab. The latte
 is ordinary browsing and does not imply a connected review panel. Production
 builds should not enable the developer bridge automatically.
 
+## JSON content and the Voice website
+
+Explicitly configured JSON files are supported source documents. The adapter reads
+named prose fields such as title, lead, method, limitations and API explanations.
+It preserves UTF-16 positions across escaped quotes and Unicode characters.
+Technical IDs, URLs and markup are excluded. Duplicate keys and invalid JSON are
+rejected. Proposals preserve JSON string escaping and the existing source-version
+checks; applying a proposal writes the original file.
+
+The Voice checkout includes its own `voice.config.json`. To register it:
+
+```sh
+npm run website:preview
+# In a second terminal:
+npm start
+# With both services running:
+npm run onboard:website
+```
+
+The project opens the Studio product page. Its heading and introduction come from
+`website/content/studio.json`. The project also includes the original Markdown
+files for the 18 HTML guides and the English/German research JSON records.
+Use the connection badge to select a different research source file. A route
+selects one source file; only exact visible text matches receive annotations.
+JavaScript-generated page structure and text spanning multiple source files are
+not automatically assigned to a guessed source.
+
+The local website enables its HTML review bridge with `?voice-studio=1` on
+loopback. Ordinary public browsing exposes no analysis or prompt-composition
+controls. The bridge passes review selections and findings, without credentials
+or model execution. After a JSON source change, rebuild the static website with
+`npm run website:build` and reload it to inspect the result.
+
 ## Markdown: browse the project folder
 
 Register a folder, navigate through its subfolders, and open a Markdown file.

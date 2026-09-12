@@ -25,13 +25,13 @@ async function read(source){
 async function write(target,data){const dest=path.join(output,target);await fs.mkdir(path.dirname(dest),{recursive:true});await fs.writeFile(dest,data)}
 async function copy(source,target){await write(target,await read(source));sourceTargets.set(source,target)}
 
-for(const asset of ['site.css','docs.css','product.css','site.js','json-viewer.js','json-viewer.css','writing-patterns.css','writing-patterns.js','writing-playground.js','research.css','research.js'])await copy('website/'+asset,asset);
+for(const asset of ['site.css','docs.css','product.css','site.js','json-viewer.js','json-viewer.css','writing-patterns.css','writing-patterns.js','research.css','research.js'])await copy('website/'+asset,asset);
 for(const name of ['practice','studies','strategies','libraries','review-economics'])await copy('website/research/'+name+'.json','sources/research/'+name+'.json');
+for(const name of ['practice','studies','strategies','libraries','economics-sources'])await copy('website/research/de/'+name+'.json','sources/research/de/'+name+'.json');
 await copy('website/assets/studio-review.png','assets/studio-review.png');
 await copy('website/assets/studio-review.capture.json','assets/studio-review.capture.json');
 for(const name of studioImages)for(const extension of ['png','capture.json'])await copy(`website/assets/${name}.${extension}`,`assets/${name}.${extension}`);
 await copy('packages/review/dist/voice-review.js','voice-review.js');
-for(const name of ['index.js','catalogue.json','surface-patterns.json'])await copy('packages/writing-rules/dist/'+name,'writing-rules/'+name);
 await copy('packages/writing-rules/src/catalogue.json','sources/writing-rules/catalogue.json');
 for(const source of downloads)await copy(source,'sources/repository/'+source);
 // Publish current storage examples; design schemas remain in the repository.
@@ -77,7 +77,7 @@ for(const page of pages){
 }
 // Preserve existing bookmarks without a separate product page or sitemap entry.
 await write('project-reviews/index.html','<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=../"><meta name="robots" content="noindex"><link rel="canonical" href="https://agent-orchestrator.dev/voice/"><title>Voice · Git-backed review</title></head><body><p><a href="../">Git-backed review is on the Voice homepage.</a></p></body></html>');
-for(const source of ['website/site.mjs','website/research.mjs','website/review-economics.mjs','website/writing-patterns.mjs','website/writing-playground.mjs','website/studio-tour.mjs','website/docs-index.mjs','website/build.mjs','website/guides.mjs','website/render-guide.mjs','website/template.mjs','package-lock.json'])await read(source);
+for(const source of ['website/site.mjs','website/content/studio.json','website/research.mjs','website/review-economics.mjs','website/library-analysis.mjs','website/tooling-library.mjs','website/writing-patterns.mjs','website/studio-tour.mjs','website/docs-index.mjs','website/build.mjs','website/guides.mjs','website/render-guide.mjs','website/template.mjs','package-lock.json'])await read(source);
 let git={available:false};
 try{const run=args=>execFileSync('git',args,{cwd:root,encoding:'utf8',timeout:5000,windowsHide:true}).trim();git={available:true,commit:run(['rev-parse','HEAD']),branch:run(['branch','--show-current']),sourcePath:run(['rev-parse','--show-prefix']),workingTreeDirty:!!run(['status','--porcelain','--untracked-files=normal','--','.'])}}catch{}
 await write('build-info.json',JSON.stringify({schemaVersion:1,product:'Voice public website',deploymentTarget:origin+'/voice/',builtAt:new Date().toISOString(),git,inputs,routes,published:false},null,2)+'\n');

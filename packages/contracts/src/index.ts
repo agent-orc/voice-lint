@@ -1,7 +1,7 @@
 /** Voice Studio review API v0. Source offsets are UTF-16 code units, half-open.
  * The review adapter must explicitly convert when consuming Voice Lint's
  * proposed unicode_code_point analysis contract. These are not core spans. */
-export type DocumentFormat = 'html' | 'markdown' | 'typescript';
+export type DocumentFormat = 'html' | 'markdown' | 'typescript' | 'json';
 export interface ProjectSummary { id: string; name: string; description: string; documentCount: number; liveUrl?: string | null; sourceRoutes?: Record<string, string>; sourceContexts?: Record<string, string[]>; }
 /** Half-open offsets in the original source file, measured in UTF-16 code units.
  * This is not a DOM-text or Unicode-code-point span; the source adapter maps between them. */

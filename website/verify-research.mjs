@@ -12,7 +12,9 @@ const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const base=process.env.VOICE_WEBSITE_URL??'http://127.0.0.1:5187/voice/';
 const origin=new URL(base);
 assert(['127.0.0.1','localhost','[::1]'].includes(origin.hostname),'Research verification target must be loopback');
-const sections=['findings','practice','studies','strategies','libraries','economics','voice','sources'];
+const sections=['findings','practice','studies','strategies','libraries','economics','library-analysis','voice','sources'];
+let activeLocale='en';
+const prefix=()=>activeLocale==='de'?'de-':'';
 const types={practice:'practice',studies:'study',strategies:'strategy-evidence',libraries:'library'};
 const ruleIds=new Set(catalogue.rules.map(rule=>rule.id));
 const release=JSON.parse(await fs.readFile(path.join(root,'docs/plans/writing-review-next-release.json'),'utf8'));
@@ -70,6 +72,18 @@ for(const source of economics.organizationResearch.sources){
  assert(source.apiUse.releaseFunctionIds.every(id=>releaseFunctionIds.has(id)));
 }
 
+const deDatasets={};
+for(const name of Object.keys(types)){
+ deDatasets[name]=JSON.parse(await fs.readFile(path.join(root,'website/research/de',name+'.json'),'utf8'));
+ assert.equal(deDatasets[name].length,datasets[name].length);
+ for(const [index,localized] of deDatasets[name].entries()){
+  const original=datasets[name][index];assert.equal(localized.id,original.id);assert.equal(localized.url,original.url);
+  assert.deepEqual(localized.relatedRuleIds,original.relatedRuleIds);assert.deepEqual(localized.apiUse.releaseFunctionIds,original.apiUse.releaseFunctionIds);
+  assert.deepEqual(localized.apiUse.availableNow.map(api=>api.symbol),original.apiUse.availableNow.map(api=>api.symbol));
+ }
+}
+const economicsSourcesDe=JSON.parse(await fs.readFile(path.join(root,'website/research/de/economics-sources.json'),'utf8'));
+const localizedRecords=()=>activeLocale==='en'?records:Object.entries(deDatasets).flatMap(([dataset,items])=>items.map(item=>({...item,dataset})));
 async function visibleApi(detail,record){
  const api=detail.locator('.research-api');assert.equal(await api.count(),1,record.id+' needs one API connection');assert(await api.isVisible());
  const text=normalize(await api.innerText());assert(text.includes(normalize(record.apiUse.currentUse)),record.id+' current API use is missing');assert(text.includes(normalize(record.apiUse.missingCapability)),record.id+' missing capability is hidden');
@@ -88,8 +102,8 @@ try{
  page.on('pageerror',error=>errors.push(error.message));
  page.on('request',request=>requests.push({method:request.method(),url:request.url()}));
  const researchUrl=new URL('research/',base).href;
- const content=()=>page.locator('.research-content[lang="en"]');
- async function language(locale){await page.getByRole('button',{name:locale.toUpperCase(),exact:true}).click();assert.equal(await page.locator('html').getAttribute('lang'),locale);}
+ const content=()=>page.locator('.research-content[lang="'+activeLocale+'"]');
+ async function language(locale){activeLocale=locale;await page.getByRole('button',{name:locale.toUpperCase(),exact:true}).click();assert.equal(await page.locator('html').getAttribute('lang'),locale);}
  async function fits(label){assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),label+' must not cause horizontal page overflow');}
  await page.goto(researchUrl,{waitUntil:'domcontentloaded'});
  assert.equal(await page.locator('html').getAttribute('lang'),'en','Public research defaults to English even in a German browser');
@@ -99,12 +113,12 @@ try{
   for(const locale of ['en','de']){
    await language(locale);assert.equal(await content().count(),1);assert(await content().isVisible());
    assert.equal(await page.locator('.guide-sidebar, .guide-nav').count(),0,'Native research page must not inherit the guide sidebar');
-   const heading=page.getByRole('heading',{level:1});assert.equal(await heading.count(),1);assert(await heading.isVisible());assert.equal(await heading.innerText(),locale==='de'?'Texte, die man gern liest.':'Writing worth reading.');
+   const heading=page.getByRole('heading',{level:1});assert.equal(await heading.count(),1);assert(await heading.isVisible());assert.equal(await heading.innerText(),locale==='de'?'KI-Texte, die man gern liest.':'AI writing worth reading.');
    if(locale==='en'){await page.evaluate(()=>scrollTo(0,0));await fs.mkdir(path.join(root,'.local'),{recursive:true});await page.screenshot({path:path.join(root,'.local','navigation-research-'+viewport.width+'.png')});}
-   for(const id of sections){assert.equal(await page.locator('[id="'+id+'"]').count(),1,'Missing or duplicate research section: '+id);}
+   for(const id of sections){assert.equal(await page.locator('[id="'+prefix()+id+'"]').count(),1,'Missing or duplicate research section: '+id);}
    assert.equal(await content().locator('details.research-entry:has(.research-api)').count(),records.length);
-   for(const record of records){
-    const detail=content().locator('details.research-entry[id="'+record.id+'"]'),summary=detail.locator(':scope > summary');
+   for(const record of localizedRecords()){
+    const detail=content().locator('details.research-entry[id="'+prefix()+record.id+'"]'),summary=detail.locator(':scope > summary');
     assert((normalize(await summary.innerText())).includes(normalize(record.title??record.name)),record.id+' must be discoverable before expanding');
     if(await detail.getAttribute('open')===null)await summary.click();
     await visibleApi(detail,record);
@@ -118,26 +132,26 @@ try{
     for(const ruleId of record.relatedRuleIds)assert(hrefs.some(href=>{const target=new URL(href);return target.origin===origin.origin&&target.pathname.endsWith('/writing-patterns/')&&['#en-'+ruleId,'#de-'+ruleId].includes(target.hash);}),record.id+' must link to its related rule '+ruleId);
     await fits(locale+' '+viewport.width+'px expanded '+record.id);await summary.click();
    }
-   for(const source of economics.organizationResearch.sources){
-    const detail=page.locator('#economics details[id="'+source.id+'"]');
+   for(const source of activeLocale==='de'?economicsSourcesDe:economics.organizationResearch.sources){
+    const detail=content().locator('details[id="'+prefix()+source.id+'"]');
     await detail.locator('summary').click();
     const text=normalize(await detail.innerText());
     for(const value of [source.finding,source.limits,source.apiUse.currentUse,source.apiUse.proposed])assert(text.includes(normalize(value)));
     await fits(locale+' '+viewport.width+'px economics '+source.id);
     await detail.locator('summary').click();
    }
-   const promptLayout=page.locator('#prompt-layout');
+   const promptLayout=page.locator('#'+prefix()+'prompt-layout');
    await promptLayout.locator('summary').click();await fits(locale+' '+viewport.width+'px prompt layout');await promptLayout.locator('summary').click();
    checks.push(locale+' '+viewport.width+'px: every source/library expands with findings, limitations, actual API uses and missing capabilities; native page fits without a guide sidebar.');
    for(const dataset of Object.keys(datasets)){
-    const sources=page.locator(dataset==='review-economics'?'#economics':'#sources');
-    const target=new URL('sources/research/'+dataset+'.json',base).href;
+    const sources=page.locator('#'+prefix()+(dataset==='review-economics'?'economics':'sources'));
+    const target=new URL('sources/research/'+(activeLocale==='de'&&dataset!=='review-economics'?'de/':'')+dataset+'.json',base).href;
     // Identify by actual resolved URL, independently of translated labels.
     const index=await sources.locator('a[href]').evaluateAll((items,url)=>items.findIndex(element=>element.href===url),target);
     assert(index>=0,'Missing JSON record link: '+dataset);const jsonLink=sources.locator('a[href]').nth(index);await jsonLink.scrollIntoViewIfNeeded();
     const before=page.url();await jsonLink.click();const dialog=page.getByRole('dialog');await dialog.locator('pre:not([hidden])').waitFor();
     assert.equal(page.url(),before,'JSON evidence must open in-place');
-    const text=await dialog.locator('code').textContent();assert.equal(text,JSON.stringify(datasets[dataset],null,2),dataset+' dialog must show exactly the maintained public records as formatted JSON');
+    const text=await dialog.locator('code').textContent();assert.equal(text,JSON.stringify(activeLocale==='de'&&dataset!=='review-economics'?deDatasets[dataset]:datasets[dataset],null,2),dataset+' dialog must show exactly the maintained public records as formatted JSON');
     assert(await dialog.evaluate(element=>element.matches(':modal')),'The JSON record must be a modal dialog');
     await fits(locale+' '+viewport.width+'px JSON '+dataset);await page.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});
     assert(await jsonLink.evaluate(element=>document.activeElement===element),'Closing JSON restores focus to its source link');
@@ -147,6 +161,7 @@ try{
   }
  }
 
+ await language('en');
  const measured=page.locator('#economics');const costText=normalize(await measured.innerText());assert(costText.includes('30 authored English/German cases'));assert(costText.includes('none was sent to a model'));assert(costText.includes('Bytes are not tokens.'));assert(costText.includes('not equivalent review quality'));
  checks.push('Three full-text economics sources expose findings, limitations, actual API uses and proposed work; prompt organization remains explicit at desktop and mobile widths.');
  checks.push('Economics displays 30 authored fixtures, zero sent model requests and the bytes-versus-tokens/quality boundary; its modal reproduces the complete measured JSON object.');
@@ -183,6 +198,6 @@ try{
  checks.push('No browser exceptions, writes, model calls or cross-origin page requests occurred.');
  const buildResponse=await context.request.get(new URL('build-info.json',base).href);assert.equal(buildResponse.status(),200);const info=await buildResponse.json();
  const output=path.join(root,'test-results/voice-website');await fs.mkdir(output,{recursive:true});
- await fs.writeFile(path.join(output,'research.json'),JSON.stringify({capturedAt:new Date().toISOString(),scope:'Read-only actual local public research page in Chrome, EN/DE desktop/mobile and no JavaScript. Data checks validate references and presentation; they do not independently reproduce cited studies or install evaluated libraries.',recordCounts:Object.fromEntries(Object.entries(datasets).filter(([,value])=>Array.isArray(value)).map(([key,value])=>[key,value.length])),economics:{fixtureCount:economics.surfaceEvaluation.fixtureCount,providerRequestsSent:economics.execution.providerRequestsSent},checks,build:{builtAt:info.builtAt,inputs:info.inputs}},null,2)+'\n');
+ await fs.writeFile(path.join(output,'research.json'),JSON.stringify({capturedAt:new Date().toISOString(),scope:'Read-only actual local public research page in Chrome, EN/DE desktop/mobile and no JavaScript. Data checks validate references and presentation; they do not independently reproduce cited studies or install evaluated libraries.',languages:['en','de'],recordCounts:Object.fromEntries(Object.entries(datasets).filter(([,value])=>Array.isArray(value)).map(([key,value])=>[key,value.length])),economics:{fixtureCount:economics.surfaceEvaluation.fixtureCount,providerRequestsSent:economics.execution.providerRequestsSent},checks,build:{builtAt:info.builtAt,inputs:info.inputs}},null,2)+'\n');
  console.log('Research public UI: '+checks.length+' checks passed; '+records.length+' records, EN/DE at 1440/390px, native source details, rule links, five JSON dialogs, API connections and no-JavaScript fallback. No models or project writes.');
 }finally{await browser.close();}

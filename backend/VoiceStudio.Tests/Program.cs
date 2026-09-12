@@ -193,6 +193,7 @@ throw new Error('This source must never execute');
     File.WriteAllText(configPath, JsonSerializer.Serialize(configuration));
     Check(new ProjectStore(root, false).ListProjects().Any(p => p.Id == tsProject.Id && p.SourceContexts?.Count == 1), "configured source context persists onboarding");
     store.Unregister(tsProject.Id);
+    JsonContentChecks.Run(root, store, Check, Reject);
     var batchSources = Enumerable.Range(0, 40).Select(index => "export const content = { title: 'Batch cache document " + index + ".' };").ToArray();
     var batchBefore = TypeScriptContentAdapter.ProcessInvocationCount;
     TypeScriptContentAdapter.Warm(batchSources);

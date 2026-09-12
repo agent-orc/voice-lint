@@ -5,6 +5,9 @@ if (typeof source !== 'string' || source.length > 2_100_000) throw new Error('In
 const file = ts.createSourceFile('voice-content.ts', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
 if (file.parseDiagnostics.length) throw new Error('TypeScript syntax error: ' + ts.flattenDiagnosticMessageText(file.parseDiagnostics[0].messageText, ' '));
 const prose = new Set('title titles headline headlines headlineLines heroKicker kicker eyebrow heading headings subheading subtitle seoTitle metaDescription description descriptions lead summary heroOperational label labels navLabel body paragraphs paragraph quote quotes text texts caption captions alt annotations statusChips bullets bullet items intro introduction note notes detail details message helperText placeholder cta value benefit benefits question answer count'.toLowerCase().split(' '));
+if (source.startsWith('export const voiceJsonContent = ')) {
+  for (const key of 'observation limits limitations method methods finding findings voiceImplication application readingDepth purpose currentUse missingCapability languageSupport execution voiceFit capabilities supports instruction rationale explanation prompts symptom readerCost before after condition keep'.toLowerCase().split(' ')) prose.add(key);
+}
 const units = [];
 let excluded = 0, visibleLength = 0;
 function decode(node) {

@@ -38,7 +38,8 @@
         "shaib-slop-2025",
         "juzek-lexical-2025",
         "kobak-excess-vocabulary-2025",
-        "liang-detector-bias-2023"
+        "liang-detector-bias-2023",
+        "chakrabarty-writing-edits-2025"
       ]
     },
     {
@@ -70,7 +71,8 @@
         "vale",
         "textlint",
         "languagetool",
-        "harper"
+        "harper",
+        "chakrabarty-writing-edits-2025"
       ]
     },
     {
@@ -164,7 +166,8 @@
         "length-regularized-dpo",
         "write-good",
         "proselint",
-        "promptfoo"
+        "promptfoo",
+        "bharadwaj-preference-biases-2025"
       ],
       "localEvidence": [
         "benchmarks/writing-review/fixtures.json",
@@ -232,7 +235,9 @@
         "coauthor-writer-control",
         "textlint",
         "retext-simplify",
-        "languagetool"
+        "languagetool",
+        "chakrabarty-writing-edits-2025",
+        "bharadwaj-preference-biases-2025"
       ]
     },
     {

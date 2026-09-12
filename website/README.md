@@ -1,6 +1,6 @@
 # Voice website
 
-Six product pages with EN/DE navigation and sixteen English HTML guides form 22 content routes.
+Six product pages with EN/DE navigation and eighteen English HTML guides form 24 content routes.
 The homepage pairs a genuine Studio screenshot with a typed review-library example.
 The native Research area renders maintained source records from `website/research/`,
 with English analysis, methods, limits and reusable JSON. It is separate from the
@@ -10,7 +10,7 @@ technical guide system. The writing-patterns page uses the same versioned JSON c
 | --- | --- |
 | /voice/research/ | Practice articles, original studies, counter-strategies and library comparison |
 | /voice/ | Studio, libraries and Git-backed source/review files |
-| /voice/writing-patterns/ | Twenty AI writing anti-patterns, reader costs, counter-prompts, sources and actual local Library playground |
+| /voice/writing-patterns/ | Twenty AI writing anti-patterns, reader costs, counter-prompts, sources and static API examples |
 | /voice/studio/ | Local startup and three real Studio views |
 | /voice/library/ | Review annotations, native selection and typed integration |
 | /voice/docs/ | Studio, Library and agent workflow entry points |
@@ -30,7 +30,7 @@ npm run website:preview
 ```
 
 The command builds both libraries and the website, then serves only loopback
-port 5187. Studio runs separately on port 5188. The static website has no Studio
+port 5187. Studio runs separately on port 5188. The public website exposes no text-analysis form, prompt composer, LLM tools or model endpoint. Its code examples are documentation. The static website has no Studio
 session or backend credentials. Playground text stays in browser memory;
 surface checks and prompt composition call no model.
 
@@ -44,7 +44,7 @@ Verification links open formatted JSON dialogs with keyboard navigation,
 loading/error states and a normal-link fallback when JavaScript is disabled.
 
 Product content and controls support EN/DE with a saved language choice.
-Guide prose and research references remain English. The rule catalogue provides
+Guide prose remains English. Research summaries, methods, limitations and API applications are available in English and German; bibliographic titles retain their original language. The rule catalogue provides
 English and German examples, rule names and prompts; detailed source notes stay
 in their original English.
 
@@ -74,7 +74,7 @@ npm run test:evidence
 ```
 
 Browser checks cover desktop/mobile EN/DE routes, assets and fragments, code copy,
-no-JavaScript content, the actual annotation bundle and writing-rule package.
+no-JavaScript content, the actual HTML annotation bundle and absence of executable writing tools.
 JSON viewer checks use an isolated fixture, including invalid records and safe
 text rendering. Generated reports and screenshots are in ignored `test-results/`.
 Retained evidence has its own timestamp and build-input hashes in

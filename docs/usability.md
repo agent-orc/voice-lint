@@ -29,8 +29,8 @@ these records live and how their references connect.
 
 ## If marks are missing
 
-Check that marks are enabled, then read the browser panel's mapping count. A file
-assignment alone does not establish a text match. Open a finding to locate its
+Check that marks are enabled, then open the connection badge for mapping counts
+and source details. A file assignment alone does not establish a text match. Open a finding to locate its
 text; it may be outside the viewport. Text inside an image cannot be underlined
 as mapped DOM text. For a mismatch, check the source adapter's unit ID and exact
 text using the [bridge guide](../packages/review/LIVE-BRIDGE.md).
@@ -43,6 +43,27 @@ not been reproduced or fixed.
 
 English is the default. Choose EN/DE for the interface and rule explanations;
 source quotes, feedback and model prose keep their original language. Compact
-reduces navigation height; Website focus opens navigation and review as overlays.
-The floating controls reopen them and Escape closes an overlay. Language and
-display preferences are saved when browser storage is available.
+reduces navigation height. Website focus hides navigation behind floating
+controls; its navigation opens above the page. An open review always occupies a
+separate column beside the website. In Website focus, Escape closes the navigation
+dialog or the open review. Language and display preferences are saved when browser
+storage is available.
+
+## Resize the workspace
+
+Drag the separator beside the review or the project/file sidebar to change its
+width. Both separators support touch, arrow keys, Home and End. The review stays
+beside the website in Full, Compact and Website focus, including on small screens.
+Closing it returns that space to the website. The visible widths adapt to the
+viewport; resizing the window preserves the saved width preferences.
+
+Projects and Files collapse independently. Collapse Projects to give Files more
+space. Projects use compact rows; the file list uses the remaining sidebar height
+and scrolls separately. These section preferences persist in this browser.
+
+In Website focus, drag the grip beside Navigation to reposition the controls.
+Keyboard arrows move the focused grip; Home places it at the top left and End at
+the bottom right. Its saved position stays within the viewport after resizing.
+
+The connection badge opens source selection, mapping counts and connection
+details. Closing the details leaves the badge in the browser toolbar.

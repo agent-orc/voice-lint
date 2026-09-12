@@ -1,7 +1,7 @@
 # Model and prompt comparison
 
-The pilot prepares a paired experiment for choosing a model and a prompt shape
-by the **cost of an accepted complete review**. It uses the current Library to
+The pilot prepares a paired experiment to compare review quality across models
+and prompt shapes, then measure the **cost of an accepted complete review**. It uses the current Library to
 compose each prompt. It does not invoke a model or establish a winning model.
 
 ```sh
@@ -14,6 +14,11 @@ The output is the ignored `test-results/writing-review/model-experiment.json`.
 Source, Library, research snapshot and preparer hashes identify its inputs. The
 maintained runner, contract verifier and authored cases live in this directory.
 No credentials, runtime configuration or model output enter the prepared file.
+
+Recorded responses and independent human judgments can be evaluated with the
+[offline quality evaluator](quality-evaluation.md). Its input references the exact
+prepared manifest bytes; it does not silently rebuild current prompts for an old
+model run.
 
 ## Compare identical coverage
 
@@ -120,6 +125,12 @@ separate from prompt tuning. The preparation contains no measured model quality,
 provider token use, invoice cost, latency or AI-authorship score.
 
 ## Reviewer record
+
+The following preparation-time record describes editorial acceptance. The runnable
+offline evaluator uses the stricter, response-hash-bound judgment contract in
+[Review benchmarks](quality-evaluation.md); do not submit this early template
+as an evaluator run file.
+
 
 The generated file includes a separate acceptance-record template. Fill it after
 independent review; a null value means unassessed. This is reviewer data, not

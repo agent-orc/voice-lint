@@ -11,11 +11,16 @@
       "import": "./dist/index.js"
     },
     "./catalogue.json": "./dist/catalogue.json",
-    "./surface-patterns.json": "./dist/surface-patterns.json"
+    "./surface-patterns.json": "./dist/surface-patterns.json",
+    "./tools": {
+      "types": "./dist/tools.d.ts",
+      "import": "./dist/tools.js"
+    }
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "TOOLS.md"
   ],
   "engines": {
     "node": ">=22"

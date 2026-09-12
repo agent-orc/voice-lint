@@ -44,3 +44,30 @@ if('IntersectionObserver' in window){
 
 // JSON remains a normal link without JavaScript; enhanced views stay on this page.
 import('./json-viewer.js').then(module=>module.installJsonViewer()).catch(()=>{});
+
+
+// Local, explicit HTML review integration. No model tools or credentials.
+if (['127.0.0.1','localhost'].includes(location.hostname)
+    && new URL(location.href).searchParams.get('voice-studio') === '1') {
+  document.addEventListener('click',event=>{
+    const link=event.target instanceof Element?event.target.closest('a[href]'):null;
+    if(!link||link.hasAttribute('download'))return;
+    const target=new URL(link.href,location.href);
+    if(target.origin===location.origin&&target.pathname.startsWith('/voice/')&&target.pathname.endsWith('/')){
+      target.searchParams.set('voice-studio','1');link.href=target.href;
+    }
+  });
+  const connect = () => {
+    window.voiceStudioConnection = window.VoiceReview.connectVoiceStudio({
+      studioOrigin: 'http://127.0.0.1:5188',
+    });
+    window.addEventListener('pagehide', () => window.voiceStudioConnection?.dispose(), {once:true});
+  };
+  if (window.VoiceReview) connect();
+  else {
+    const script=document.createElement('script');
+    script.src='/voice/voice-review.js';
+    script.addEventListener('load',connect,{once:true});
+    document.head.append(script);
+  }
+}

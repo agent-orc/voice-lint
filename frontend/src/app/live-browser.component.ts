@@ -1,12 +1,12 @@
-import { Component, ElementRef, EventEmitter, Input, NgZone, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild, computed, inject, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, NgZone, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { I18nService, TranslatePipe, type TranslationParams } from './i18n.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import type { DocumentDetail, DocumentSummary, ProjectSummary, SelectionTarget } from '@voice/contracts';
 
 /** Review transport is restricted to the project's local development server. */
-@Component({ selector: 'voice-live-browser', standalone: true, imports: [FormsModule, TranslatePipe], templateUrl: './live-browser.component.html' })
-export class LiveBrowserComponent implements OnChanges, OnDestroy {
+@Component({ selector: 'voice-live-browser', standalone: true, imports: [FormsModule, TranslatePipe], templateUrl: './live-browser.component.html', styleUrl: './live-browser.component.css' })
+export class LiveBrowserComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Input({ required: true }) project!: ProjectSummary;
   @Input() documents: DocumentSummary[] = [];
   @Input() detail: DocumentDetail | null = null;
@@ -19,9 +19,16 @@ export class LiveBrowserComponent implements OnChanges, OnDestroy {
   @Output() saveUrl = new EventEmitter<string>();
   @Output() sourceMatched = new EventEmitter<boolean>();
   @ViewChild('liveFrame') liveFrame?: ElementRef<HTMLIFrameElement>;
+  @ViewChild('connectionDetails') connectionDetails?: ElementRef<HTMLElement>;
   readonly i18n = inject(I18nService);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly zone = inject(NgZone);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private frameResizeObserver?: ResizeObserver;
+  private frameLayoutObserver?: MutationObserver;
+  private frameHeightRequest = 0;
+  private destroyed = false;
+  private readonly viewportChanged = () => this.scheduleFrameHeight();
   private sessionId = crypto.randomUUID();
   private reviewId = '';
   private expectedOrigin = '';
@@ -32,6 +39,7 @@ export class LiveBrowserComponent implements OnChanges, OnDestroy {
   private manualDocument = '';
   private navigationSequence = 0;
   readonly frameUrl = signal<SafeResourceUrl | null>(null);
+  readonly frameHeight = signal<number | null>(null);
   readonly currentUrl = signal('');
   readonly pageTitle = signal('Website');
   readonly bridgeReady = signal(false);
@@ -42,11 +50,59 @@ export class LiveBrowserComponent implements OnChanges, OnDestroy {
   readonly markerNote = computed(() => !this.showMarks() ? this.i18n.t('Markierungen sind ausgeblendet. Schalte sie oben ein, um Befunde und offene Rückmeldungen zu sehen.') : this.mappingNote());
   readonly matchedFile = signal('');
   readonly showMarks = signal(true);
+  readonly connectionOpen = signal(false);
+  readonly connectionProblem = signal(false);
+  readonly mappingCoverage = signal<{ mapped: number; total: number } | null>(null);
+  readonly connectionAttention = computed(() => this.connectionProblem() || (this.bridgeReady() && (!this.matchedFile() || (this.showMarks() && this.mappingCoverage()?.mapped === 0))));
+  readonly connectionBadge = computed(() => {
+    if (this.connectionProblem()) return this.i18n.t('Verbindung prüfen');
+    if (!this.bridgeReady()) return this.i18n.t(this.currentUrl() ? 'Verbinden …' : 'Verbindung');
+    if (!this.matchedFile()) return this.i18n.t('Quelle wählen');
+    if (!this.showMarks()) return this.i18n.t('Markierungen aus');
+    const coverage = this.mappingCoverage();
+    return coverage ? this.i18n.t('{mapped}/{total} zugeordnet', coverage) : this.i18n.t('Verbunden');
+  });
+  readonly connectionTitle = computed(() => [this.i18n.t('Verbindung und Quellzuordnung'), this.i18n.t(this.status()), this.matchedFile(), this.markerNote()].filter(Boolean).join(' · '));
   address = '';
   sourceChoice = '';
   readonly integrationCode = `<script src="http://127.0.0.1:5188/library/voice-review.js"></script>\n<script>VoiceReview.connectVoiceStudio({studioOrigin: '${window.location.origin}'});</script>`;
   private readonly receive = (event: MessageEvent) => this.zone.run(() => this.onMessage(event));
   constructor() { window.addEventListener('message', this.receive); }
+
+  ngAfterViewInit(): void {
+    this.zone.runOutsideAngular(() => {
+      this.frameResizeObserver = new ResizeObserver(this.viewportChanged);
+      const host = this.host.nativeElement;
+      const studio = host.closest('voice-studio') ?? document.body;
+      // Ancestor size changes cover split widths and wrapping navigation above the frame.
+      let ancestor: HTMLElement | null = host;
+      while (ancestor) {
+        this.frameResizeObserver.observe(ancestor);
+        ancestor = ancestor.parentElement;
+      }
+      this.frameLayoutObserver = new MutationObserver(this.viewportChanged);
+      this.frameLayoutObserver.observe(studio, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['class', 'hidden', 'open'] });
+      window.addEventListener('resize', this.viewportChanged, { passive: true });
+      window.addEventListener('scroll', this.viewportChanged, { passive: true, capture: true });
+      window.visualViewport?.addEventListener('resize', this.viewportChanged, { passive: true });
+      window.visualViewport?.addEventListener('scroll', this.viewportChanged, { passive: true });
+      this.scheduleFrameHeight();
+    });
+  }
+  private scheduleFrameHeight(): void {
+    if (this.destroyed || this.frameHeightRequest) return;
+    this.frameHeightRequest = requestAnimationFrame(() => {
+      this.frameHeightRequest = 0;
+      const frame = this.liveFrame?.nativeElement;
+      if (this.destroyed || !frame?.isConnected || !frame.getClientRects().length) return;
+      const viewport = window.visualViewport;
+      const viewportHeight = viewport?.height ?? window.innerHeight;
+      const visibleTop = Math.max(0, frame.getBoundingClientRect().top - (viewport?.offsetTop ?? 0));
+      // Cap at one viewport when the toolbar scrolls away; scrolling must not grow the document indefinitely.
+      const height = Math.max(1, Math.floor(viewportHeight - visibleTop));
+      if (this.frameHeight() !== height) this.zone.run(() => this.frameHeight.set(height));
+    });
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['project'] && (changes['project'].firstChange || changes['project'].previousValue?.id !== this.project.id || changes['project'].previousValue?.liveUrl !== this.project.liveUrl)) {
@@ -65,17 +121,20 @@ export class LiveBrowserComponent implements OnChanges, OnDestroy {
     if (changes['loading'] || changes['documents'] || changes['detail']) this.sendReview();
     if (changes['activeFindingId'] && this.reviewId) this.post({ type: 'voice-studio:select-finding', reviewId: this.reviewId, findingId: this.activeFindingId });
   }
+  openConnectionDetails(): void { this.connectionDetails?.nativeElement.showPopover(); }
+  connectionToggled(): void { this.connectionOpen.set(this.connectionDetails?.nativeElement.matches(':popover-open') ?? false); }
+  private showConnectionError(message: string): void { this.status.set(message); this.connectionProblem.set(true); this.openConnectionDetails(); }
   openAddress(): void {
     try {
       const url = this.validateUrl(this.address);
       if (!this.project.liveUrl || new URL(this.project.liveUrl).origin !== url.origin) this.saveUrl.emit(url.href);
       else this.navigate(url.href);
-    } catch (error) { this.status.set((error as Error).message); }
+    } catch (error) { this.showConnectionError((error as Error).message); }
   }
-  useAsStart(): void { try { this.saveUrl.emit(this.validateUrl(this.address).href); } catch (error) { this.status.set((error as Error).message); } }
+  useAsStart(): void { try { this.saveUrl.emit(this.validateUrl(this.address).href); } catch (error) { this.showConnectionError((error as Error).message); } }
   navigate(raw: string): void {
     let url: URL;
-    try { url = this.validateUrl(raw); } catch (error) { this.status.set((error as Error).message); return; }
+    try { url = this.validateUrl(raw); } catch (error) { this.showConnectionError((error as Error).message); return; }
     url.searchParams.set('voice-studio', '1');
     url.searchParams.set('voice-studio-origin', window.location.origin);
     this.disconnect(); this.sessionId = crypto.randomUUID(); this.expectedOrigin = url.origin;
@@ -85,12 +144,13 @@ export class LiveBrowserComponent implements OnChanges, OnDestroy {
     setTimeout(() => { if (sequence === this.navigationSequence) this.frameUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url.href)); });
   }
   frameLoaded(): void {
+    this.scheduleFrameHeight();
     this.bridgeReady.set(false); this.reviewId = ''; this.reviewSentFor = ''; this.reviewSentDetail = null; this.sourceMatched.emit(false);
     this.status.set('Website geöffnet · Verbindung zur Review-Library wird hergestellt …');
     clearInterval(this.handshakeTimer); let attempts = 0;
     const connect = () => {
       this.post({ type: 'voice-studio:connect' });
-      if (++attempts >= 16 && !this.bridgeReady()) { clearInterval(this.handshakeTimer); this.status.set('Website ohne Review-Verbindung. Library einbinden oder die Seite in einem eigenen Tab öffnen.'); }
+      if (++attempts >= 16 && !this.bridgeReady()) { clearInterval(this.handshakeTimer); this.status.set('Website ohne Review-Verbindung. Library einbinden oder die Seite in einem eigenen Tab öffnen.'); this.connectionProblem.set(true); }
     };
     connect(); this.handshakeTimer = setInterval(connect, 500);
   }
@@ -127,7 +187,7 @@ export class LiveBrowserComponent implements OnChanges, OnDestroy {
       if (url.origin !== this.expectedOrigin) return;
       clearInterval(this.handshakeTimer);
       if (this.currentUrl() !== url.href) this.manualDocument = '';
-      this.bridgeReady.set(true); this.currentUrl.set(url.href); this.address = url.href;
+      this.bridgeReady.set(true); this.connectionProblem.set(false); this.currentUrl.set(url.href); this.address = url.href;
       this.pageTitle.set(typeof message.title === 'string' ? message.title : 'Website');
       this.reviewSentFor = ''; this.reviewSentDetail = null; this.reviewId = ''; this.status.set('Live verbunden · Originalseite mit ihren Styles und Skripten');
       const file = this.resolveDocument(url.href); this.matchedFile.set(file?.path ?? ''); this.sourceChoice = file?.id ?? ''; this.sourceMatched.emit(false);
@@ -150,6 +210,7 @@ export class LiveBrowserComponent implements OnChanges, OnDestroy {
       const anchoredFindings = findings.filter(item => !unmappedFindings.has(item.id)).length;
       const anchoredFeedback = feedback.filter(item => !unmappedFeedback.has(item.id)).length;
       const matched = !!this.detail && this.resolveDocument(this.currentUrl())?.id === this.detail.id;
+      this.mappingCoverage.set(matched ? { mapped, total: count } : null);
       if (matched && this.showMarks()) {
         const hint = !mapped ? 'Kein Quelltext passt eindeutig zum sichtbaren Seitentext. Prüfe die Quelldatei und die Sprache der Website.'
           : !findings.length && !feedback.length ? 'Für diese Quelle liegen keine Befunde oder offenen Rückmeldungen vor. Zugeordnete Texte lassen sich für Feedback auswählen.'
@@ -160,7 +221,7 @@ export class LiveBrowserComponent implements OnChanges, OnDestroy {
       }
       this.sourceMatched.emit(matched && mapped > 0 && this.showMarks());
     }
-    if (message.type === 'voice-studio:error' && typeof message.message === 'string') this.mappingMessage.set(message.message);
+    if (message.type === 'voice-studio:error' && typeof message.message === 'string') { this.mappingMessage.set(message.message); this.connectionProblem.set(true); this.openConnectionDetails(); }
   }
   private resolveDocument(raw: string): DocumentSummary | undefined {
     if (this.manualDocument) return this.documents.find(file => file.id === this.manualDocument);
@@ -175,9 +236,10 @@ export class LiveBrowserComponent implements OnChanges, OnDestroy {
     } catch { return undefined; }
   }
   private urlForDocument(file: DocumentSummary): string | null {
-    if (!this.project.liveUrl || file.format === 'markdown') return null;
+    if (!this.project.liveUrl) return null;
     const route = Object.entries(this.project.sourceRoutes ?? {}).find(([, source]) => source === file.path.replaceAll('\\', '/'))?.[0];
     if (route) return new URL(route, this.project.liveUrl).href;
+    if (file.format === 'markdown') return null;
     if (file.format === 'html') return new URL(file.path.replaceAll('\\', '/'), new URL('.', this.project.liveUrl)).href;
     return null;
   }
@@ -193,6 +255,7 @@ export class LiveBrowserComponent implements OnChanges, OnDestroy {
     // A fresh adapter snapshot may remap units without changing source or feedback hashes.
     const mappedDetail = matched ? detail : null;
     if (this.reviewSentFor === key && this.reviewSentDetail === mappedDetail) return;
+    this.mappingCoverage.set(null);
     this.reviewSentFor = key; this.reviewSentDetail = mappedDetail; this.reviewId = crypto.randomUUID();
     this.post({ type: 'voice-studio:review', reviewId: this.reviewId, pageUrl: this.currentUrl(), units: matched && this.showMarks() ? detail.units : [], findings: matched && this.showMarks() ? detail.findings : [], feedback: matched && this.showMarks() ? detail.feedback : [] });
   }
@@ -202,6 +265,18 @@ export class LiveBrowserComponent implements OnChanges, OnDestroy {
     return !!unit && Number.isInteger(target.start) && Number.isInteger(target.end) && target.start >= 0 && target.end > target.start && target.end <= unit.text.length && unit.text.slice(target.start, target.end) === target.quote;
   }
   private post(message: Record<string, unknown>): void { if (this.expectedOrigin) this.liveFrame?.nativeElement.contentWindow?.postMessage({ ...message, sessionId: this.sessionId }, this.expectedOrigin); }
-  private disconnect(): void { this.post({ type: 'voice-studio:disconnect' }); clearInterval(this.handshakeTimer); this.bridgeReady.set(false); this.reviewId = ''; this.reviewSentFor = ''; this.reviewSentDetail = null; this.mappingMessage.set(''); this.matchedFile.set(''); this.sourceMatched.emit(false); }
-  ngOnDestroy(): void { ++this.navigationSequence; this.disconnect(); window.removeEventListener('message', this.receive); }
+  private disconnect(): void { this.post({ type: 'voice-studio:disconnect' }); clearInterval(this.handshakeTimer); this.bridgeReady.set(false); this.reviewId = ''; this.reviewSentFor = ''; this.reviewSentDetail = null; this.mappingMessage.set(''); this.mappingCoverage.set(null); this.connectionProblem.set(false); this.matchedFile.set(''); this.sourceMatched.emit(false); }
+  ngOnDestroy(): void {
+    this.destroyed = true;
+    cancelAnimationFrame(this.frameHeightRequest);
+    this.frameResizeObserver?.disconnect();
+    this.frameLayoutObserver?.disconnect();
+    window.removeEventListener('resize', this.viewportChanged);
+    window.removeEventListener('scroll', this.viewportChanged, true);
+    window.visualViewport?.removeEventListener('resize', this.viewportChanged);
+    window.visualViewport?.removeEventListener('scroll', this.viewportChanged);
+    ++this.navigationSequence;
+    this.disconnect();
+    window.removeEventListener('message', this.receive);
+  }
 }

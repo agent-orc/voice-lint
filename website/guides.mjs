@@ -1,5 +1,7 @@
 // Explicit publication catalogue: never discover documents from private runtime folders.
 export const guides = [
+  {slug:'writing-tools',source:'packages/writing-rules/TOOLS.md',title:'Writing tools for agents',description:'Register four LLM tools for rule knowledge, review prompts, local signals and host-supplied model evidence.',group:'Start here',status:'Implemented'},
+  {slug:'review-benchmarks',source:'benchmarks/writing-review/quality-evaluation.md',title:'Review benchmarks',description:'Evaluate retained responses, independent human judgments and all-attempt costs with frozen inputs and reproducible reports.',group:'Reference',status:'Implemented'},
   {slug:'writing-rules',source:'docs/writing-rules.md',title:'Writing rules and prompt composition',description:'Select a review profile, inspect rule examples and compose a task-specific prompt.',group:'Reference',status:'Implemented'},
   {slug:'ai-text-signals',source:'docs/ai-text-signals.md',title:'Inspect AI-like writing patterns',description:'Use local style cues and understand what they can establish about text authorship.',group:'Reference',status:'Implemented'},
   {slug:'workflow',source:'docs/workflow.md',title:'The Studio workflow',description:'From a registered folder and running page to an explicit, version-checked source change.',group:'Start here',status:'Implemented'},

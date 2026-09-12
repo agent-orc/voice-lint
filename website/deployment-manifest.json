@@ -28,19 +28,23 @@
     "/voice/guides/maintaining/",
     "/voice/guides/commands/",
     "/voice/guides/verification/",
-    "/voice/guides/notices/"
+    "/voice/guides/notices/",
+    "/voice/guides/writing-tools/",
+    "/voice/guides/review-benchmarks/"
   ],
   "ecosystemEntry": {
     "name": "Voice",
-    "kind": "App and library",
-    "description": "A local review UI and typed Library for Git repositories or ordinary source folders, with readable technical guides.",
+    "kind": "Studio and two libraries",
+    "description": "Local text review in Git project folders, with agent tooling and an independent HTML review library.",
     "href": "/voice/",
     "studioHref": "/voice/studio/",
     "libraryHref": "/voice/library/",
     "docsHref": "/voice/docs/",
     "typedLibraryHref": "/voice/guides/library-types/",
     "patternsHref": "/voice/writing-patterns/",
-    "researchHref": "/voice/research/"
+    "researchHref": "/voice/research/",
+    "writingToolsHref": "/voice/guides/writing-tools/",
+    "benchmarksHref": "/voice/guides/review-benchmarks/"
   },
   "existingDeploymentPattern": "Static website build to an explicitly selected deploy branch; host mounts the artifact at the product path.",
   "unresolvedHostInputs": [
@@ -51,7 +55,7 @@
   "applicationUrl": "http://127.0.0.1:5188/",
   "publishApplicationBackend": false,
   "publicPageCount": 6,
-  "htmlGuideCount": 16,
+  "htmlGuideCount": 18,
   "pageCatalogue": "website/site.mjs",
   "guideCatalogue": "website/guides.mjs",
   "guideContentLanguage": "en",
@@ -59,12 +63,15 @@
     "en",
     "de"
   ],
-  "researchContentLanguage": "en",
   "redirects": [
     {
       "from": "/voice/project-reviews/",
       "to": "/voice/",
       "kind": "static-html-refresh"
     }
+  ],
+  "researchContentLanguages": [
+    "en",
+    "de"
   ]
 }

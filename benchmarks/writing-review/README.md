@@ -1,5 +1,10 @@
 # Writing review benchmark
 
+For evaluating recorded model responses with independent human judgments, see
+[Review benchmarks](quality-evaluation.md). The evaluator preserves frozen inputs,
+planned denominators and unknown judgments; quality does not depend on available
+cost data.
+
 For a prepared comparison of model cost effectiveness and matched prompt groups,
 see [Model and prompt comparison](model-comparison.md). Its generator creates
 canonical request payloads and unresolved candidate assignments without calling

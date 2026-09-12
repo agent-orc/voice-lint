@@ -70,7 +70,7 @@ public static class TypeScriptContentAdapter
 
     private static Extraction[] ExtractBatch(string[] sources)
     {
-        var start = new ProcessStartInfo("node") { RedirectStandardInput = true, RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false, CreateNoWindow = true };
+        var start = new ProcessStartInfo("node") { RedirectStandardInput = true, RedirectStandardOutput = true, RedirectStandardError = true, StandardInputEncoding = new UTF8Encoding(false, true), StandardOutputEncoding = new UTF8Encoding(false, true), StandardErrorEncoding = new UTF8Encoding(false, true), UseShellExecute = false, CreateNoWindow = true };
         start.ArgumentList.Add(FindScript());
         using var process = new Process { StartInfo = start };
         try { process.Start(); Interlocked.Increment(ref processInvocations); }
@@ -91,13 +91,15 @@ public static class TypeScriptContentAdapter
         try { extracted = JsonSerializer.Deserialize<Extraction[]>(output.GetAwaiter().GetResult(), ProjectStore.Json) ?? throw new JsonException(); }
         catch (JsonException) { throw new ApiError(422, "Ungültige Antwort des TypeScript-Quelladapters."); }
         if (extracted.Length != sources.Length) throw new ApiError(422, "Die TypeScript-Batchantwort ist unvollständig.");
+        if (extracted.Any(document => document.Units.Any(unit => unit.Starts.Length != unit.Text.Length || unit.Ends.Length != unit.Text.Length)))
+            throw new ApiError(422, "Quelladapter liefert uneinheitliche UTF-16-Textpositionen.");
         return extracted;
     }
 
     private static ParsedDocument Render(Extraction extracted)
     {
         var units = extracted.Units.Select((unit, index) => new MappedUnit(
-            new TextUnit("ts-u-" + index, unit.Text, new(unit.Start, unit.End), unit.Kind, extracted.Language),
+            new TextUnit("ts-u-" + index, unit.Text, new(unit.Start, unit.End), unit.Kind, UnitLanguage(unit.Property, extracted.Language)),
             unit.Starts, unit.Ends)).ToArray();
         var html = new StringBuilder("<!doctype html><html><head><meta charset=\"utf-8\"><style>body{font:17px/1.65 system-ui,sans-serif;padding:32px;color:#26352d;background:#fcfcf9}small{color:#607068}section{margin-bottom:24px}h1,h2{font-size:24px;line-height:1.3}</style></head><body>");
         for (var i = 0; i < units.Length; i++)
@@ -109,6 +111,12 @@ public static class TypeScriptContentAdapter
         }
         html.Append("</body></html>");
         return new ParsedDocument(units, html.ToString(), extracted.ExcludedRegions, extracted.Language);
+    }
+
+    private static string UnitLanguage(string property, string fallback)
+    {
+        var language = property.Split('.').LastOrDefault(segment => segment is "en" or "de");
+        return language ?? fallback;
     }
 
     public static string EscapeReplacement(string replacement, char quote)

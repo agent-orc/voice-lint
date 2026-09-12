@@ -1,5 +1,101 @@
 [
   {
+    "id": "chakrabarty-writing-edits-2025",
+    "title": "Can AI writing be salvaged? Mitigating Idiosyncrasies and Improving Human-AI Alignment in the Writing Process through Edits",
+    "authors": [
+      "Tuhin Chakrabarty",
+      "Philippe Laban",
+      "Chien-Sheng Wu"
+    ],
+    "date": "2024-09-22",
+    "url": "https://arxiv.org/html/2409.14509v5",
+    "kind": "study",
+    "question": "Which edits address ornamental, imprecise or redundant AI-generated writing?",
+    "method": "Eight writers informed seven edit categories; eighteen writers edited 1,057 creative-writing paragraphs from GPT-4o, Claude 3.5 Sonnet and Llama 3.1-70B.",
+    "findings": [
+      "The taxonomy separates distracting ornament, insufficient specificity, awkward wording and redundant exposition.",
+      "Adding relevant detail can improve writing even when it increases length."
+    ],
+    "limitations": [
+      "Creative genres and subjective expert edits do not establish technical-heading failure rates. Paragraph-level evaluation can miss whole-document problems; factual hallucinations were not studied."
+    ],
+    "voiceImplication": "Review what wording contributes to the reader's task; retain useful metaphor, rhythm and specificity.",
+    "readingDepth": "CHI 2025 paper; arXiv v5 (2025-03-04), sections 4.1–4.4, 6.1 and 8. Date records the first preprint.",
+    "relatedRuleIds": [
+      "reader-goal",
+      "word-choice",
+      "task-relevance",
+      "repetition"
+    ],
+    "apiUse": {
+      "availableNow": [
+        {
+          "symbol": "selectWritingRules",
+          "purpose": "Select reader-goal, word-choice and repetition guidance."
+        },
+        {
+          "symbol": "composeWritingReviewPrompt",
+          "purpose": "Supply audience and purpose for contextual review."
+        }
+      ],
+      "currentUse": "The composer prepares instructions. It does not detect these semantic categories or implement the study's editing model.",
+      "missingCapability": "Compare quoted problems and alternatives against page context, including deliberate keep cases and expert disagreement.",
+      "releaseFunctionIds": [
+        "contextual-review",
+        "result-validation",
+        "alternative-comparison"
+      ]
+    }
+  },
+  {
+    "id": "bharadwaj-preference-biases-2025",
+    "title": "Flattery, Fluff, and Fog: Diagnosing and Mitigating Idiosyncratic Biases in Preference Models",
+    "authors": [
+      "Anirudh Bharadwaj",
+      "Chaitanya Malaviya",
+      "Nitish Joshi",
+      "Mark Yatskar"
+    ],
+    "date": "2025-06-05",
+    "url": "https://arxiv.org/html/2506.05339v3",
+    "kind": "study",
+    "question": "Do model judges reward surface features beyond human preferences?",
+    "method": "Controlled English counterfactual pairs vary five features; four reward models and three LLM judges are compared with three human judgments per case.",
+    "findings": [
+      "Reward models overvalued jargon and vagueness relative to human judgments; LLM judges also showed preference distortions.",
+      "Counterfactual training reduced measured miscalibration."
+    ],
+    "limitations": [
+      "Synthetic single-turn pairs, selected historical models and noisy human labels limit transfer. The study cannot explain the cause of a particular Voice heading."
+    ],
+    "voiceImplication": "Benchmark usefulness and specificity independently of a judge's preference for polished presentation.",
+    "readingDepth": "Full text v3 (2026-03-03): sections 2–5 and 8, including pair construction, human comparison and training-data analysis. Date records the first preprint.",
+    "relatedRuleIds": [
+      "reader-goal",
+      "word-choice",
+      "format-fit",
+      "reported-evidence"
+    ],
+    "apiUse": {
+      "availableNow": [
+        {
+          "symbol": "getWritingRule",
+          "purpose": "Retrieve contextual wording and format guidance."
+        },
+        {
+          "symbol": "composeWritingReviewPrompt",
+          "purpose": "Request concrete reader impact and quoted evidence."
+        }
+      ],
+      "currentUse": "These instructions support review; they neither calibrate a judge nor establish human acceptance.",
+      "missingCapability": "Compare controlled alternatives with blinded human adjudication; test whether decorative phrasing changes model judgments despite equivalent substance.",
+      "releaseFunctionIds": [
+        "prompt-benchmarks",
+        "alternative-comparison"
+      ]
+    }
+  },
+  {
     "id": "shaib-slop-2025",
     "title": "Measuring AI ‘Slop’ in Text",
     "authors": [

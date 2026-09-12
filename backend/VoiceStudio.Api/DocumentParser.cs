@@ -32,7 +32,7 @@ public static partial class DocumentParser
 
     public static ParsedDocument Parse(string source, string format)
     {
-        return format == "html" ? Html(source) : format == "typescript" ? TypeScriptContentAdapter.Parse(source) : Markdown(source);
+        return format == "json" ? JsonContentAdapter.Parse(source) : format == "html" ? Html(source) : format == "typescript" ? TypeScriptContentAdapter.Parse(source) : Markdown(source);
     }
 
     private static MappedUnit? Unit(string raw, int offset, string kind, string lang, int ordinal, bool decode, bool markdown)

@@ -21,7 +21,6 @@ try{
  const page=await context.newPage();page.setDefaultTimeout(12000);page.on('pageerror',error=>errors.push(error.message));page.on('request',request=>requests.push({method:request.method(),url:request.url()}));
  const current=()=>page.locator('article:not([hidden])');
  async function language(locale){await page.getByRole('button',{name:locale.toUpperCase(),exact:true}).click();assert.equal(await page.locator('html').getAttribute('lang'),locale);}
- async function submit(form){await form.locator('button[type=submit]').click();}
  async function recordLinks(){for(const href of await page.locator('a[href]').evaluateAll(items=>items.map(item=>item.href)))if(href.startsWith(base))links.add(href);}
  await page.goto(new URL('writing-patterns/',base).href,{waitUntil:'domcontentloaded'});
  assert.equal(await page.locator('html').getAttribute('lang'),'en');
@@ -29,7 +28,7 @@ try{
   await page.setViewportSize(viewport);
   for(const locale of ['en','de']){
    await language(locale);const article=current();
-   await article.locator('[data-pattern-filters]:not([hidden])').waitFor();await article.locator('[data-signal-form]:not([hidden])').waitFor({state:'attached'});
+   await article.locator('[data-pattern-filters]:not([hidden])').waitFor();
    assert.equal(await article.locator('[data-pattern-rule]').count(),catalogue.rules.length);
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Writing patterns must fit the viewport');
    await article.locator('[data-pattern-category]').selectOption('claims');
@@ -54,32 +53,8 @@ try{
    }
    checks.push(locale+' '+viewport.width+'px: all '+catalogue.rules.length+' negative names and bad examples are visible upfront; opening each card reveals its reader cost, remedy and counter-prompt.');
 
-   const signal=article.locator('[data-signal-form]');await signal.locator('xpath=..').locator('summary').click();
-   await signal.locator('[data-signal-text]').fill(locale==='de'?'Es ist wichtig zu betonen: Git ist die bevorzugte Datenquelle. Dieser nahtlose Ablauf koennte Reviews erleichtern.':'It is worth noting that Git is the preferred source of record. This seamless workflow may generally make reviews easier.');await submit(signal);await signal.locator('[data-signal-results] li').first().waitFor();
-   const status=await signal.locator('[data-signal-status]').textContent();assert(status.includes(locale==='de'?'für 8 Regeln':'for 8 rules'));assert(status.includes(locale==='de'?'Urheberschaft wurden nicht bewertet':'authorship were not assessed'));
-   const source=await signal.locator('[data-signal-text]').inputValue();
-   for(const item of await signal.locator('[data-signal-results] li').all()){
-    const quote=await item.locator('q').textContent(),span=await item.locator('span').textContent(),match=span.match(/(\d+)–(\d+)/);assert(match);assert.equal(source.slice(Number(match[1]),Number(match[2])),quote);
-   }
-   await signal.locator('[data-signal-text]').fill(locale==='de'?'Öffne die Datei und speichere deine Entscheidung.':'Open the file and save your decision.');await submit(signal);assert.equal(await signal.locator('[data-signal-results] li').count(),0);
-   assert((await signal.locator('[data-signal-status]').textContent()).startsWith('0 '));
-   checks.push(`${locale} ${viewport.width}px: local signals expose exact UTF-16 quotes, eight-rule coverage, no-authorship boundary and honest zero matches.`);
-   await signal.locator('xpath=..').locator('summary').click();
-
-   const compose=article.locator('[data-prompt-form]');await compose.locator('xpath=..').locator('summary').click();
-   assert.equal(await compose.locator('select option').count(),4);
-   const audience=locale==='de'?'Entwickler <script>window.__PROMPT_EXECUTED=true</script>':'Developers <script>window.__PROMPT_EXECUTED=true</script>';
-   await compose.locator('[data-prompt-audience]').fill(audience);
-   for(const profile of catalogue.profiles){
-    await compose.locator('[data-prompt-profile]').selectOption(profile.id);await submit(compose);await compose.locator('[data-prompt-result]:not([hidden])').waitFor();
-    const code=await compose.locator('code').textContent();assert(code.includes(audience));
-    const selected=[...code.matchAll(/^\[([^\]]+)\]/gm)].map(match=>match[1]);assert.equal(selected.length,6);assert.deepEqual([...selected].sort(),[...profile.ruleIds].sort());
-    assert(code.includes(locale==='de'?'keinen Text automatisch':'do not rewrite text automatically'));assert(code.includes(locale==='de'?'ein bis drei':'one to three'));assert(code.includes(locale==='de'?'weder Autorschaft':'neither authorship'));assert(!code.includes('AI probability:'));
-   }
-   assert.equal(await compose.locator('script').count(),0);assert.equal(await page.evaluate(()=>window.__PROMPT_EXECUTED),undefined);
-   const code=await compose.locator('code').textContent();await compose.locator('.copy-code').click();assert.equal((await page.evaluate(()=>navigator.clipboard.readText())).replaceAll('\r\n','\n'),code);
-   checks.push(`${locale} ${viewport.width}px: all four six-rule profiles compose locally, user context remains text, exact prompt copy works.`);
-   await compose.locator('xpath=..').locator('summary').click();
+   assert.equal(await page.locator('[data-writing-playground], [data-signal-form], [data-prompt-form], textarea, button[type=submit]').count(),0,'Public pages must not expose analysis or prompt composition controls');
+   checks.push(locale+' '+viewport.width+'px: static rule reference exposes no text-analysis form or prompt-composition controls.');
    await recordLinks();
   }
  }
@@ -112,9 +87,14 @@ try{
  checks.push(`${links.size} local writing, docs, Git, Studio and verification links/section targets resolve.`);
 
  const noJs=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}});const fallback=await noJs.newPage();await fallback.goto(new URL('writing-patterns/',base).href);assert.equal(await fallback.locator('article:not([hidden]) [data-pattern-rule]').count(),catalogue.rules.length);await fallback.locator('article:not([hidden]) [data-pattern-rule] summary').first().click();assert(await fallback.locator('article:not([hidden]) [data-pattern-rule] code').first().isVisible());await noJs.close();checks.push(catalogue.rules.length+' anti-patterns and their counter-prompts remain readable on mobile without JavaScript.');
- assert.deepEqual(errors,[]);assert(requests.every(request=>request.method==='GET'),'Public page controls must not send mutation or model requests');assert(requests.every(request=>new URL(request.url).origin===url.origin),'No public playground content is sent to another origin');
+ for(const asset of ['writing-playground.js','writing-rules/index.js','writing-rules/tools.js']){
+  const response=await context.request.get(new URL(asset,base).href);assert.equal(response.status(),404,'Executable writing capability must not be publicly served: '+asset);
+ }
+ assert(requests.every(request=>!new URL(request.url).pathname.includes('/writing-rules/')&&!request.url.includes('writing-playground')),'Public interactions must not load writing tooling');
+ checks.push('Removed playground and executable writing-library routes return 404; public controls load no writing tools.');
+ assert.deepEqual(errors,[]);assert(requests.every(request=>request.method==='GET'),'Public page controls must not send mutation or model requests');assert(requests.every(request=>new URL(request.url).origin===url.origin),'Public browsing loads no external resources');
  checks.push('No browser exceptions, mutation requests or external uploads occurred.');
  const info=await(await context.request.get(new URL('build-info.json',base).href)).json();
  const output=path.join(root,'test-results/voice-website');await fs.mkdir(output,{recursive:true});await fs.writeFile(path.join(output,'writing-patterns.json'),JSON.stringify({capturedAt:new Date().toISOString(),scope:'Actual built public website in local Chrome; no Studio sessions, source edits or model calls.',checks,build:{builtAt:info.builtAt,inputs:info.inputs}},null,2)+'\n');
- console.log(`Writing patterns public UI: ${checks.length} checks passed, EN/DE at 1440/390px, profiles/signals/hash/filter/copy, JSON dialogs and three authentic Studio captures. No model calls or project writes.`);
+ console.log(`Writing patterns public UI: ${checks.length} checks passed, EN/DE at 1440/390px, static rules/hash/filter/copy, JSON dialogs and three authentic Studio captures. No model calls or project writes.`);
 }finally{await browser.close();}

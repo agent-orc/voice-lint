@@ -4,7 +4,7 @@ import { writingCatalogue, getWritingRule, composeWritingReviewPrompt, findWriti
 
 test('negative definitions reach prompts and optional additions remain contextual reviews', () => {
   const ruleIds = ['unearned-praise', 'false-balance', 'exhaustive-checklist', 'forced-template'];
-  assert.equal(writingCatalogue.version, 'voice-writing-rules/0.2.0');
+  assert.equal(writingCatalogue.version, 'voice-writing-rules/0.2.1');
   for (const language of ['en', 'de']) {
     const result = composeWritingReviewPrompt({ audience: 'Developers', goal: 'Assess the proposal', language, ruleIds });
     assert.deepEqual(result.ruleIds, ruleIds);

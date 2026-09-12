@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "measuredAt": "2026-09-12T13:48:56.129Z",
+  "measuredAt": "2026-09-12T15:07:04.268Z",
   "benchmark": "voice-writing-review-authored-v1",
-  "catalogueVersion": "voice-writing-rules/0.2.0",
+  "catalogueVersion": "voice-writing-rules/0.2.1",
   "execution": {
     "offline": true,
     "providerRequestsSent": 0,
@@ -12,7 +12,7 @@
   "provenance": {
     "fixtureSha256": "caa45260f4c077434ec76098b8e9a57585111d7c604549fd61f6a4db22ca29e4",
     "runnerSha256": "010df8edeb97ac298af1e856ee59ea164d44737f51f086203259fb96a380a638",
-    "librarySha256": "0b761d41398e2e89a730e426758439cb1a12cb70ecc3ed812845ffbc147cf41a",
+    "librarySha256": "ce63fd5588ab37e945d27c224c66131e578464629568616358cb404f2f138eb7",
     "authoredFixtureNotice": "Fixtures authored for this offline benchmark. These are editorial test cases, not sampled model responses, a representative corpus, or independent ground truth.",
     "labelling": "expectedReview lists the exact passage and rule that an editor judged worth reviewing. An empty list means keep this fixture in its stated context. A scanner candidate on a keep fixture is a false positive for this editorial decision, not a scanner malfunction."
   },
@@ -44,7 +44,7 @@
         "sameRuleCoverage": true,
         "requestReduction": 570,
         "payloadUtf8BytesSaved": 741931,
-        "payloadUtf8ReductionFraction": 0.587558751440326,
+        "payloadUtf8ReductionFraction": 0.5791652843208812,
         "repeatedSourceUtf8BytesSaved": 107806,
         "encodedTokensSaved": null
       },
@@ -54,7 +54,7 @@
         "sameRuleCoverage": true,
         "requestReduction": 150,
         "payloadUtf8BytesSaved": 195245,
-        "payloadUtf8ReductionFraction": 0.5120589361490084,
+        "payloadUtf8ReductionFraction": 0.5048691056153742,
         "repeatedSourceUtf8BytesSaved": 28370,
         "encodedTokensSaved": null
       }
@@ -67,16 +67,16 @@
         "fixtureCount": 30,
         "totalRequests": 600,
         "totalInstructions": {
-          "utf16CodeUnits": 1114605,
-          "utf8Bytes": 1122855
+          "utf16CodeUnits": 1132905,
+          "utf8Bytes": 1141155
         },
         "totalRepeatedSource": {
           "utf16CodeUnits": 112520,
           "utf8Bytes": 113480
         },
         "totalPayload": {
-          "utf16CodeUnits": 1253525,
-          "utf8Bytes": 1262735
+          "utf16CodeUnits": 1271825,
+          "utf8Bytes": 1281035
         },
         "totalEncodedTokens": null
       },
@@ -87,16 +87,16 @@
         "fixtureCount": 30,
         "totalRequests": 30,
         "totalInstructions": {
-          "utf16CodeUnits": 504135,
-          "utf8Bytes": 508680
+          "utf16CodeUnits": 522435,
+          "utf8Bytes": 526980
         },
         "totalRepeatedSource": {
           "utf16CodeUnits": 5626,
           "utf8Bytes": 5674
         },
         "totalPayload": {
-          "utf16CodeUnits": 516211,
-          "utf8Bytes": 520804
+          "utf16CodeUnits": 534511,
+          "utf8Bytes": 539104
         },
         "totalEncodedTokens": null
       },
@@ -107,16 +107,16 @@
         "fixtureCount": 30,
         "totalRequests": 180,
         "totalInstructions": {
-          "utf16CodeUnits": 336810,
-          "utf8Bytes": 339330
+          "utf16CodeUnits": 342195,
+          "utf8Bytes": 344760
         },
         "totalRepeatedSource": {
           "utf16CodeUnits": 33756,
           "utf8Bytes": 34044
         },
         "totalPayload": {
-          "utf16CodeUnits": 378486,
-          "utf8Bytes": 381294
+          "utf16CodeUnits": 383871,
+          "utf8Bytes": 386724
         },
         "totalEncodedTokens": null
       },
@@ -127,16 +127,16 @@
         "fixtureCount": 30,
         "totalRequests": 30,
         "totalInstructions": {
-          "utf16CodeUnits": 176160,
-          "utf8Bytes": 177705
+          "utf16CodeUnits": 181545,
+          "utf8Bytes": 183135
         },
         "totalRepeatedSource": {
           "utf16CodeUnits": 5626,
           "utf8Bytes": 5674
         },
         "totalPayload": {
-          "utf16CodeUnits": 184456,
-          "utf8Bytes": 186049
+          "utf16CodeUnits": 189841,
+          "utf8Bytes": 191479
         },
         "totalEncodedTokens": null
       }

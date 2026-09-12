@@ -17,7 +17,12 @@
   </div>
 </header>
 @if (focusNavigation()) {
-  <div class="focus-tools"><button type="button" class="button secondary" (click)="toggleNavigation()" [attr.aria-expanded]="navigationOpen()" aria-controls="workspace-navigation">☰ {{ 'Navigation' | t }}</button><button type="button" class="button secondary" (click)="reviewOpen.set(!reviewOpen()); navigationOpen.set(false)" [attr.aria-expanded]="reviewOpen()">{{ (reviewOpen() ? 'Review schließen' : 'Review öffnen') | t }}</button></div>
+  <div #focusTools class="focus-tools" [class.dragging]="movingFocusTools()" [style.left.px]="focusToolsPosition().x" [style.top.px]="focusToolsPosition().y">
+    <button id="focus-tools-drag" type="button" class="focus-tools-drag" [attr.aria-label]="'Navigationsleiste verschieben' | t" aria-describedby="focus-tools-help" [attr.title]="'Ziehen oder mit Pfeiltasten verschieben' | t" (pointerdown)="beginFocusToolsMove($event)" (pointermove)="moveFocusTools($event)" (pointerup)="finishFocusToolsMove($event)" (pointercancel)="finishFocusToolsMove($event)" (lostpointercapture)="finishFocusToolsMove($event)" (keydown)="focusToolsKeydown($event)"><span aria-hidden="true">⠿</span></button>
+    <button type="button" class="button secondary" (click)="toggleNavigation()" [attr.aria-expanded]="navigationOpen()" aria-controls="workspace-navigation">☰ {{ 'Navigation' | t }}</button>
+    <button type="button" class="button secondary" (click)="reviewOpen.set(!reviewOpen()); navigationOpen.set(false)" [attr.aria-expanded]="reviewOpen()" aria-controls="voice-review-panel">{{ (reviewOpen() ? 'Review schließen' : 'Review öffnen') | t }}</button>
+    <span id="focus-tools-help" class="layout-control-help">{{ 'Pfeiltasten verschieben die Leiste. Umschalt beschleunigt. Pos1 setzt sie nach oben links, Ende nach unten rechts.' | t }}</span>
+  </div>
   @if (navigationOpen()) { <div class="navigation-backdrop" (click)="closeNavigation()" aria-hidden="true"></div> }
 }
 
@@ -98,128 +103,50 @@
     </section>
   </main>
 } @else {
-  <div class="studio-layout" [class.sidebar-collapsed]="sidebarCollapsed()">
+  <div class="studio-layout" [class.sidebar-collapsed]="sidebarCollapsed()" [style.--sidebar-width]="sidebarWidth() + 'px'">
     @if (!sidebarCollapsed()) {
-      <aside class="project-sidebar" [attr.aria-label]="'Projekte und Dateien' | t">
-        <div class="sidebar-heading">
-          <span class="eyebrow">{{ 'ARBEITSRAUM' | t }}</span
-          ><button
-            class="icon-button"
-            type="button"
-            [attr.title]="'Lokales Projekt öffnen' | t"
-            [attr.aria-label]="'Lokales Projekt öffnen' | t"
-            (click)="registrationOpen.set(!registrationOpen())"
-          >
-            +
-          </button>
-        </div>
-        @if (registrationOpen()) {
-          <form class="register-form" (ngSubmit)="registerProject()">
-            <label for="project-path">{{ 'Lokaler Projektordner' | t }}</label
-            ><input
-              id="project-path"
-              name="projectPath"
-              [(ngModel)]="projectPath"
-              [placeholder]="'C:\\Projekte\\meine-webseite' | t"
-              required
-            />
-            <label for="project-name"
-              >Name <span class="optional">optional</span></label
-            ><input
-              id="project-name"
-              name="projectName"
-              [(ngModel)]="projectName"
-              [placeholder]="'Meine Webseite' | t"
-            />
-            <button
-              class="button primary small wide"
-              [disabled]="busy() || !projectPath.trim()"
-            >
-
-              {{ 'Projekt öffnen' | t }}
-            </button>
-            <p class="small-muted">
-
-              {{ 'Durchsucht HTML- und Markdown-Dateien. Dynamische Anwendungen benötigen einen Quelltext-Adapter.' | t }}
-            </p>
-          </form>
-        }
-        <div class="project-list">
-          @for (project of projects(); track project.id) {
-            <button
-              type="button"
-              class="project-button"
-              [class.active]="selectedProject()?.id === project.id"
-              [disabled]="busy()"
-              (click)="openProject(project)"
-            >
-              <span class="folder-icon" aria-hidden="true">◇</span
-              ><span
-                >{{ project.name }}<small
-                  >{{ project.documentCount }}
-                  {{ project.documentCount === 1 ? ('Datei' | t) : ('Dateien' | t) }}</small
-                ></span
-              ><span class="chevron" aria-hidden="true">›</span>
-            </button>
-          }
-        </div>
-        @if (selectedProject(); as project) {
-          <div class="file-section-heading">
-            <span class="eyebrow">{{ 'DATEIEN' | t }}</span
-            ><span class="count">{{ documents().length }}</span>
+      <aside #projectSidebar id="project-sidebar" class="project-sidebar" [style.--sidebar-height]="sidebarHeight() === null ? null : sidebarHeight() + 'px'" [attr.aria-label]="'Projekte und Dateien' | t">
+        <section class="sidebar-projects-section" [class.section-collapsed]="projectsCollapsed()">
+          <div class="sidebar-heading">
+            <button id="toggle-sidebar-projects" type="button" class="sidebar-section-toggle" (click)="toggleSidebarSection('projects')" [attr.aria-expanded]="!projectsCollapsed()" aria-controls="sidebar-projects"><span aria-hidden="true">{{ projectsCollapsed() ? '▸' : '▾' }}</span><span>{{ 'Projekte' | t }}</span><span class="count">{{ projects().length }}</span></button>
+            <button class="icon-button" type="button" [attr.title]="'Lokales Projekt öffnen' | t" [attr.aria-label]="'Lokales Projekt öffnen' | t" (click)="toggleProjectRegistration()">+</button>
           </div>
-          <div class="folder-location">
-            <strong>/{{ folderPath() }}</strong>
-            @if (folderPath()) {
-              <button
-                type="button"
-                class="text-button"
-                (click)="parentFolder()"
-              >
-
-                {{ '↑ Übergeordneter Ordner' | t }}
-              </button>
+          <div id="sidebar-projects" [hidden]="projectsCollapsed()">
+            @if (registrationOpen()) {
+              <form class="register-form" (ngSubmit)="registerProject()">
+                <label for="project-path">{{ 'Lokaler Projektordner' | t }}</label><input id="project-path" name="projectPath" [(ngModel)]="projectPath" [placeholder]="'C:\\Projekte\\meine-webseite' | t" required />
+                <label for="project-name">Name <span class="optional">optional</span></label><input id="project-name" name="projectName" [(ngModel)]="projectName" [placeholder]="'Meine Webseite' | t" />
+                <button class="button primary small wide" [disabled]="busy() || !projectPath.trim()">{{ 'Projekt öffnen' | t }}</button>
+                <p class="small-muted">{{ 'Durchsucht HTML- und Markdown-Dateien. Dynamische Anwendungen benötigen einen Quelltext-Adapter.' | t }}</p>
+              </form>
             }
+            <div class="project-list">
+              @for (project of projects(); track project.id) {
+                <button type="button" class="project-button" [class.active]="selectedProject()?.id === project.id" [disabled]="busy()" (click)="openProject(project)" [attr.title]="project.name">
+                  <span class="folder-icon" aria-hidden="true">◇</span><span class="project-name">{{ project.name }}</span><span class="project-file-count" [attr.aria-label]="(project.documentCount === 1 ? 'Datei' : 'Dateien') | t">{{ project.documentCount }}</span>
+                </button>
+              }
+            </div>
           </div>
-          <div class="file-list">
-            @for (folder of subfolders(); track folder.path) {
-              <button
-                type="button"
-                class="file-button folder-button"
-                (click)="folderPath.set(folder.path)"
-              >
-                <span aria-hidden="true">▸</span><span>{{ folder.name }}/</span>
-              </button>
-            }
-            @for (file of visibleFiles(); track file.id) {
-              <button
-                type="button"
-                class="file-button"
-                [class.active]="document()?.id === file.id"
-                [disabled]="busy()"
-                (click)="
-                  openDocument(file.id, tab() === 'project' ? 'preview' : tab())
-                "
-              >
-                <span class="file-type">{{ file.format === "markdown" ? "M↓" : "〈〉" }}</span
-                ><span class="file-name"
-                  >{{ file.path }}<small>{{ file.wordCount }} {{ 'Wörter' | t }}</small></span
-                >
-                @if (file.findingCount > 0) {
-                  <span class="file-count">{{ file.findingCount }}</span>
+        </section>
+        @if (selectedProject()) {
+          <section class="sidebar-files-section" [class.section-collapsed]="filesCollapsed()">
+            <div class="file-section-heading"><button id="toggle-sidebar-files" type="button" class="sidebar-section-toggle" (click)="toggleSidebarSection('files')" [attr.aria-expanded]="!filesCollapsed()" aria-controls="sidebar-files"><span aria-hidden="true">{{ filesCollapsed() ? '▸' : '▾' }}</span><span>{{ 'Dateien' | t }}</span><span class="count">{{ documents().length }}</span></button></div>
+            <div id="sidebar-files" [hidden]="filesCollapsed()">
+              <div class="folder-location"><strong>/{{ folderPath() }}</strong>@if (folderPath()) { <button type="button" class="text-button" (click)="parentFolder()">{{ '↑ Übergeordneter Ordner' | t }}</button> }</div>
+              <div class="file-list">
+                @for (folder of subfolders(); track folder.path) { <button type="button" class="file-button folder-button" (click)="folderPath.set(folder.path)"><span aria-hidden="true">▸</span><span>{{ folder.name }}/</span></button> }
+                @for (file of visibleFiles(); track file.id) {
+                  <button type="button" class="file-button" [class.active]="document()?.id === file.id" [disabled]="busy()" (click)="openDocument(file.id, tab() === 'project' ? 'preview' : tab())" [attr.title]="file.path">
+                    <span class="file-type">{{ file.format === 'markdown' ? 'M↓' : '〈〉' }}</span><span class="file-name">{{ file.path.split('/').pop() }}</span>@if (file.findingCount > 0) { <span class="file-count">{{ file.findingCount }}</span> }
+                  </button>
                 }
-              </button>
-            }
-          </div>
-          <div class="project-description">{{ project.description }}</div>
+              </div>
+            </div>
+          </section>
         }
-        <div class="sidebar-footer">
-          <div>
-            <span class="status-dot connected"></span>  {{ 'Im lokalen Projekt gespeichert' | t }}
-          </div>
-          <p>{{ 'Dein Feedback bleibt bei der Quelle.' | t }}</p>
-        </div>
       </aside>
+      <div id="sidebar-splitter" class="pane-splitter sidebar-splitter" role="separator" tabindex="0" aria-orientation="vertical" aria-controls="project-sidebar" [attr.aria-label]="'Breite der Projektleiste' | t" [attr.aria-valuemin]="sidebarBounds().minimum" [attr.aria-valuemax]="sidebarBounds().maximum" [attr.aria-valuenow]="sidebarWidth()" [attr.aria-valuetext]="'{width} Pixel' | t:{width: sidebarWidth()}" [style.left.px]="focusNavigation() ? sidebarWidth() + 10 : null" (pointerdown)="beginPaneResize('sidebar', $event)" (pointermove)="movePaneResize($event)" (pointerup)="finishPaneResize($event)" (pointercancel)="finishPaneResize($event)" (lostpointercapture)="finishPaneResize($event)" (keydown)="paneResizeKeydown('sidebar', $event)"></div>
     }
 
     <main class="workspace">
@@ -415,7 +342,7 @@
                               ? "MD"
                               : file.format === "typescript"
                                 ? "TS"
-                                : "HTML" }}</span>
+                                : file.format === "json" ? "JSON" : "HTML" }}</span>
                         </td>
                         <td>{{ file.wordCount }}</td>
                         <td>{{ file.findingCount }}</td>
@@ -474,8 +401,11 @@
       } @else if (!loading() || (tab() === "preview" && isLiveWebsite())) {
         @if (document(); as current) {
           <div
+            #documentWorkspace
             class="document-workspace"
             [class.review-collapsed]="!reviewOpen()"
+            [class.resizing-review]="resizingPane() === 'review'"
+            [style.--review-width]="reviewWidth() + 'px'"
           >
             <section class="document-pane" [attr.aria-label]="'Dokument' | t">
               @if (tab() === "preview" && isLiveWebsite()) {
@@ -507,7 +437,7 @@
                       ? "Markdown"
                       : current.format === "typescript"
                         ? "TypeScript"
-                        : "HTML" }}</span>
+                          : current.format === "json" ? "JSON" : "HTML" }}</span>
                 </div>
                 <div class="preview-context">
                   <span>{{ current.format === "markdown"
@@ -554,7 +484,7 @@
                         ? "Markdown"
                         : current.format === "typescript"
                           ? "TypeScript"
-                          : "HTML" }}
+                          : current.format === "json" ? "JSON" : "HTML" }}
                     {{ '· schreibgeschützte Ansicht' | t }}</span
                   >
                 </div>
@@ -673,7 +603,8 @@
             </section>
 
             @if (reviewOpen()) {
-              <aside class="review-panel" [attr.aria-label]="'Analyse und Feedback' | t">
+              <div id="review-splitter" class="pane-splitter review-splitter" role="separator" tabindex="0" aria-orientation="vertical" aria-controls="voice-review-panel" aria-describedby="review-splitter-help" [attr.aria-label]="'Breite des Reviews' | t" [attr.aria-valuemin]="reviewBounds().minimum" [attr.aria-valuemax]="reviewBounds().maximum" [attr.aria-valuenow]="reviewWidth()" [attr.aria-valuetext]="'{width} Pixel' | t:{width: reviewWidth()}" (pointerdown)="beginPaneResize('review', $event)" (pointermove)="movePaneResize($event)" (pointerup)="finishPaneResize($event)" (pointercancel)="finishPaneResize($event)" (lostpointercapture)="finishPaneResize($event)" (keydown)="paneResizeKeydown('review', $event)"><span id="review-splitter-help" class="layout-control-help">{{ 'Pfeil links verbreitert das Review, Pfeil rechts verschmälert es. Pos1 setzt die Mindestbreite, Ende die Höchstbreite.' | t }}</span></div>
+              <aside id="voice-review-panel" class="review-panel" [attr.aria-label]="'Analyse und Feedback' | t">
                 <div class="review-panel-heading">
                   <div>
                     <div class="eyebrow">{{ 'DEVELOPER REVIEW' | t }}</div>
@@ -1068,3 +999,5 @@
     </main>
   </div>
 }
+
+@if (resizingPane() || movingFocusTools()) { <div class="layout-drag-shield" [class.moving-tools]="movingFocusTools()" aria-hidden="true"></div> }

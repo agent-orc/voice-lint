@@ -1,4 +1,12 @@
 export const appMessages: Record<string, string> = {
+  'Projekte': 'Projects',
+  'Navigationsleiste verschieben': 'Move navigation controls',
+  'Ziehen oder mit Pfeiltasten verschieben': 'Drag or move with arrow keys',
+  'Pfeiltasten verschieben die Leiste. Umschalt beschleunigt. Pos1 setzt sie nach oben links, Ende nach unten rechts.': 'Arrow keys move the controls. Shift moves faster. Home places them at the top left; End at the bottom right.',
+  'Breite der Projektleiste': 'Project sidebar width',
+  'Breite des Reviews': 'Review panel width',
+  '{width} Pixel': '{width} pixels',
+  'Pfeil links verbreitert das Review, Pfeil rechts verschmälert es. Pos1 setzt die Mindestbreite, Ende die Höchstbreite.': 'Left arrow widens the review; right arrow narrows it. Home sets the minimum width; End sets the maximum width.',
   'Gib den Verbindungscode einmal ein. Du kannst diesen Browser auf diesem Gerät sieben Tage lang angemeldet lassen.': 'Enter the connection code once. You can stay signed in to this browser on this device for seven days.',
   'Diesen Browser 7 Tage merken': 'Remember this browser for 7 days',
   'Nur auf einem eigenen Gerät aktivieren. Abmelden entfernt den gespeicherten Zugang dieses Browsers.': 'Use this on your own device. Signing out removes this browser’s remembered access.',
