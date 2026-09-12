@@ -1,3 +1,4 @@
+import {websiteVerificationBase,websiteVerificationDirectory,publicVerification} from './verification-target.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -7,8 +8,8 @@ import {JSDOM} from 'jsdom';
 import {pages} from './site.mjs';
 import {guides} from './guides.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
-const output=path.join(root,'test-results/voice-website');await fs.mkdir(output,{recursive:true});
-const base='http://127.0.0.1:5187/voice/',errors=[],checked=[],verifiedLinks=new Set();
+const output=path.join(root,'test-results/'+websiteVerificationDirectory);await fs.mkdir(output,{recursive:true});
+const base=websiteVerificationBase,errors=[],checked=[],verifiedLinks=new Set();
 assert.equal(pages.length,6,'Six native product pages are published');assert.equal(guides.length,18,'Eighteen maintained guides are published');
 assert(!pages.some(page=>page.slug==='project-reviews'),'Project reviews must only remain as a compatibility redirect');
 const browser=await chromium.launch({channel:'chrome',headless:true});
@@ -91,6 +92,6 @@ try{
  await page.goto(base+'project-reviews/',{waitUntil:'domcontentloaded'});await page.waitForURL(base);assert(await page.locator('article:not([hidden]) .home-git').isVisible(),'Legacy URL must really land on homepage Git content');
  const noJs=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}});const fallback=await noJs.newPage();await fallback.goto(base+'project-reviews/');await fallback.waitForURL(base);assert.equal(await fallback.locator('.site-nav .nav-tools a').count(),2);assert.equal(await fallback.locator('.site-nav .nav-resources a').count(),3);assert.equal(await fallback.locator('article:not([hidden]) h1').textContent(),'Review the words.Keep the intent.');await fallback.goto(base+'guides/library-types/');assert(await fallback.locator('.guide-content pre').count()>0);assert(await fallback.getByRole('link',{name:'Mount the review library',exact:true}).isVisible());await noJs.close();
  assert.deepEqual(errors,[]);
- await fs.writeFile(path.join(output,'verification.json'),JSON.stringify({capturedAt:new Date().toISOString(),views:checked,localLinks:verifiedLinks.size,errors,libraryDemo:'actual bundle, marks toggle, native selection, language switch',guideFeatures:'HTML, local routes and fragments, source download, exact code copy, responsive navigation',homepage:'real UI screenshot, equal-width typed code panels and Git records linked to the file tree',header:'Two tool links and three resource links, keyboard navigation, localized labels and current-page state at both viewport sizes',legacyRoute:'project-reviews redirects to homepage with and without JavaScript and is absent from the 24-route sitemap',noJavaScript:'English content, grouped navigation, legacy redirect and all guide navigation available',build:{builtAt:info.builtAt,inputs:info.inputs},git:info.git},null,2)+'\n');
+ await fs.writeFile(path.join(output,'verification.json'),JSON.stringify({capturedAt:new Date().toISOString(),base,publicVerification,views:checked,localLinks:verifiedLinks.size,errors,libraryDemo:'actual bundle, marks toggle, native selection, language switch',guideFeatures:'HTML, local routes and fragments, source download, exact code copy, responsive navigation',homepage:'real UI screenshot, equal-width typed code panels and Git records linked to the file tree',header:'Two tool links and three resource links, keyboard navigation, localized labels and current-page state at both viewport sizes',legacyRoute:'project-reviews redirects to homepage with and without JavaScript and is absent from the 24-route sitemap',noJavaScript:'English content, grouped navigation, legacy redirect and all guide navigation available',build:{builtAt:info.builtAt,inputs:info.inputs},git:info.git},null,2)+'\n');
  console.log(`PASS ${checked.length} route/language/viewport views, ${verifiedLinks.size} local links/assets/fragments, HTML guides, exact copy, real library selection/marks, saved language and no-JS content. No browser errors or model calls.`);
 }finally{await browser.close()}

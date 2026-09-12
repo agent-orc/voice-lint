@@ -1,3 +1,4 @@
+import {websiteVerificationBase,websiteVerificationDirectory,publicVerification} from './verification-target.mjs';
 // Read-only QA of the built local research page. No service startup or model calls.
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -9,9 +10,9 @@ import * as writingApi from '@voice/writing-rules';
 import * as reviewApi from '@voice/review';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
-const base=process.env.VOICE_WEBSITE_URL??'http://127.0.0.1:5187/voice/';
+const base=websiteVerificationBase;
 const origin=new URL(base);
-assert(['127.0.0.1','localhost','[::1]'].includes(origin.hostname),'Research verification target must be loopback');
+
 const sections=['findings','practice','studies','strategies','libraries','economics','library-analysis','voice','sources'];
 let activeLocale='en';
 const prefix=()=>activeLocale==='de'?'de-':'';
@@ -197,7 +198,7 @@ try{
  assert(requests.every(request=>new URL(request.url).origin===origin.origin),'Research interactions must not upload content or load external resources');
  checks.push('No browser exceptions, writes, model calls or cross-origin page requests occurred.');
  const buildResponse=await context.request.get(new URL('build-info.json',base).href);assert.equal(buildResponse.status(),200);const info=await buildResponse.json();
- const output=path.join(root,'test-results/voice-website');await fs.mkdir(output,{recursive:true});
+ const output=path.join(root,'test-results/'+websiteVerificationDirectory);await fs.mkdir(output,{recursive:true});
  await fs.writeFile(path.join(output,'research.json'),JSON.stringify({capturedAt:new Date().toISOString(),scope:'Read-only actual local public research page in Chrome, EN/DE desktop/mobile and no JavaScript. Data checks validate references and presentation; they do not independently reproduce cited studies or install evaluated libraries.',languages:['en','de'],recordCounts:Object.fromEntries(Object.entries(datasets).filter(([,value])=>Array.isArray(value)).map(([key,value])=>[key,value.length])),economics:{fixtureCount:economics.surfaceEvaluation.fixtureCount,providerRequestsSent:economics.execution.providerRequestsSent},checks,build:{builtAt:info.builtAt,inputs:info.inputs}},null,2)+'\n');
  console.log('Research public UI: '+checks.length+' checks passed; '+records.length+' records, EN/DE at 1440/390px, native source details, rule links, five JSON dialogs, API connections and no-JavaScript fallback. No models or project writes.');
 }finally{await browser.close();}

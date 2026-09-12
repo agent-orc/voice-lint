@@ -12,6 +12,8 @@ requirements are in the [main README](../README.md).
 | `npm run frontend:publish-local` | Copy an already completed staged frontend, entry point last | Replaces the local served frontend; no backend restart or remote publication |
 | `npm run website:build` | Build bilingual product pages, the library demo and styled HTML technical guides | `website/dist/voice/`; no deployment |
 | `npm run website:preview` | Build and serve the public-site preview on loopback 5187 | Same static output and a local process |
+| `npm run website:verify-artifact` | Validate the static publication inventory, source hashes, Git revision, routes and public browser boundaries; requires a clean committed build | Read-only; `-- --allow-dirty` is limited to local preparation |
+| `npm run website:verify-deployment` | Compare the fixed public Voice target with the exact local artifact; verify routes, content types and hosting boundaries | Read-only public requests; report under `test-results/voice-deployment/` |
 | `npm run test:source-provenance -- --help` | Configurable source/hash/Git and optional task-provenance verification for a running local Studio | Compact report under ignored `test-results/`; no source-write/model request |
 | `npm run docs:dossier:check -- --repository PATH` | Compare the maintained VL-W1 section with its standalone Voice Lint checkout | No writes; nonzero exit when synchronization is needed |
 | `npm run docs:dossier:sync -- --repository PATH` | Synchronize maintained dossier content/presentation while preserving lifecycle fields | Explicit writes to that documentation checkout; no Git operation |
@@ -21,8 +23,9 @@ requirements are in the [main README](../README.md).
 | `npm run build:writing-rules` | Build the local writing catalogue, prompt composer and surface-cue API | Package ESM files, JSON and declarations under `packages/writing-rules/dist/` |
 | `npm run test:writing-rules` | Check rule/source consistency, prompt boundaries, signals and typed consumers | Offline fixtures; no model call |
 | `npm run test:json-viewer` | Check JSON dialogs with an isolated loopback fixture | Browser report under `test-results/voice-website/`; no Studio access |
-| `npm run test:writing-patterns` | Check the published writing catalogue and actual local package demo | Browser report; requires website preview on 5187 |
-| `npm run test:website` | Browser-check website routes, EN/DE, mobile layout and actual library demo | Ignored screenshots/report; requires the local website preview |
+| `npm run test:writing-patterns` | Check the published writing catalogue, EN/DE filters, examples and absence of executable writing tools | Browser report; local preview by default, or the fixed public target below |
+| `npm run test:website` | Browser-check routes, EN/DE, mobile layout and the supplied HTML-annotation example | Ignored screenshots/report; local preview by default, or the fixed public target below |
+| `npm run test:research` | Check bilingual Research records, source/API links and JSON dialogs | Ignored browser report; local preview by default, or the fixed public target below |
 | `npm run test:library-types` | Compile isolated TS/JS consumers and check real IntelliSense completions/hover documentation | Offline package fixtures; no VS Code UI automation |
 | `npm run test:session` | Backend browser trust, expiry, restart and revocation contracts | Isolated temporary session state; no live backend |
 | `npm run test:session-ui` | Resume/401/race regressions in the actual UI methods | Fake HTTP only |
@@ -40,6 +43,18 @@ running API could otherwise lock its build files.
 `session.mjs` is an internal helper that reads private session state; it is not
 an evidence exporter. `publish-built-frontend.mjs` is a local deployment helper,
 not the public ecosystem website deployer.
+
+## Public website browser checks
+
+These commands use the fixed public deployment target instead of the local preview:
+
+```sh
+VOICE_WEBSITE_URL=https://agent-orchestrator.dev/voice/ npm run test:website
+VOICE_WEBSITE_URL=https://agent-orchestrator.dev/voice/ npm run test:research
+VOICE_WEBSITE_URL=https://agent-orchestrator.dev/voice/ npm run test:writing-patterns
+```
+
+The allowed target is explicit. Public reports are separated from local preview reports; the checks use no Studio session and make no model requests.
 
 ## Scenario scripts
 

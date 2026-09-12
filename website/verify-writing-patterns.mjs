@@ -1,3 +1,4 @@
+import {websiteVerificationBase,websiteVerificationDirectory,publicVerification} from './verification-target.mjs';
 // Read-only QA of the already built local public website. Does not start services or models.
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -9,8 +10,8 @@ import {guides} from './guides.mjs';
 import catalogue from '../packages/writing-rules/src/catalogue.json' with {type:'json'};
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
-const base=process.env.VOICE_WEBSITE_URL??'http://127.0.0.1:5187/voice/';
-const url=new URL(base);assert(['127.0.0.1','localhost','[::1]'].includes(url.hostname),'Verification target must be loopback');
+const base=websiteVerificationBase;
+
 const verificationSource=await fs.readFile(path.join(root,guides.find(item=>item.slug==='verification').source),'utf8');
 const expectedVerificationRecords=[];marked.walkTokens(marked.lexer(verificationSource),token=>{if(token.type==='link')expectedVerificationRecords.push(token.href);});
 assert(expectedVerificationRecords.length>0&&expectedVerificationRecords.every(href=>/\.json$/.test(href)),'The maintained Verification list must contain only JSON record links.');
@@ -95,6 +96,6 @@ try{
  assert.deepEqual(errors,[]);assert(requests.every(request=>request.method==='GET'),'Public page controls must not send mutation or model requests');assert(requests.every(request=>new URL(request.url).origin===url.origin),'Public browsing loads no external resources');
  checks.push('No browser exceptions, mutation requests or external uploads occurred.');
  const info=await(await context.request.get(new URL('build-info.json',base).href)).json();
- const output=path.join(root,'test-results/voice-website');await fs.mkdir(output,{recursive:true});await fs.writeFile(path.join(output,'writing-patterns.json'),JSON.stringify({capturedAt:new Date().toISOString(),scope:'Actual built public website in local Chrome; no Studio sessions, source edits or model calls.',checks,build:{builtAt:info.builtAt,inputs:info.inputs}},null,2)+'\n');
+ const output=path.join(root,'test-results/'+websiteVerificationDirectory);await fs.mkdir(output,{recursive:true});await fs.writeFile(path.join(output,'writing-patterns.json'),JSON.stringify({capturedAt:new Date().toISOString(),scope:'Actual built public website in local Chrome; no Studio sessions, source edits or model calls.',checks,build:{builtAt:info.builtAt,inputs:info.inputs}},null,2)+'\n');
  console.log(`Writing patterns public UI: ${checks.length} checks passed, EN/DE at 1440/390px, static rules/hash/filter/copy, JSON dialogs and three authentic Studio captures. No model calls or project writes.`);
 }finally{await browser.close();}

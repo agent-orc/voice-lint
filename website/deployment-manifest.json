@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "prepared-not-published",
+  "status": "configured-awaiting-first-deployment",
   "target": "https://agent-orchestrator.dev/voice/",
   "buildCommand": "npm run website:build",
   "artifactDirectory": "website/dist/voice",
@@ -46,12 +46,8 @@
     "writingToolsHref": "/voice/guides/writing-tools/",
     "benchmarksHref": "/voice/guides/review-benchmarks/"
   },
-  "existingDeploymentPattern": "Static website build to an explicitly selected deploy branch; host mounts the artifact at the product path.",
-  "unresolvedHostInputs": [
-    "Central hosting repository/configuration",
-    "Selected source and deploy repository",
-    "Existing central project-card and sitemap integration"
-  ],
+  "existingDeploymentPattern": "Static snapshot at the root of voice-deploy; Caddy mounts /srv/sites/voice/current under /voice/; the existing host timer pulls the artifact branch.",
+  "unresolvedHostInputs": [],
   "applicationUrl": "http://127.0.0.1:5188/",
   "publishApplicationBackend": false,
   "publicPageCount": 6,
@@ -73,5 +69,12 @@
   "researchContentLanguages": [
     "en",
     "de"
-  ]
+  ],
+  "hostingRepository": "https://github.com/agent-orc/website",
+  "sourceRepository": "https://github.com/RobertMischke/agent-taskboard-devspace",
+  "sourceDirectory": "voice-studio",
+  "sourceBranch": "main",
+  "deployBranch": "voice-deploy",
+  "deploymentMode": "Explicit static snapshot publication; existing host pull and symlink swap",
+  "automaticSourcePublication": "Not enabled; the proposed GitHub workflow requires separate approval"
 }
