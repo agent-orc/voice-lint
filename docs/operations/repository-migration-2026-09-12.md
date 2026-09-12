@@ -166,3 +166,11 @@ After restart, both the project API and registry file contain exactly six unique
 projects. The backend suite passed 146 assertions, including 40 regressions for
 separator variants, trailing separators, restart and registration idempotence,
 unchanged source/metadata/registry bytes, distinct IDs and invalid relative roots.
+
+## Public deployment completed
+
+The owner approved the central-repository exception. Integration commit eeee6eff3d2cd7b6a6ddfbfe14f8a9c0d7b5e339 is published in agent-orc/website; product source and static artifacts remain in agent-orc/voice-lint.
+
+The website is live at https://agent-orchestrator.dev/voice/. Clean source 7360a67e255656d4a3d38f04afa2e7db377409ec produced static artifact 12fabf4ec02d504ce7502d2c8b7eb40e1fe19d71; strict validation passed 99 files, 24 content routes plus the redirect and 87 input hashes. HTTPS verification at 2026-09-12T21:57:43.793Z compared all 99 file hashes and content types, checked 24 HTML routes, the 308 redirect, private/unknown-route 404s and the ecosystem link. Five sibling sites and the unrelated hosted application retained byte-identical public HTML. The existing Caddy configuration was backed up before its validated replacement and reload.
+
+The [retained public deployment record](../verification/2026-09-12-public-deployment/README.md) identifies this release and its scope. Earlier pending/404 observations above remain historical. No Studio backend or model capability was deployed.

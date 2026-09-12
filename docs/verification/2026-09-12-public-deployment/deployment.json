@@ -1,0 +1,507 @@
+{
+  "verifiedAt": "2026-09-12T21:57:43.793Z",
+  "base": "https://agent-orchestrator.dev/voice/",
+  "sourceCommit": "7360a67e255656d4a3d38f04afa2e7db377409ec",
+  "buildTime": "2026-09-12T21:52:01.284Z",
+  "files": [
+    {
+      "path": "assets/studio-focus.capture.json",
+      "sha256": "3e1fc8140c320cf500145cb6efbb72691eb55734d9b7d98194b709e44bca68cb",
+      "contentType": "application/json"
+    },
+    {
+      "path": "assets/studio-focus.png",
+      "sha256": "8575dfc7d353bebbf71f7260d9c178eaa47dfcffd61820619c2c0d0ccc77de21",
+      "contentType": "image/png"
+    },
+    {
+      "path": "assets/studio-live-review.capture.json",
+      "sha256": "06483fe725505db0ee31fc77c3665099ee03daa158d1e2c7c13a1bcd66cf7f04",
+      "contentType": "application/json"
+    },
+    {
+      "path": "assets/studio-live-review.png",
+      "sha256": "20f88d1701c4ea29ca9ece709d7c0dd369510bbf56149b4367b6097f444b21ba",
+      "contentType": "image/png"
+    },
+    {
+      "path": "assets/studio-review.capture.json",
+      "sha256": "7983a44aee4088fe84654e6480afe35bf755ad53627058d082e1824b3ab3c8f6",
+      "contentType": "application/json"
+    },
+    {
+      "path": "assets/studio-review.png",
+      "sha256": "812a75da5a17f371937398ede7f0131084289f3974bf5ddc8cf093349cfec742",
+      "contentType": "image/png"
+    },
+    {
+      "path": "assets/studio-source.capture.json",
+      "sha256": "36a5c9795e313e3bcceb31b24e17d11342209496acba267638cc14074cdfdaf3",
+      "contentType": "application/json"
+    },
+    {
+      "path": "assets/studio-source.png",
+      "sha256": "fa4417b3a3adf5fa9b7206799d6fba4739648688cb421dec1628d9edefedd195",
+      "contentType": "image/png"
+    },
+    {
+      "path": "build-info.json",
+      "sha256": "15af1e030160b7137afeaea6517c0eaa0d63ae81829615043762f94e6ccc026f",
+      "contentType": "application/json"
+    },
+    {
+      "path": "docs.css",
+      "sha256": "937daa672bf22f600ce13f23cb15bab4d5b05fcabe93e6d0a2e25e34dd0bf00e",
+      "contentType": "text/css; charset=utf-8"
+    },
+    {
+      "path": "docs/index.html",
+      "sha256": "69448a0a261013ec975558e6cc01f65d8d5bc2dad4718c634f8a3df9b69dc0b7",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "guides/agent-integration/index.html",
+      "sha256": "72b8500422528c4338dea94f455524aaadd34cd8f4614da839808983fb23797d",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "guides/ai-text-signals/index.html",
+      "sha256": "9a35639f7e92972c7ebe958e10d52fb7312f1932ebca9834ffa9c601e5258f8a",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "guides/checks/index.html",
+      "sha256": "e61476e5c1254eac8a2b27ac2fd93c75d1177d6a7401c34b0d07ed61ed7b59b9",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "guides/commands/index.html",
+      "sha256": "61d0a79da44301ba5e800ed47a8cae5f0935666384974e943cbe5a7448a9a9fa",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "guides/holistic-review/index.html",
+      "sha256": "5a06e9387b0874394098d2d4d77882683ceba252c1446c376d23009dfab92a4a",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "guides/library-types/index.html",
+      "sha256": "c174b288ff0e61c4fbd0cae0c16401a6a386894fb6ea3b48758ca55bc1e9855c",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "guides/library/index.html",
+      "sha256": "f9f38cff96ce77af894913c57425b3b47b70207e4f4ad48fccc7b197d8660a7c",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "guides/live-bridge/index.html",
+      "sha256": "ca6c283c8949a24b7ba699fbf8878820eff89b2aa618984f492a0c4b4c00ff8a",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "guides/maintaining/index.html",
+      "sha256": "ed04ff1ccb43b419be36c453c53692af83689e91af87d4561e97d08fbb610c91",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "guides/notices/index.html",
+      "sha256": "30c6b2b7ae8fc7f48b55fff37808cf5c36591314f2cc06fb19ffd85cd8b2ddcf",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "guides/review-benchmarks/index.html",
+      "sha256": "ba503d50db645dd091009c0b26f4249e8967cb833977efddc6cc170db403e963",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "guides/runner-integration/index.html",
+      "sha256": "0306de612f473829d589679e76ce355843f8070b723a32e19c5989ccdfb81a1e",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "guides/session/index.html",
+      "sha256": "84748850c58e63b3011720a25196d9140bf242d5cbf531c427fc2782061e9987",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "guides/usability/index.html",
+      "sha256": "1896fab45794537915c4dcd9b77d1feb09b07a97acc0eb84a4d99a06f16b09ab",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "guides/verification/index.html",
+      "sha256": "31b3c4588ff6afbcda3a79442d47545c0d707ebc707f74c0e6aaa6c05edd6177",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "guides/workflow/index.html",
+      "sha256": "1dab1213173fa9dc3f745f48927f9a08e2a2af30faf3ceb39fbd96bce785b7a0",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "guides/writing-rules/index.html",
+      "sha256": "51af9ce490ce1c010d628bf3b20135faf62ca6fb153e8bd59f10432a34495e34",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "guides/writing-tools/index.html",
+      "sha256": "84d01010d5e1f7c989b22cf2c67bebb8753bdacc82fd631978cc7d6b800e8c4b",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "index.html",
+      "sha256": "978caf8fb4a8d194f9d8d0e9f1e912d397bfe6b8d6953b90cc1a7b89bdb8f7c7",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "json-viewer.css",
+      "sha256": "c481a44db216ae3d54f6cb311ef5fc1503187b029a0074c2494f432cb16d8ad7",
+      "contentType": "text/css; charset=utf-8"
+    },
+    {
+      "path": "json-viewer.js",
+      "sha256": "a4f58880012be97fa6fc9d917e0f60c81856e9bfdd7315b4ec7c8a71216ce74c",
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    {
+      "path": "library/index.html",
+      "sha256": "4b90db717a95e47c38443806c30813d94d984bf4735bd6613d2600ce827fe96f",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "product.css",
+      "sha256": "705ad182ca170204ed204e1dd1f44a8e50dae0e43f937bbf93881028897c8f28",
+      "contentType": "text/css; charset=utf-8"
+    },
+    {
+      "path": "project-reviews/index.html",
+      "sha256": "10444ced9e2e614d0e93f21abcc02eecfd2755eadbab0d74afecae9a69805db0",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "research.css",
+      "sha256": "8e16e553dd39f451ec764903c9bea031f5376822ec3eb0c45dc5b4764715c309",
+      "contentType": "text/css; charset=utf-8"
+    },
+    {
+      "path": "research.js",
+      "sha256": "599015f12dac485482c2c3a5060d864737509b9b62842b56a9b0fbc7e05a0a9e",
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    {
+      "path": "research/index.html",
+      "sha256": "bd1b9239d7429d416eada8c4276446157661a876951c7274d85c5ab72fcfffa1",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "site.css",
+      "sha256": "5a8113108ff06a757ca2a394eb9494130756d8a4750e1daa142dc539941c7344",
+      "contentType": "text/css; charset=utf-8"
+    },
+    {
+      "path": "site.js",
+      "sha256": "bd72c66988f5761d5f8e054acab9dd1ca29ed3eb5e445c4ad23dbc1d2d046b76",
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    {
+      "path": "sitemap.xml",
+      "sha256": "0af8189d013b699728e1fdb43856a43e3f9108ebf9875c5407ea9b88e9dc4a42",
+      "contentType": "text/xml; charset=utf-8"
+    },
+    {
+      "path": "sources/agent-integration.md",
+      "sha256": "2d8192df8a5e41f97b0eafd1125834b3079bff1969c519942837f175d4cdb6b5",
+      "contentType": "text/markdown; charset=utf-8"
+    },
+    {
+      "path": "sources/ai-text-signals.md",
+      "sha256": "d00c3798b48e2fac608bead5276e1ad6f1fab8c1a9c9c67306655d3d73894e86",
+      "contentType": "text/markdown; charset=utf-8"
+    },
+    {
+      "path": "sources/checks.md",
+      "sha256": "20026de19f95d3b17ae740e628c1de9bb43b01c2253d62f7f30270cd93739a0b",
+      "contentType": "text/markdown; charset=utf-8"
+    },
+    {
+      "path": "sources/commands.md",
+      "sha256": "1745f3a7c62a127972dd3be235e32f14a8ea2f46f254c2dc98c99f3ef23d3250",
+      "contentType": "text/markdown; charset=utf-8"
+    },
+    {
+      "path": "sources/examples/stored-selection-decision.example.json",
+      "sha256": "27278b81409d6b8ffec5c81733736a8ea465559e6f84a24cdba51e736e6d88aa",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/examples/stored-source-task.example.json",
+      "sha256": "74608c6a482a9bf22b7a8921536ddc6afe0d9e14622fdce85d48370e60fb145d",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/holistic-review.md",
+      "sha256": "77deca55d978eaf1f4f8b2cec7de17311d4bcb69f5622a4a7344871d6e9ee067",
+      "contentType": "text/markdown; charset=utf-8"
+    },
+    {
+      "path": "sources/library-types.md",
+      "sha256": "ff1dc61665c68bf465a857510787ceee31a65331150eaae09b816ae94795f3c3",
+      "contentType": "text/markdown; charset=utf-8"
+    },
+    {
+      "path": "sources/library.md",
+      "sha256": "a7fc37e9397b6b54e87bd349c24fe77f31496a6a20fe787b5baf6323b2662920",
+      "contentType": "text/markdown; charset=utf-8"
+    },
+    {
+      "path": "sources/live-bridge.md",
+      "sha256": "e183a733a6aac8b125be519a8df62c313b23074ce2ef6a529bb0d012280f3504",
+      "contentType": "text/markdown; charset=utf-8"
+    },
+    {
+      "path": "sources/maintaining.md",
+      "sha256": "e850f4f1080021d771ffb2021af51a55fefa098e32a391be7d0a0984c7534506",
+      "contentType": "text/markdown; charset=utf-8"
+    },
+    {
+      "path": "sources/notices.md",
+      "sha256": "dee0cfcfa39d21cff747714a838755a08f02df23572495678cf14fcbcf762b0c",
+      "contentType": "text/markdown; charset=utf-8"
+    },
+    {
+      "path": "sources/repository/docs/licenses/npm-inventory.json",
+      "sha256": "925d3c094935a7d36025f3e8f72ba03cc3139c31756746bf61e1bda345652a46",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/repository/packages/review/examples/javascript.js",
+      "sha256": "0a2a8f85ed9938187b2243bc88cb009e7fe6a1e0827bfd7faf6993c70a4fb852",
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    {
+      "path": "sources/repository/packages/review/examples/standalone.js",
+      "sha256": "00b44420306d77037fec9db15fe448b94635aa8ed93029fd487a5d0755449169",
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    {
+      "path": "sources/repository/packages/review/examples/typescript.ts",
+      "sha256": "8913fddf00a43604df79632008037ae9bce506b17f6b3da5c75d6e8c09ca2102",
+      "contentType": "text/vnd.trolltech.linguist; charset=utf-8"
+    },
+    {
+      "path": "sources/repository/scripts/verify-holistic-examples.mjs",
+      "sha256": "3102effc0da4fb556df32f2967b8f931a7bcff2301f6f68960e93fc0098ccf67",
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    {
+      "path": "sources/research/de/economics-sources.json",
+      "sha256": "ceded2c80d1ab7c4652f4d6a6557a62f9f868c9469f69007dbdafce797cf27fe",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/research/de/libraries.json",
+      "sha256": "1a575e5b20a1ee6ce3a044a7d234e4111906d09b358b3979f3ea08c4acf526f7",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/research/de/practice.json",
+      "sha256": "eb9372f0bc5f9779e2a88ba3cd79d2375320d8343612db9c859a6c6e334fa430",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/research/de/strategies.json",
+      "sha256": "5ddc8d058fe0d49535ba42984168c695abf1274989f9d5b72388d87fa27ab1df",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/research/de/studies.json",
+      "sha256": "a811f50628abdc83792465f402fd530fd5a314173b4f02c55d09034f7642c5d4",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/research/libraries.json",
+      "sha256": "23180bd43bb59d4caabe64f232c05ca67206c7a22ca9424ad5292e5e8c32f35a",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/research/practice.json",
+      "sha256": "b863a1624addf0b48cfc791a9a595feb519791368bebacdb1732f71b84d2d903",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/research/review-economics.json",
+      "sha256": "90d1e89190e2b9b520e6e8c3478adceca36a3d270ada35b7274094baa336d03e",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/research/strategies.json",
+      "sha256": "38c71c35e2cd9251d170161a2ed1d81265f8f581156ea57195456beee2a23262",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/research/studies.json",
+      "sha256": "9b432cdb4594e4fe41468a463a111c6993d74b305857197952f4374f7acdebac",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/review-benchmarks.md",
+      "sha256": "6792a0f36ceb72fd5415f4da55ac21b5aa8644f8941d3060f6242d02cdfafdfc",
+      "contentType": "text/markdown; charset=utf-8"
+    },
+    {
+      "path": "sources/runner-integration.md",
+      "sha256": "002e3ac07d481e9fb9bc334e6be04fe379020d4d72dc974cc669279441b94c9e",
+      "contentType": "text/markdown; charset=utf-8"
+    },
+    {
+      "path": "sources/session.md",
+      "sha256": "6dcc3f592c43158371f83744a45b0527a223ca412b0c764f88e29f11160cea2f",
+      "contentType": "text/markdown; charset=utf-8"
+    },
+    {
+      "path": "sources/usability.md",
+      "sha256": "5c0c6e25461a5d1b710398c40a67b9ca8791519868263700196dbf56a43b0e50",
+      "contentType": "text/markdown; charset=utf-8"
+    },
+    {
+      "path": "sources/verification-follow-up/website.json",
+      "sha256": "045a9ad9c39a197b2fae15c4244b2f7f39195a3460443b128b7487cd50dbc73c",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/verification-writing/json-viewer.json",
+      "sha256": "1155bebf246cf2260f8316b5e5e8bfb78f7ccae46924ea485d1b9ce92d2283f1",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/verification-writing/manifest.json",
+      "sha256": "d0b28d038f9af422fa9adbec962c86bffdeae1cc72b816312a0c7d39aeaa741e",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/verification-writing/website.json",
+      "sha256": "37832743afb205140ed848d7361931cb35ccd44d3a34ec35a9fecaf7d413d24c",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/verification-writing/writing-patterns.json",
+      "sha256": "4bb16e68f2d955b6265c247a03aa7cbafec322e9096023693f17fae9e1f165c6",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/verification.md",
+      "sha256": "02b74873b8156ea33f326aaffba61ffd4c4a8439a6130330cc571397c28ffe35",
+      "contentType": "text/markdown; charset=utf-8"
+    },
+    {
+      "path": "sources/verification/manifest.json",
+      "sha256": "29fd7eac72686ff119b60eee3a06e696975be7336b0e86e9c5412c3aa369adc8",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/verification/README.md",
+      "sha256": "eae9239844736236a7d58df6d6eda927f336918ba35aa23b51ccd2e9536023ea",
+      "contentType": "text/markdown; charset=utf-8"
+    },
+    {
+      "path": "sources/verification/reports/app-startup.json",
+      "sha256": "7d8a258c3e3023d9faff495d6080bb28d2e0a0a11bc741f625ae618edc21d1c4",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/verification/reports/baseline-checks.json",
+      "sha256": "b086758cf87bc24b8f8832eeba29290dac032d81c140ea53e8927c38512d3200",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/verification/reports/dossier-handoff.json",
+      "sha256": "7c9667a7868103303368c1dc83dc91417c126249305ac132a7f5eda966b02764",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/verification/reports/navigation-language.json",
+      "sha256": "f1050dd93b7359e28d169b9dfdad3170805aea5883e34ec8e7ba9eb6bf5d9a9b",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/verification/reports/selection-workflow-visual.json",
+      "sha256": "db55eed6cb53a2002cd2d144f9a19b5c06def49082723c3c41f71531fd18da30",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/verification/reports/source-provenance.json",
+      "sha256": "96a8d157fdf3a2e8193b72b30e1289f9f70305ca01a5870130e1c5f1749ffb7b",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/verification/reports/voice-website.json",
+      "sha256": "7c0ae1011caab55c0105dff8fa98b6fefb6b8f78e7030b15d4d5f0ec5cb2de9a",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/verification/screenshots/focus-navigation-mobile.png",
+      "sha256": "7613c7d9d714e8901fa9d61472ecf259f55abc249cc20983ac9de17318cd9b61",
+      "contentType": "image/png"
+    },
+    {
+      "path": "sources/verification/screenshots/library-demo-mobile.png",
+      "sha256": "6d75615b9f8ac487d3a21ac06a76340ece42ba8cf3645f23b8eb748348600d6d",
+      "contentType": "image/png"
+    },
+    {
+      "path": "sources/verification/screenshots/selection-keep-persisted.png",
+      "sha256": "42a1c07f8ebc0a0919dafeb6c18085b6651e6e5ec485c956d8579b73f0250ffd",
+      "contentType": "image/png"
+    },
+    {
+      "path": "sources/workflow.md",
+      "sha256": "30534ae52a10a139a5d2974cdf9056ebed12b8c0be3e2c1a6ce0e6272f8d65eb",
+      "contentType": "text/markdown; charset=utf-8"
+    },
+    {
+      "path": "sources/writing-rules.md",
+      "sha256": "42a63716132d40e6f17ac10e58ea1f3d1bcc18c728e4ad5b2c9c6c6588047f3f",
+      "contentType": "text/markdown; charset=utf-8"
+    },
+    {
+      "path": "sources/writing-rules/catalogue.json",
+      "sha256": "d2a98d8cb6665d2d505a2051483f3dd34fe5802d9a8039e339fdd6488d82f476",
+      "contentType": "application/json"
+    },
+    {
+      "path": "sources/writing-tools.md",
+      "sha256": "515c5a20ac329d0e466b100d05e556d13ef9cef0d74a68e36e53b8e574f8a001",
+      "contentType": "text/markdown; charset=utf-8"
+    },
+    {
+      "path": "studio/index.html",
+      "sha256": "2c2b31291a5489e84796d8aaa216c18a5e531f628d0e9868454cf364a2bc0eeb",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "path": "voice-review.js",
+      "sha256": "7b8761e5b846673cbee005fec59cdd5d63b2a8b2b3826d127823e480dc2596c4",
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    {
+      "path": "writing-patterns.css",
+      "sha256": "0a8d84392829c1602c769152ba47a528d826b66fe31aa9473f7c157ee9534ab0",
+      "contentType": "text/css; charset=utf-8"
+    },
+    {
+      "path": "writing-patterns.js",
+      "sha256": "75ead902d8c80e4f141a0f99d11f9678df2a3a2ce599d381d277d29c20cee46c",
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    {
+      "path": "writing-patterns/index.html",
+      "sha256": "42fc7faca2deedf25fee1172f0976348cba8c3414cc311f55f3a4da66336243b",
+      "contentType": "text/html; charset=utf-8"
+    }
+  ],
+  "routes": 24,
+  "bareRedirect": 308,
+  "unknownAndPrivateRoutes": 404,
+  "ecosystemLink": true
+}

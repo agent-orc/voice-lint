@@ -111,8 +111,8 @@ npm run website:preview
 # Open http://127.0.0.1:5187/voice/
 ```
 
-The public website presents Studio, both libraries, AI writing research and HTML
-guides. It exposes no text-analysis form, prompt-generation playground, LLM tools
+The [Voice website](https://agent-orchestrator.dev/voice/) presents Studio, both
+libraries, AI writing research and HTML guides. It exposes no text-analysis form, prompt-generation playground, LLM tools
 or model endpoint. Product and Research content support English and German;
 technical guide bodies remain English.
 

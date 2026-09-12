@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "recordDate": "2026-09-12",
+  "curatedAt": "2026-09-12T22:00:57.124Z",
+  "purpose": "HTTPS verification of the published static Voice website and ecosystem integration; no Studio/backend or model qualification claim.",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 1271,
+      "sha256": "935745ce660532dc5598e942c557509b0da347ac6979d479e59943d30dd52621"
+    },
+    {
+      "path": "deployment.json",
+      "bytes": 19266,
+      "sha256": "b4e6cb6751dd48f986de7fa5569556f42b8cf64607dea57fdd7bf28bc9834a71"
+    },
+    {
+      "path": "release.json",
+      "bytes": 668,
+      "sha256": "632d715cb423b6498fe8ae1a5034ca66cd7678aea8cb9cbf87b8815ca99f0923"
+    }
+  ]
+}

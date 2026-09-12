@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-09-12T21:57:43.793Z",
+  "url": "https://agent-orchestrator.dev/voice/",
+  "sourceRepository": "https://github.com/agent-orc/voice-lint.git",
+  "sourceCommit": "7360a67e255656d4a3d38f04afa2e7db377409ec",
+  "artifactBranch": "deploy",
+  "artifactCommit": "12fabf4ec02d504ce7502d2c8b7eb40e1fe19d71",
+  "artifactSha256": "4b7457c5050856fef7f436c710bcef9924ade0e7d9da85935fae35392f4de3317",
+  "centralRepository": "https://github.com/agent-orc/website.git",
+  "centralCommit": "eeee6eff3d2cd7b6a6ddfbfe14f8a9c0d7b5e339",
+  "scope": "Static website, documentation and ecosystem link; Studio and model execution remain local."
+}
