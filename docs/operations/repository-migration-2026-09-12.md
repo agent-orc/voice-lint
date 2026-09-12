@@ -1,7 +1,7 @@
 # Voice repository migration — 12 September 2026
 
 Internal operation record for VL-W1. This file records repository provenance and
-the remaining local/runtime handoff; it is not a public product guide.
+the completed local/runtime handoff and release status; it is not a public product guide.
 
 ## Repository ownership
 
@@ -25,6 +25,7 @@ their own repositories and working directories.
 | Earlier Devspace `origin/main` baseline | [2b235ab](https://github.com/RobertMischke/agent-taskboard-devspace/commit/2b235ab) |
 | Exported Voice-only history tip | `f19c7dc` |
 | Standalone integration merge | `12e8bdb` |
+| Published standalone source on `main` | [d491e5b](https://github.com/agent-orc/voice-lint/commit/d491e5b) |
 
 The export used `git subtree split --prefix=voice-studio` from the recorded
 Devspace source. It retained seven Voice product commits and moved their file
@@ -44,8 +45,9 @@ different IDs because their trees and ancestry changed.
 Merge `12e8bdb` joins the unrelated histories. Its first parent is the existing
 Voice Lint update `1db8a02`; its second parent is the export `f19c7dc`. The
 integration retains both histories and does not require a force push of
-`main`. This record does not claim that the merged source has already been
-pushed to the remote.
+`main`. The reviewed source was pushed successfully to
+[agent-orc/voice-lint main at d491e5b](https://github.com/agent-orc/voice-lint/commit/d491e5b),
+advancing the remote from 2bcc58d.
 
 Original audit references, dated screenshots and evidence hashes retain their
 original commit IDs and paths. They describe the inputs that were actually
@@ -88,11 +90,15 @@ The existing private session store and browser enrollment were preserved.
 Session tests passed 55 assertions. These are runtime migration checks, separate
 from the retained earlier layout and source-adapter evidence.
 
-Remote publication of main is still pending, and the public website has not been
-deployed. The remaining release work is to publish the reviewed source, build and
-validate its static artifact, publish that artifact explicitly, then verify the
-actual public files and browser behavior. Removal of the superseded Devspace
-product copy is a separate local cleanup step.
+Source publication is complete at d491e5b. The public website still returns
+HTTP 404 and has not been deployed. The remaining release work is to build and
+validate the intended committed source, publish its static artifact explicitly,
+then verify the actual public files and browser behavior.
+
+Local cleanup is complete. The old active Devspace product directory no longer
+exists. The published Devspace tree and history remain unchanged; all new Voice
+commits belong in Voice Lint. The only active product root is
+C:/Projects/voice-lint, with no submodule link.
 
 Pairing codes, bearer tokens, browser enrollment credentials and private runtime
 records are not stored in this document or the dossier.
@@ -113,3 +119,25 @@ records are not stored in this document or the dossier.
   No source edits, API writes or model calls were made by those checks.
 - After relocation, the real isolated Chrome session suite passed 18 checks, including close/reopen, new tabs, reload, logout, origin rejection and temporary mode.
 - Local artifact validation with --allow-dirty passed 99 files, 24 content routes plus the redirect, and 87 input hashes. This validates local preparation; it does not establish committed-source publication or public hosting.
+- Final post-move website checks passed 96 route/language/viewport views and 322 links, assets and fragments. Research passed 16 checks for 30 sources; writing patterns passed 22 checks. The small writing-pattern test-origin fix is included in published source d491e5b. These were local browser checks, not public-deployment verification.
+
+## Completed local Devspace cleanup
+
+- Devspace main is back at published baseline 2b235abbe7de435acf84b38ac7dc589d365b07f0.
+- The two unpublished Voice commits are retained at local backup ref
+  refs/backup/voice-standalone-20260912-71f0d92, pointing to
+  71f0d92f55f1003f784e36172b3f61c57b307bff. The standalone f19c7dc ancestry was
+  checked before cleanup.
+- Non-cone sparse-checkout patterns /* and !/voice-studio/ exclude the old product
+  path from the local Devspace checkout. They do not remove it from the published
+  remote tree or create a submodule.
+- All 24,623 inventoried remaining files were moved unchanged by checked rename
+  to C:/Projects/voice-lint/.local/repository-migration/devspace-runtime. The old
+  voice-studio directory no longer exists.
+- The final cleanup run preserved unrelated working-tree status, unrelated index
+  entries, submodule HEADs and the remaining inventory exactly. No Devspace commit
+  or push and no submodule change was made.
+- The private audit is retained at
+  .local/repository-migration/cleanup-audit-2026-09-12T20-32-06.125Z/report.json,
+  with before/after status, index/configuration backups and the file inventory.
+  Its contents are not published as website evidence.
