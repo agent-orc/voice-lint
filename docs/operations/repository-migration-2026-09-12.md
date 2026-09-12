@@ -90,10 +90,19 @@ The existing private session store and browser enrollment were preserved.
 Session tests passed 55 assertions. These are runtime migration checks, separate
 from the retained earlier layout and source-adapter evidence.
 
-Source publication is complete at d491e5b. The public website still returns
-HTTP 404 and has not been deployed. The remaining release work is to build and
-validate the intended committed source, publish its static artifact explicitly,
-then verify the actual public files and browser behavior.
+Source [f7980be](https://github.com/agent-orc/voice-lint/commit/f7980be) is published on main. Strict artifact validation
+without --allow-dirty passed from that clean committed source: 99 files,
+24 routes plus the redirect and 87 input hashes.
+Artifact SHA-256: be976b841ee6b9001d948c4595804818373969aac725bc656e35c45fa23e7c5f.
+
+Static release [f6286e6](https://github.com/agent-orc/voice-lint/commit/f6286e6136a7cdb5b6903c22065e9eae8f344b2d)
+was pushed to agent-orc/voice-lint deploy. It contains the 99 static website files,
+without the Studio application or backend. The artifact is published in the
+correct product repository.
+
+The public /voice/ mount still returns HTTP 404. Shared routing and ecosystem
+changes are prepared; the user decision on the shared-repository exception
+remains open. Public reachability and verification are still outstanding.
 
 Local cleanup is complete. The old active Devspace product directory no longer
 exists. The published Devspace tree and history remain unchanged; all new Voice
@@ -141,3 +150,19 @@ records are not stored in this document or the dossier.
   .local/repository-migration/cleanup-audit-2026-09-12T20-32-06.125Z/report.json,
   with before/after status, index/configuration backups and the file inventory.
   Its contents are not published as website evidence.
+
+## Registry path normalization after restart
+
+The migrated registry stored absolute roots with forward slashes; example
+registration compared them with native Windows paths and added two duplicate
+built-in examples on restart. The private repair removed exactly those two
+identical built-in duplicates and preserved all six original IDs and their data.
+
+ProjectStore now canonicalizes loaded absolute roots with GetFullPath and
+TrimEndingDirectorySeparator before example and registration comparisons. It
+rejects relative or partially qualified stored roots, does not automatically
+merge different IDs, and does not rewrite the registry merely to normalize paths.
+After restart, both the project API and registry file contain exactly six unique
+projects. The backend suite passed 146 assertions, including 40 regressions for
+separator variants, trailing separators, restart and registration idempotence,
+unchanged source/metadata/registry bytes, distinct IDs and invalid relative roots.
