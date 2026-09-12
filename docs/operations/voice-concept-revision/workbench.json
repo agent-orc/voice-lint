@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "id": "voice-concept-revision",
-  "title": "Voice Lint concept revision",
-  "summary": "Voice Studio Preview 0.3: actual Angular websites and Markdown folders, persistent feedback, explicit Runner source tasks, a shared rule wiki and local project checks. The real homepage pilot applied six reviewed edits; 26 website content modules were revised. All 27 routes passed desktop/mobile browser checks and npm run check completed successfully through Studio. Twenty original editorial tasks are completed; three factual follow-ups remain queued. Language-tool candidates and separate engine/data licenses are documented. One model pilot is not model qualification. Current evidence is recorded at the top; earlier research is preserved.",
+  "title": "Voice Lint and Voice Studio: readiness",
+  "summary": "Updated 12 September 2026: Voice Studio supports supervised local review with seven-day browser access and logout, English/German UI, compact/overlay navigation, keep decisions, alternatives and file/Git provenance. Session verification passed 34 backend, 16 UI and 18 Chrome checks without model or source writes. The Library has tested TS/checkJs declarations and actual language-service completion/hover checks. Its bilingual website pairs a genuine Studio capture with typed code and renders 16 allowlisted English HTML guides; the expanded website passed 84 desktop/mobile EN/DE views, 168 links/assets/fragments, code copy and the actual Library demo. The owner-approved Agent Studio hero was restored again after the later b9d84b2 override. Goal-based reviews, SEO/consistency/visual tasks and AGT integration remain documented designs. No public deployment, Voice Lint analyzer/CLI/CI release or model qualification is claimed. Voice source changes are committed and pushed (51ae359); the approved Agent Studio hero is committed and pushed (a33b926). Separate project launch entries open Studio and the product/documentation website.",
   "entrypoint": "index.html",
   "status": "decision-pending",
   "phase": "decision-ready",
-  "updatedAt": "2026-09-06T22:38:57.674Z",
+  "updatedAt": "2026-09-12T11:38:26.106Z",
   "sourceTaskKeys": [],
   "relatedTaskKeys": [
     "AGT-2237",

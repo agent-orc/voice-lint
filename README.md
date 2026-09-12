@@ -37,7 +37,7 @@ Nothing in the table is released functionality; even M0 is not complete.
 
 ## Current product priority: JavaScript library and local Voice Studio
 
-**Voice Studio Preview 0.2 is implemented** in the separate
+**Voice Studio Preview 0.3 is implemented** in the separate
 [Voice Studio workspace](https://github.com/RobertMischke/agent-taskboard-devspace/tree/main/voice-studio),
 with an Angular frontend, .NET backend and reusable `@voice/review` JavaScript
 library. It connects local running websites and Markdown sources to underlined
@@ -50,7 +50,7 @@ The original Quality Studio website remains the selected dictionary-adapter
 pilot. Its inline `data-i18n` dictionary is not yet supported for source changes;
 those bound edits are rejected. The static example project is a separate fixture.
 See the [current dossier status](docs/operations/voice-concept-revision/index.html#voice-studio-current)
-for verified behaviour and remaining limits. The broader Voice Lint analyzer
+for the 12 September 2026 readiness assessment, verified behaviour and remaining limits. Studio is suitable for supervised local editorial use; it is not a released Voice Lint analyzer or an automatic publication gate. The broader Voice Lint analyzer
 contracts and roadmap below remain proposed.
 
 The current delivery sequence is [P1–P6 in the product design](docs/on-page-review.md#8-delivery-order-and-ownership).
