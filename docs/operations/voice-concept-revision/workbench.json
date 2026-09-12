@@ -2,11 +2,11 @@
   "schemaVersion": 1,
   "id": "voice-concept-revision",
   "title": "Voice Lint and Voice Studio: readiness",
-  "summary": "Voice Studio remains a supervised local preview. The website separates Studio/Library tools from Research, AI anti-patterns and Docs; Git-backed storage is on the homepage. All 28 research records identify available API functions and missing capabilities. A proposed next-release collection defines ten functions, including context, validation, batching, usage budgets and prompt evaluation. An actual 30-case EN/DE offline benchmark measured 58.8% fewer UTF-8 input bytes when combining the same 20 rules and 51.2% for the same six rules. These are not measured model tokens, costs or recognition quality. Lexical keep cases and missed semantic issues are retained as limits. Official model/pricing candidates are documented; real model comparison awaits runtime access and a cost ceiling. No new automatic semantic analyzer, third-party engine integration, authorship probability or public deployment is claimed.",
+  "summary": "Voice Studio remains a supervised local preview. The running Voice website is registered from 27 original JSON and Markdown sources with explicit route mapping. JSON review preserves exact Unicode/source spans, applies guarded JSON-safe replacements and rejects stale or malformed changes. Review stays beside the website in every navigation mode; review and sidebar widths are resizable, Projects and Files collapse independently, and the floating handle is movable. A toolbar badge opens connection and mapping details. Research prose and API relationships are available in English and German. 120 layout checks and 96 website views passed, with 320 local targets. Backend verification passed 106 assertions; real Chrome onboarding verified exact German selection and original Markdown navigation without source or model writes. The two libraries separate writing knowledge and four host-driven tools from HTML visualization. Public pages expose no LLM capability. Reproducible offline quality evaluation is implemented; no model-quality run or measured winner exists. Publication remains pending exact approval requested by automatic review; the earlier pushed baseline is 2b235ab.",
   "entrypoint": "index.html",
   "status": "decision-pending",
   "phase": "decision-ready",
-  "updatedAt": "2026-09-12T14:32:37.954Z",
+  "updatedAt": "2026-09-12T19:29:47.161Z",
   "sourceTaskKeys": [],
   "relatedTaskKeys": [
     "AGT-2237",
