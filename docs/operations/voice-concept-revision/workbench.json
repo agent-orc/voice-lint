@@ -2,11 +2,11 @@
   "schemaVersion": 1,
   "id": "voice-concept-revision",
   "title": "Voice Lint and Voice Studio: readiness",
-  "summary": "Voice Studio supports supervised local file review with saved decisions, reviewed source changes and seven-day browser sessions. @voice/writing-rules supplies 20 named AI anti-patterns, four six-rule profiles, EN/DE examples and counter-prompts; eight rules have transparent local surface checks. The native Research website area contains seven practice sources, nine studies, four strategy studies and eight library comparisons with methods, limits, official references and reusable JSON. It connects research to the pattern catalogue without treating anecdotes as model benchmarks. Public HTML guides describe current behavior, file trees and saved JSON; internal AGT and holistic implementation plans remain in repository docs. No authorship detector, measured model effectiveness, automatic holistic evaluator or public deployment is claimed. Studio retains its existing four local checks; the expanded catalogue is independently reusable by hosts.",
+  "summary": "Voice Studio remains a supervised local preview. The website separates Studio/Library tools from Research, AI anti-patterns and Docs; Git-backed storage is on the homepage. All 28 research records identify available API functions and missing capabilities. A proposed next-release collection defines ten functions, including context, validation, batching, usage budgets and prompt evaluation. An actual 30-case EN/DE offline benchmark measured 58.8% fewer UTF-8 input bytes when combining the same 20 rules and 51.2% for the same six rules. These are not measured model tokens, costs or recognition quality. Lexical keep cases and missed semantic issues are retained as limits. Official model/pricing candidates are documented; real model comparison awaits runtime access and a cost ceiling. No new automatic semantic analyzer, third-party engine integration, authorship probability or public deployment is claimed.",
   "entrypoint": "index.html",
   "status": "decision-pending",
   "phase": "decision-ready",
-  "updatedAt": "2026-09-12T13:09:40.934Z",
+  "updatedAt": "2026-09-12T14:32:37.954Z",
   "sourceTaskKeys": [],
   "relatedTaskKeys": [
     "AGT-2237",
