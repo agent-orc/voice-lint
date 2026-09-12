@@ -21,6 +21,13 @@ public sealed partial class ProjectStore
         EnsureNoLinks(runtime);
         var registry = Path.Combine(runtime, "projects.json");
         projects = File.Exists(registry) ? ReadJson<List<RegisteredProject>>(registry) : [];
+        for (var index = 0; index < projects.Count; index++)
+        {
+            var project = projects[index];
+            if (string.IsNullOrWhiteSpace(project.Root) || !Path.IsPathFullyQualified(project.Root))
+                throw new ApiError(422, "Gespeicherte Projektpfade müssen absolut sein.");
+            projects[index] = project with { Root = Path.TrimEndingDirectorySeparator(Path.GetFullPath(project.Root)) };
+        }
         if (addExamples)
         {
             AddExample(home, "quality-website", "Quality Studio · Beispielwebsite");
@@ -30,10 +37,10 @@ public sealed partial class ProjectStore
 
     private void AddExample(string home, string directory, string name)
     {
-        var root = Path.Combine(home, "examples", directory);
+        var root = Path.TrimEndingDirectorySeparator(Path.GetFullPath(Path.Combine(home, "examples", directory)));
         if (Directory.Exists(root) && !projects.Any(p => string.Equals(p.Root, root, StringComparison.OrdinalIgnoreCase)))
         {
-            projects.Add(new(directory, name, Path.GetFullPath(root), directory == "quality-website" ? "http://127.0.0.1:5189/index.html" : null));
+            projects.Add(new(directory, name, root, directory == "quality-website" ? "http://127.0.0.1:5189/index.html" : null));
             SaveRegistry();
         }
         else if (directory == "quality-website")
