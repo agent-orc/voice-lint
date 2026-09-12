@@ -59,6 +59,7 @@ export const appMessages: Record<string, string> = {
   'Quelltext': 'Source',
   'Dateibericht': 'File report',
   'Projektbericht': 'Project report',
+  'Lädt …': 'Loading …',
   'Dateien werden eingelesen und geprüft …': 'Reading and checking files …',
   'PROJEKTBERICHT': 'PROJECT REPORT',
   'Dateien im Projekt': 'Project files',

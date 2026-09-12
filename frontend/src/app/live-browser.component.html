@@ -14,9 +14,12 @@
   </button>
   <span class="visually-hidden" role="status">{{ connectionBadge() }}</span>
 </form>
+<div class="document-loading-surface">
 @if (frameUrl(); as url) {
-  <iframe #liveFrame class="live-frame" [style.height.px]="frameHeight()" [style.min-height.px]="frameHeight()" [title]="'Laufende Website mit Voice Review' | t" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads" [src]="url" (load)="frameLoaded()"></iframe>
-} @else { <div class="browser-empty"><h2>{{ 'Deine Website im Studio öffnen' | t }}</h2><p>{{ 'Starte den lokalen Entwicklungsserver deiner Website und trage oben seine Adresse ein. Die Website läuft mit ihrer Navigation, ihren Styles und Skripten.' | t }}</p></div> }
+  <iframe #liveFrame class="live-frame" [attr.aria-busy]="loading" [attr.inert]="loading ? '' : null" [style.height.px]="frameHeight()" [style.min-height.px]="frameHeight()" [title]="'Laufende Website mit Voice Review' | t" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads" [src]="url" (load)="frameLoaded()"></iframe>
+} @else { <div class="browser-empty" [attr.aria-busy]="loading"><h2>{{ 'Deine Website im Studio öffnen' | t }}</h2><p>{{ 'Starte den lokalen Entwicklungsserver deiner Website und trage oben seine Adresse ein. Die Website läuft mit ihrer Navigation, ihren Styles und Skripten.' | t }}</p></div> }
+<ng-content />
+</div>
 <section #connectionDetails id="browser-connection-details" class="browser-connection-details" popover="auto" role="dialog" aria-labelledby="browser-connection-title" (toggle)="connectionToggled()">
   <header class="connection-heading"><h2 id="browser-connection-title">{{ 'Verbindung und Quellzuordnung' | t }}</h2><button type="button" class="icon-button" popovertarget="browser-connection-details" popovertargetaction="hide" [attr.aria-label]="'Verbindungsdetails schließen' | t" autofocus>×</button></header>
   <p class="connection-status" role="status" [class.attention]="connectionAttention()"><i class="status-dot" [class.connected]="bridgeReady()" aria-hidden="true"></i>{{ status() | t }}</p>

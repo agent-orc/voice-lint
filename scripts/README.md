@@ -33,6 +33,7 @@ requirements are in the [main README](../README.md).
 | `npm run test:selection-ui` | Deferred HTTP/state regressions for keep, alternatives, retries and cancellation | Fake HTTP only |
 | `npm run test:selection-workflow` | Real browser source/keep/proposal workflow against its own temporary fixture | Registers and edits only its fixture, then unregisters/removes it; no model |
 | `npm run test:navigation` | Language, compact/focus navigation and overlay browser scenarios | Browser-local preferences and ignored evidence; requires Studio and the configured pilot website |
+| `npm run test:loading-overlay` | Check delayed loading without layout shifts; requires running Studio with `quality-website` and `markdown-handbook` projects and Chrome | Read-only project API calls and temporary test-session pairing; ignored screenshots/report under `test-results/loading-overlay/` |
 | `npm run test:wiki-i18n` | Wiki translation coverage and source-quote preservation | Offline only |
 
 Backend suites (`test:backend`, `test:runner`, `test:tasks`, `test:checks`,

@@ -281,15 +281,19 @@
         @if (focusNavigation() && liveBrowser) { <form class="focus-address" (submit)="openFocusAddress(focusAddress.value); $event.preventDefault()"><label for="focus-website-address">{{ 'Website' | t }}</label><input #focusAddress id="focus-website-address" type="url" [value]="liveBrowser.address" required /><button type="submit" class="button primary">{{ 'Öffnen' | t }}</button><p class="small-muted">{{ liveBrowser.matchedFile() }}</p></form> }
       </div>
 
-      @if (loading()) {
-        <div class="loading-state" role="status">
-          <span class="loading-indicator"></span>{{ 'Dateien werden eingelesen und geprüft …' | t }}
-        </div>
-      }
+      <ng-template #loadingOverlay>
+        @if (loading()) {
+          <div class="document-loading-overlay" role="status" aria-live="polite" aria-atomic="true">
+            <span class="document-loading-message" aria-hidden="true"><span class="loading-indicator"></span><span class="document-loading-label">{{ 'Lädt …' | t }}</span></span>
+            <span class="visually-hidden">{{ 'Dateien werden eingelesen und geprüft …' | t }}</span>
+          </div>
+        }
+      </ng-template>
 
-      @if (!loading() && tab() === "project") {
+      @if (tab() === "project") {
+        <div class="document-loading-surface" [class.initial-document-surface]="!projectReport()">
         @if (projectReport(); as report) {
-          <section class="report project-report">
+          <section class="report project-report" [attr.aria-busy]="loading()" [attr.inert]="loading() ? '' : null">
             <div class="report-intro">
               <div class="eyebrow">{{ 'PROJEKTBERICHT' | t }}</div>
               <h2>{{ 'Dateien im Projekt' | t }}</h2>
@@ -398,7 +402,9 @@
             </p>
           </section>
         }
-      } @else if (!loading() || (tab() === "preview" && isLiveWebsite())) {
+        <ng-container *ngTemplateOutlet="loadingOverlay" />
+        </div>
+      } @else {
         @if (document(); as current) {
           <div
             #documentWorkspace
@@ -422,7 +428,7 @@
                     (feedback)="liveFeedback($event)"
                     (saveUrl)="saveLiveUrl($event)"
                     (sourceMatched)="setLiveMatch($event)"
-                  />
+                  ><ng-container *ngTemplateOutlet="loadingOverlay" /></voice-live-browser>
                 }
               }
               @if (tab() === "preview" && !isLiveWebsite()) {
@@ -454,13 +460,17 @@
                     {{ (previewMappingIssue()) | t }}
                   </div>
                 }
+                <div class="document-loading-surface">
                 <iframe
                   #previewFrame
+                  [attr.aria-busy]="loading()" [attr.inert]="loading() ? '' : null"
                   [attr.title]="'Dokumentvorschau mit Voice-Markierungen' | t"
                   sandbox="allow-same-origin"
                   [srcdoc]="previewHtml()"
                   (load)="previewLoaded()"
                 ></iframe>
+                <ng-container *ngTemplateOutlet="loadingOverlay" />
+                </div>
                 <div class="preview-legend">
                   @for (category of categories; track category.id) {
                     <span
@@ -488,14 +498,18 @@
                     {{ '· schreibgeschützte Ansicht' | t }}</span
                   >
                 </div>
-                <pre class="source-view"><code>{{ current.source }}</code></pre>
+                <div class="document-loading-surface">
+                  <pre class="source-view" [attr.aria-busy]="loading()" [attr.inert]="loading() ? '' : null"><code>{{ current.source }}</code></pre>
+                  <ng-container *ngTemplateOutlet="loadingOverlay" />
+                </div>
                 <div class="source-footer">
 
                   {{ 'Änderungen werden als Vorschlag vorbereitet und nach deiner Prüfung in diese Datei geschrieben.' | t }}
                 </div>
               }
               @if (tab() === "file") {
-                <div class="report file-report">
+                <div class="document-loading-surface">
+                <div class="report file-report" [attr.aria-busy]="loading()" [attr.inert]="loading() ? '' : null">
                   <div class="eyebrow">{{ 'BERICHT ZUR GANZEN DATEI' | t }}</div>
                   <h2>{{ 'Textstellen prüfen' | t }}</h2>
                   <p class="report-description">
@@ -598,6 +612,8 @@
                       </button>
                     }
                   </div>
+                </div>
+                <ng-container *ngTemplateOutlet="loadingOverlay" />
                 </div>
               }
             </section>
@@ -979,7 +995,8 @@
             }
           </div>
         } @else {
-          <section class="empty-workspace">
+          <div class="document-loading-surface initial-document-surface">
+          <section class="empty-workspace" [style.visibility]="loading() ? 'hidden' : null" [attr.aria-busy]="loading()" [attr.inert]="loading() ? '' : null">
             <h2>{{ 'Projekt öffnen' | t }}</h2>
             <p>
 
@@ -994,6 +1011,8 @@
               {{ 'Projektordner öffnen' | t }}
             </button>
           </section>
+          <ng-container *ngTemplateOutlet="loadingOverlay" />
+          </div>
         }
       }
     </main>

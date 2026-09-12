@@ -61,6 +61,7 @@
     "benchmark:writing-review:evaluate": "node benchmarks/writing-review/evaluate-model-quality.mjs",
     "onboard:website": "node scripts/onboard-voice-website.mjs",
     "test:split-layout": "node scripts/verify-split-layout.mjs",
+    "test:loading-overlay": "node scripts/verify-loading-overlay.mjs",
     "test:website-onboarding": "node scripts/verify-voice-website-onboarding.mjs",
     "website:verify-artifact": "node scripts/verify-website-artifact.mjs",
     "website:verify-deployment": "node scripts/verify-website-deployment.mjs"

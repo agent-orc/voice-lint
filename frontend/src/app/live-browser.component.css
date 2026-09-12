@@ -249,3 +249,6 @@
   .browser-toolbar .browser-marks,
   .browser-toolbar .browser-open { display: none; }
 }
+
+/* The toolbar stays outside the busy website surface. */
+.document-loading-surface { position: relative; min-width: 0; }
