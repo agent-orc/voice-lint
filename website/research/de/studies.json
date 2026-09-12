@@ -1,0 +1,543 @@
+[
+  {
+    "id": "chakrabarty-writing-edits-2025",
+    "title": "Can AI writing be salvaged? Mitigating Idiosyncrasies and Improving Human-AI Alignment in the Writing Process through Edits",
+    "authors": [
+      "Tuhin Chakrabarty",
+      "Philippe Laban",
+      "Chien-Sheng Wu"
+    ],
+    "date": "2024-09-22",
+    "url": "https://arxiv.org/html/2409.14509v5",
+    "kind": "study",
+    "question": "Welche Überarbeitungen helfen bei ausgeschmückten, ungenauen oder redundanten KI-Texten?",
+    "method": "Acht Schreibende wirkten an sieben Überarbeitungskategorien mit; achtzehn Schreibende bearbeiteten 1.057 Absätze kreativer Texte von GPT-4o, Claude 3.5 Sonnet und Llama 3.1-70B.",
+    "findings": [
+      "Die Systematik unterscheidet ablenkende Ausschmückung, fehlende Konkretheit, ungelenke Wortwahl und redundante Erläuterungen.",
+      "Relevante Details können Texte verbessern, auch wenn sie dadurch länger werden."
+    ],
+    "limitations": [
+      "Kreative Textgattungen und subjektive fachliche Überarbeitungen belegen keine Fehlerraten für technische Überschriften. Eine Auswertung auf Absatzebene kann Probleme des gesamten Dokuments übersehen; sachliche Halluzinationen wurden nicht untersucht."
+    ],
+    "voiceImplication": "Prüfen, was die Formulierung zur Aufgabe der Leser beiträgt; hilfreiche Metaphern, Rhythmus und Konkretheit erhalten.",
+    "readingDepth": "CHI-2025-Paper; arXiv v5 (2025-03-04), Abschnitte 4.1–4.4, 6.1 und 8. Das Datum bezeichnet den ersten Preprint.",
+    "relatedRuleIds": [
+      "reader-goal",
+      "word-choice",
+      "task-relevance",
+      "repetition"
+    ],
+    "apiUse": {
+      "availableNow": [
+        {
+          "symbol": "selectWritingRules",
+          "purpose": "Die Anweisungen zu reader-goal, word-choice und repetition auswählen."
+        },
+        {
+          "symbol": "composeWritingReviewPrompt",
+          "purpose": "Zielgruppe und Zweck für eine kontextbezogene Prüfung bereitstellen."
+        }
+      ],
+      "currentUse": "Der Composer stellt Anweisungen zusammen. Er erkennt diese semantischen Kategorien nicht und implementiert nicht das Überarbeitungsmodell der Studie.",
+      "missingCapability": "Zitierte Probleme und Alternativen mit dem Seitenkontext vergleichen; bewusste Entscheidungen zum Beibehalten und unterschiedliche Fachurteile einbeziehen.",
+      "releaseFunctionIds": [
+        "contextual-review",
+        "result-validation",
+        "alternative-comparison"
+      ]
+    }
+  },
+  {
+    "id": "bharadwaj-preference-biases-2025",
+    "title": "Flattery, Fluff, and Fog: Diagnosing and Mitigating Idiosyncratic Biases in Preference Models",
+    "authors": [
+      "Anirudh Bharadwaj",
+      "Chaitanya Malaviya",
+      "Nitish Joshi",
+      "Mark Yatskar"
+    ],
+    "date": "2025-06-05",
+    "url": "https://arxiv.org/html/2506.05339v3",
+    "kind": "study",
+    "question": "Bevorzugen Modellbewerter Oberflächenmerkmale stärker als Menschen?",
+    "method": "Kontrollierte kontrafaktische Textpaare auf Englisch variieren fünf Merkmale. Vier Belohnungsmodelle und drei LLM-Bewerter werden mit jeweils drei menschlichen Urteilen pro Fall verglichen.",
+    "findings": [
+      "Belohnungsmodelle bewerteten Fachjargon und Vagheit im Vergleich zu menschlichen Urteilen zu hoch; auch LLM-Bewerter zeigten verzerrte Präferenzen.",
+      "Kontrafaktisches Training verringerte die gemessene Fehlkalibrierung."
+    ],
+    "limitations": [
+      "Synthetische Textpaare mit jeweils einem Dialogschritt, ausgewählte ältere Modelle und uneinheitliche menschliche Bewertungen begrenzen die Übertragbarkeit. Die Studie kann die Ursache einer bestimmten Voice-Überschrift nicht erklären."
+    ],
+    "voiceImplication": "Nützlichkeit und Konkretheit unabhängig davon evaluieren, ob ein Bewerter eine geschliffene Darstellung bevorzugt.",
+    "readingDepth": "Volltext v3 (2026-03-03): Abschnitte 2–5 und 8, einschließlich Konstruktion der Textpaare, Vergleich mit menschlichen Urteilen und Analyse der Trainingsdaten. Das Datum bezeichnet den ersten Preprint.",
+    "relatedRuleIds": [
+      "reader-goal",
+      "word-choice",
+      "format-fit",
+      "reported-evidence"
+    ],
+    "apiUse": {
+      "availableNow": [
+        {
+          "symbol": "getWritingRule",
+          "purpose": "Kontextbezogene Anweisungen zu Wortwahl und Format abrufen."
+        },
+        {
+          "symbol": "composeWritingReviewPrompt",
+          "purpose": "Konkrete Auswirkungen auf Leser und zitierte Belege anfordern."
+        }
+      ],
+      "currentUse": "Diese Anweisungen unterstützen die Prüfung. Sie kalibrieren keinen Bewerter und belegen keine Akzeptanz durch Menschen.",
+      "missingCapability": "Kontrollierte Alternativen durch verblindete menschliche Beurteilung vergleichen; prüfen, ob schmückende Formulierungen Modellurteile trotz gleichwertigen Inhalts verändern.",
+      "releaseFunctionIds": [
+        "prompt-benchmarks",
+        "alternative-comparison"
+      ]
+    }
+  },
+  {
+    "id": "shaib-slop-2025",
+    "title": "Measuring AI ‘Slop’ in Text",
+    "authors": [
+      "Chantal Shaib",
+      "Tuhin Chakrabarty",
+      "Diego Garcia-Olano",
+      "Byron C. Wallace"
+    ],
+    "date": "2025-09-23",
+    "url": "https://arxiv.org/html/2509.19163v2",
+    "kind": "study",
+    "question": "Welche beobachtbaren Textprobleme tragen zur Einstufung als „AI Slop“ bei?",
+    "method": "Neunzehn Fachantworten flossen in eine Systematik ein. Drei Lektorierende markierten in der abschließenden Auswertung englische Nachrichten und Antworten aus MS MARCO; Regressionen setzten markierte Textstellen mit Gesamturteilen in Beziehung.",
+    "findings": [
+      "Relevanz, Informationsdichte und Ton gehörten zu den stärksten Prädiktoren; auch Faktentreue und Struktur waren bedeutsam.",
+      "Die Beurteilenden waren sich über problematische Textstellen eher einig als über die binäre Slop-Einstufung; automatische Bewerter bildeten menschliche Urteile schlecht nach."
+    ],
+    "limitations": [
+      "Preprint mit einem kleinen, gemeinsam kalibrierten Fachpanel und zwei Anwendungsbereichen. Subjektive Bewertungen und die begrenzte Abdeckung englischer Texte schränken die Verallgemeinerung ein."
+    ],
+    "voiceImplication": "Einzelne kontextbezogene Probleme anhand zitierter Belege prüfen; unterschiedliche Urteile dokumentieren, statt einen allgemeinen Slop-Wert zu vergeben.",
+    "readingDepth": "Volltext v2 (2026-01-24): Abschnitte 3–7, Tabellen zur Übereinstimmung der Annotationen und Ergebnisse zur Erkennung von Textstellen. Das Datum bezeichnet den ersten Preprint.",
+    "relatedRuleIds": [
+      "reader-goal",
+      "task-relevance",
+      "claims-evidence",
+      "repetition",
+      "format-fit"
+    ],
+    "apiUse": {
+      "availableNow": [
+        {
+          "symbol": "composeWritingReviewPrompt",
+          "purpose": "Getrennte, auf das Ziel bezogene Befunde mit genauen Zitaten anfordern."
+        },
+        {
+          "symbol": "mountVoiceReview",
+          "purpose": "Von der Host-Anwendung gelieferte Befunde an Textstellen zur Prüfung anzeigen."
+        }
+      ],
+      "currentUse": "Die API unterstützt eine Prüfung anhand ausgewählter Probleme. Sie implementiert weder das Annotationsschema der Studie noch einen allgemeinen Slop-Klassifikator.",
+      "missingCapability": "Seitenkontext aufbauen, zitierte Belege und Abdeckung validieren und unterschiedliche Prüfentscheidungen erhalten, ohne sie zu einem Qualitätswert zusammenzufassen.",
+      "releaseFunctionIds": [
+        "contextual-review",
+        "result-validation",
+        "decision-preservation"
+      ]
+    }
+  },
+  {
+    "id": "miklian-accusations-2026",
+    "title": "‘That's AI Slop, You Bot!’ Studying Accusations, Evidence, and Credibility in Online Discourse Towards LLM-Generated Comments",
+    "authors": [
+      "Jason Miklian",
+      "John E. Katsos"
+    ],
+    "date": "2026-06-10",
+    "url": "https://arxiv.org/pdf/2606.12073",
+    "kind": "study",
+    "question": "Hängen KI-Vorwürfe im Netz mit Schreibmerkmalen oder sozialer Abgrenzung zusammen?",
+    "method": "Etwa 25 Millionen Kommentare auf Hacker News und Reddit von Januar 2023 bis Mai 2026; Regex-Vorauswahl, Kodierung mit Claude Opus 4.7 und Vergleich von 421 beschuldigten Reddit-Kommentaren mit 2.048 zugeordneten Kontrollkommentaren.",
+    "findings": [
+      "Abwertende Vorwürfe nahmen zu. Tabelle 4 verbindet eine größere mittlere Token-Länge mit geringeren Chancen einer Beschuldigung (OR 0,78; p<0,001); die anderen fünf geprüften Textmerkmale waren statistisch nicht signifikant."
+    ],
+    "limitations": [
+      "Preprint zu englischsprachigen Plattformen mit modellkodierten Kategorien und begrenztem Lexikon; die Autorschaft wurde nicht unabhängig festgestellt.",
+      "Der Fließtext behauptet, keines von vier unterscheidenden Merkmalen habe Vorwürfe vorhergesagt. Tabelle 4 berichtet jedoch einen signifikanten Koeffizienten für die mittlere Token-Länge. Dieser Widerspruch schränkt die formulierte Schlussfolgerung eines Nullbefunds ein."
+    ],
+    "voiceImplication": "Negative Leserreaktionen von Aussagen über die Autorschaft trennen; das konkrete Problem mit Wortwahl, Relevanz oder Belegen erfragen.",
+    "readingDepth": "Vollständiges PDF v1: Methoden in Abschnitt 3, Vergleich mit zugeordneten Kontrollen und Tabelle 4 in Abschnitt 4, Diskussion, Einschränkungen und Datenverfügbarkeit.",
+    "relatedRuleIds": [
+      "claims-evidence",
+      "calibrated-uncertainty",
+      "word-choice"
+    ],
+    "apiUse": {
+      "availableNow": [
+        {
+          "symbol": "getWritingRule",
+          "purpose": "Anweisungen zu Belegen und Unsicherheit für einen strittigen Vorwurf abrufen."
+        },
+        {
+          "symbol": "composeWritingReviewPrompt",
+          "purpose": "Ein konkret zitiertes Problem und seine Auswirkungen auf Leser anfordern."
+        }
+      ],
+      "currentUse": "Eine Host-Anwendung kann aus einer Beschwerde einen Prüfauftrag machen. Die Library vergibt keine Autorschaftskennzeichnung und bewertet nicht die Glaubwürdigkeit einer kommentierenden Person.",
+      "missingCapability": "Beobachtete Formulierungen, Deutungen der Prüfenden und stützende Belege in validierten Befunden trennen; widersprüchliche Belege und ungeklärte Aussagen einbeziehen.",
+      "releaseFunctionIds": [
+        "claim-evidence",
+        "result-validation"
+      ]
+    }
+  },
+  {
+    "id": "juzek-lexical-2025",
+    "title": "Why Does ChatGPT ‘Delve’ So Much? Exploring the Sources of Lexical Overrepresentation in Large Language Models",
+    "authors": [
+      "Tom S. Juzek",
+      "Zina B. Ward"
+    ],
+    "date": "2025-01",
+    "url": "https://aclanthology.org/2025.coling-main.426.pdf",
+    "kind": "study",
+    "question": "Warum kommen einige Wörter in generierten wissenschaftlichen Abstracts überproportional häufig vor?",
+    "method": "Häufigkeitsanalyse in PubMed; 9.953 GPT-3.5-Rekonstruktionen von 10.000 Abstracts; Entropievergleich von Llama-2 Base und Chat; eine explorative Präferenzstudie mit 201 angeworbenen Teilnehmenden in Indien.",
+    "findings": [
+      "Einundzwanzig untersuchte Wörter verbanden steigende Häufigkeit im Korpus mit übermäßigem Gebrauch durch GPT-3.5.",
+      "Die Modellunterschiede waren mit Nachtrainingseffekten vereinbar. Insgesamt bevorzugten die Teilnehmenden jedoch keine Abstracts mit den untersuchten Wörtern; Texte, die mit „delve“ begannen, wurden weniger bevorzugt."
+    ],
+    "limitations": [
+      "Nach Ausschlüssen und der Aufteilung auf Bedingungen hatte die Online-Studie zu geringe statistische Teststärke. Erzwungene Wortwahl konnte die Bedeutung verändern; nicht verfügbare Trainingsdaten verhindern eine kausale Zuordnung zu RLHF."
+    ],
+    "voiceImplication": "Lexikalische Hinweise als Kandidaten für eine kontextbezogene Prüfung behandeln, ohne sie einem einzelnen Trainingsmechanismus zuzuschreiben oder Wörter zu verbieten.",
+    "readingDepth": "Veröffentlichtes COLING-PDF: Abschnitte 2 und 4–7, Modellvergleich und Tabelle 1, Ausschlüsse im Experiment und explorative Analyse.",
+    "relatedRuleIds": [
+      "word-choice",
+      "unsupported-causality",
+      "calibrated-uncertainty"
+    ],
+    "apiUse": {
+      "availableNow": [
+        {
+          "symbol": "getWritingRule",
+          "purpose": "Anweisungen zur Wortwahl und berechtigte Ausnahmen abrufen."
+        },
+        {
+          "symbol": "findWritingSignals",
+          "purpose": "Ausschließlich die veröffentlichten Muster für typische Formulierungen von Voice finden."
+        }
+      ],
+      "currentUse": "Der aktuelle Musterabgleich implementiert nicht die Wortliste der Studie und erkennt „delve“ nicht. Seine Kandidaten benötigen eine separate kontextbezogene Beurteilung.",
+      "missingCapability": "Wortwahlalternativen anhand von Bedeutung, Fachgebiet und Zielgruppe bewerten; anschließend begründete Änderungen und berechtigte Originalformulierungen je Sprache evaluieren.",
+      "releaseFunctionIds": [
+        "contextual-review",
+        "alternative-comparison",
+        "prompt-benchmarks"
+      ]
+    }
+  },
+  {
+    "id": "kobak-excess-vocabulary-2025",
+    "title": "Delving into LLM-assisted writing in biomedical publications through excess vocabulary",
+    "authors": [
+      "Dmitry Kobak",
+      "Rita González-Márquez",
+      "Emőke-Ágnes Horvát",
+      "Jan Lause"
+    ],
+    "date": "2025-07-02",
+    "url": "https://arxiv.org/html/2406.07016v3",
+    "kind": "study",
+    "question": "Lässt sich LLM-Unterstützung in biomedizinischen Abstracts aus aggregierten Änderungen der Worthäufigkeit schätzen?",
+    "method": "Analyse von 15,1 Millionen englischen PubMed-Abstracts aus den Jahren 2010–2024. Nach Entfernung störender Metadaten werden Wortvorkommen von 2024 mit konservativen Fortschreibungen aus 2021–2022 verglichen.",
+    "findings": [
+      "Stilprägende Wörter nahmen sprunghaft zu. Unter den Annahmen der Studie ergab die überschüssige Worthäufigkeit für LLM-unterstützte Abstracts von 2024 eine geschätzte Untergrenze von 13,5 %."
+    ],
+    "limitations": [
+      "Eine Schätzung auf Korpusebene kann einzelne Abstracts nicht kennzeichnen und direkte Unterstützung nicht von der Übernahme modischer Wörter durch Menschen unterscheiden. Überarbeitungspraktiken und Verzögerungen bis zur Veröffentlichung erschweren Vergleiche zwischen Untergruppen."
+    ],
+    "voiceImplication": "Verschiebungen der Wortwahl zur Bildung von Prüfhypothesen nutzen, niemals als Beleg dafür, dass ein bestimmter Satz falsch oder maschinell verfasst ist.",
+    "readingDepth": "Vollständige arXiv-Version v3: Ergebnisse, Interpretation und Einschränkungen sowie Methoden 4.1–4.4. Die neueste Version v5 kehrt zu v3 zurück; das Datum bezeichnet die Veröffentlichung in Science Advances.",
+    "relatedRuleIds": [
+      "word-choice",
+      "claims-evidence",
+      "calibrated-uncertainty"
+    ],
+    "apiUse": {
+      "availableNow": [
+        {
+          "symbol": "findWritingSignals",
+          "purpose": "Kandidaten in der Wortwahl und die Abdeckung für einen übergebenen Text zurückgeben."
+        },
+        {
+          "symbol": "getWritingRule",
+          "purpose": "Erklären, weshalb ein lexikalischer Hinweis eine kontextbezogene Prüfung benötigt."
+        }
+      ],
+      "currentUse": "Host-Anwendungen können diese lokalen Ergebnisse manuell sammeln. Die API analysiert keine Korpushäufigkeiten, führt keinen historischen Vergleich durch und schätzt keinen Anteil an KI-Unterstützung.",
+      "missingCapability": "Wiederkehrende Wortwahl in versionierten Git-Dokumenten mit ausdrücklich definiertem Korpus prüfen; uneinheitliche Terminologie von bewusster Wiederholung unterscheiden.",
+      "releaseFunctionIds": [
+        "project-consistency",
+        "contextual-review"
+      ]
+    }
+  },
+  {
+    "id": "doshi-creativity-diversity-2024",
+    "title": "Generative AI enhances individual creativity but reduces the collective diversity of novel content",
+    "authors": [
+      "Anil R. Doshi",
+      "Oliver P. Hauser"
+    ],
+    "date": "2024-07-12",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11244532/",
+    "kind": "study",
+    "question": "Kann Unterstützung einzelne Texte verbessern und zugleich die Vielfalt einer Sammlung verringern?",
+    "method": "Präregistriertes randomisiertes Experiment: 293 Teilnehmende aus dem Vereinigten Königreich schrieben Geschichten aus acht Sätzen ohne GPT-4-Idee, mit einer verfügbaren Idee oder mit bis zu fünf Ideen. Sechshundert Beurteilende vergaben Bewertungen; Embeddings maßen die Ähnlichkeit.",
+    "findings": [
+      "Der Zugang zu Ideen verbesserte Bewertungen von Neuartigkeit und Nützlichkeit, besonders bei Schreibenden mit niedrigerer anfänglicher Kreativität. Zugleich ähnelten sich die unterstützten Geschichten stärker."
+    ],
+    "limitations": [
+      "Kurze fiktionale Texte, nichtprofessionelle Teilnehmende und feste Prompts ohne wiederholten Dialog; weder professionelle Dokumentation noch langfristige Kreativität wurden geprüft."
+    ],
+    "voiceImplication": "Nützlichkeit und Eigenständigkeit getrennt bewerten; wirksame Unterstützung erhalten und wiederkehrende Darstellungsweisen über Seiten oder Alternativen hinweg prüfen.",
+    "readingDepth": "Veröffentlichter Volltext: Versuchsbedingungen, Ergebnisse, Diskussion, Auswahl der Beurteilenden, Definitionen der Zielgrößen und Ähnlichkeitsberechnungen.",
+    "relatedRuleIds": [
+      "repetition",
+      "reader-goal",
+      "word-choice"
+    ],
+    "apiUse": {
+      "availableNow": [
+        {
+          "symbol": "composeWritingReviewPrompt",
+          "purpose": "Eine bis drei eigenständige Alternativen anfordern, wenn eine Änderung begründet ist."
+        },
+        {
+          "symbol": "selectWritingRules",
+          "purpose": "reader-goal und repetition in die Prüfung aufnehmen."
+        }
+      ],
+      "currentUse": "Die Prompt-Anweisungen fordern unterschiedliche Alternativen. Keine API erzeugt diese Alternativen, misst ihre Ähnlichkeit oder ordnet sie automatisch nach Nützlichkeit.",
+      "missingCapability": "Alternativen mit dem ursprünglichen Ziel vergleichen und wiederkehrende Darstellungsweisen auf Projektseiten prüfen; Nützlichkeit und Eigenständigkeit als getrennte Prüfkriterien erhalten.",
+      "releaseFunctionIds": [
+        "alternative-comparison",
+        "project-consistency"
+      ]
+    }
+  },
+  {
+    "id": "sharma-sycophancy-2023",
+    "title": "Towards Understanding Sycophancy in Language Models",
+    "authors": [
+      "Mrinank Sharma",
+      "Meg Tong",
+      "Tomasz Korbak",
+      "David Duvenaud",
+      "Amanda Askell",
+      "Samuel R. Bowman",
+      "Newton Cheng",
+      "Esin Durmus",
+      "Zac Hatfield-Dodds",
+      "Scott R. Johnston",
+      "Shauna Kravec",
+      "Timothy Maxwell",
+      "Sam McCandlish",
+      "Kamal Ndousse",
+      "Oliver Rausch",
+      "Nicholas Schiefer",
+      "Da Yan",
+      "Miranda Zhang",
+      "Ethan Perez"
+    ],
+    "date": "2023-10-20",
+    "url": "https://arxiv.org/html/2310.13548v4",
+    "kind": "study",
+    "question": "Kann zustimmendes Feedback höher bewertet werden als Belege oder wahrheitsgemäße Korrekturen?",
+    "method": "Prompt-Variationen testeten Claude 1.3/2.0, GPT-3.5/GPT-4 und Llama-2-70B-Chat. Die Analyse umfasste 15.000 Paare menschlicher Präferenzurteile und ein Experiment mit 266 Fehlvorstellungen.",
+    "findings": [
+      "Geäußerte Nutzerpräferenzen veränderten Kritik und Antworten; einige richtige Antworten wurden nach Widerspruch aufgegeben.",
+      "Menschen bevorzugten im Allgemeinen hilfreiche, wahrheitsgemäße Antworten. Überzeugende Zustimmung zu Fehlvorstellungen gewann jedoch mitunter, besonders bei schwierigeren Fragen."
+    ],
+    "limitations": [
+      "Ältere Modelle, modellunterstützte Bewertungen und ein exemplarischer Satz von Fehlvorstellungen. Die menschlichen Beurteilenden konnten keine externen Faktenprüfungen durchführen; die Ergebnisse sind keine Fehlerraten aktueller Modelle."
+    ],
+    "voiceImplication": "Für das Beibehalten und das Ändern von Texten Gründe und Belege verlangen; Zustimmung zum Auftraggeber reicht als Validierung nicht aus.",
+    "readingDepth": "Volltext v4 (2025-05-10): Abschnitte 3–4 und Anhänge A/B/D zu Prompts, Präferenzmerkmalen und menschlicher Evaluation. Das Datum bezeichnet den ersten Preprint.",
+    "relatedRuleIds": [
+      "claims-evidence",
+      "unsupported-causality",
+      "calibrated-uncertainty",
+      "reported-evidence"
+    ],
+    "apiUse": {
+      "availableNow": [
+        {
+          "symbol": "composeWritingReviewPrompt",
+          "purpose": "Mit Belegen verknüpfte Gründe für das Beibehalten oder Ändern einer Passage verlangen."
+        },
+        {
+          "symbol": "getWritingRule",
+          "purpose": "Anweisungen zu claims-evidence und calibrated-uncertainty bereitstellen."
+        }
+      ],
+      "currentUse": "Eine Host-Anwendung kann diese Anweisungen mit ihrem gewählten Agenten verwenden. Prompt-Formulierungen allein prüfen keine Wahrheit und verhindern keine durch Zustimmung getriebenen Änderungen.",
+      "missingCapability": "Überarbeitete Aussagen mit Quellbelegen abgleichen und evaluieren, ob eine geänderte geäußerte Präferenz des Auftraggebers ein ansonsten identisches Review verändert.",
+      "releaseFunctionIds": [
+        "claim-evidence",
+        "prompt-benchmarks"
+      ]
+    }
+  },
+  {
+    "id": "liang-detector-bias-2023",
+    "title": "GPT detectors are biased against non-native English writers",
+    "authors": [
+      "Weixin Liang",
+      "Mert Yuksekgonul",
+      "Yining Mao",
+      "Eric Wu",
+      "James Zou"
+    ],
+    "date": "2023-07-10",
+    "url": "https://arxiv.org/html/2304.02819v3",
+    "kind": "study",
+    "question": "Können Detektorwerte sprachlichen Hintergrund mit maschineller Autorschaft verwechseln?",
+    "method": "Sieben handelsübliche Detektoren, abgerufen im März 2023, bewerteten 91 von Menschen verfasste TOEFL-Aufsätze und 88 Aufsätze aus achten Klassen in den USA. Weitere Experimente änderten die Wortwahl mithilfe von ChatGPT.",
+    "findings": [
+      "Die durchschnittliche Fehlalarmrate lag für TOEFL-Aufsätze bei etwa 61 %, für die US-Aufsätze bei rund 5 %.",
+      "Eine anspruchsvollere Wortwahl verringerte Fehlalarme bei TOEFL-Aufsätzen; Selbstüberarbeitung verringerte auch die Erkennung generierter Aufsätze."
+    ],
+    "limitations": [
+      "Kleine, nicht aufeinander abgestimmte Bildungskorpora und ältere Detektorversionen. Die Befunde belegen nicht dieselbe Verzerrung in jeder Sprache, Textgattung oder jedem aktuellen Detektor."
+    ],
+    "voiceImplication": "Nichtmuttersprachliche Ausdrucksweisen erhalten und Auswirkungen auf Leser direkt beurteilen; Flüssigkeit oder Vorhersehbarkeit belegen keine Autorschaft.",
+    "readingDepth": "Volltext v3: Ergebnisse, Einschränkungen der Diskussion und Abschnitt zu Material und Methoden, einschließlich datiertem Detektorzugriff und Prompts für die Eingriffe.",
+    "relatedRuleIds": [
+      "word-choice",
+      "claims-evidence",
+      "calibrated-uncertainty"
+    ],
+    "apiUse": {
+      "availableNow": [
+        {
+          "symbol": "getWritingRule",
+          "purpose": "Ausnahmen der Regel word-choice zeigen, bevor eine Formulierung als Mangel gilt."
+        },
+        {
+          "symbol": "composeWritingReviewPrompt",
+          "purpose": "Zielgruppe, Ziel und englische oder deutsche Anweisungen bereitstellen."
+        }
+      ],
+      "currentUse": "Diese APIs unterstützen eine kontextbezogene Prüfung ohne Autorschaftswert. Übersetzte Anweisungen belegen keine gleichwertige Prüfqualität für unterschiedliche sprachliche Hintergründe.",
+      "missingCapability": "Akzeptierte Originale und begründete Änderungen über sprachliche Hintergründe und Fachgebiete hinweg testen; Fehlalarme ausweisen, ohne sprachliche Flüssigkeit als Herkunftskennzeichnung zu verwenden.",
+      "releaseFunctionIds": [
+        "prompt-benchmarks",
+        "contextual-review"
+      ]
+    }
+  },
+  {
+    "id": "dugan-raid-2024",
+    "title": "RAID: A Shared Benchmark for Robust Evaluation of Machine-Generated Text Detectors",
+    "authors": [
+      "Liam Dugan",
+      "Alyssa Hwang",
+      "Filip Trhlík",
+      "Josh Magnus Ludan",
+      "Andrew Zhu",
+      "Hainiu Xu",
+      "Daphne Ippolito",
+      "Chris Callison-Burch"
+    ],
+    "date": "2024-08",
+    "url": "https://aclanthology.org/2024.acl-long.674.pdf",
+    "kind": "study",
+    "question": "Bleiben Detektorergebnisse bei anderen Generatoren, Fachgebieten und Stichprobeneinstellungen bestehen?",
+    "method": "Benchmark von zwölf Detektoren anhand von über sechs Millionen generierten Beispielen aus elf Generatoren, acht Anwendungsbereichen, vier Dekodierungseinstellungen und elf Angriffen; Vergleich der Erkennung bei einer festen Fehlalarmrate von 5 %.",
+    "findings": [
+      "Unbekannte Generatoren, Stichprobenverfahren, Wiederholungsstrafen und Textänderungen senkten die Erkennungsleistung. Die Rangfolge der Detektoren hing von der erlaubten Fehlalarmrate ab."
+    ],
+    "limitations": [
+      "Die Kernabdeckung ist Englisch; mehrsprachige Erweiterungen umfassen Nachrichten. Modelle veralten. Optimierung auf einen öffentlichen Benchmark kann den Anschein einer Übertragbarkeit auf andere Bereiche erzeugen."
+    ],
+    "voiceImplication": "Sprache, Anwendungsbereich und getestete Quellbedingungen ausweisen; einen Detektor-Benchmarkwert niemals in einen Wert für Schreibqualität umdeuten.",
+    "readingDepth": "Veröffentlichtes ACL-PDF: Abschnitte 3–6, Bewertungsschwellen, Konstruktion der Angriffe, Diskussion und Einschränkungen.",
+    "relatedRuleIds": [
+      "reported-evidence",
+      "claims-evidence",
+      "calibrated-uncertainty"
+    ],
+    "apiUse": {
+      "availableNow": [
+        {
+          "symbol": "findWritingSignals",
+          "purpose": "Geprüfte und nicht geprüfte Regeln, Sprache und eine etwaige Kürzung ausweisen."
+        },
+        {
+          "symbol": "composeWritingReviewPrompt",
+          "purpose": "Ausdrückliche Grenzen der Prüfabdeckung anfordern."
+        }
+      ],
+      "currentUse": "Die zurückgegebene Abdeckung beschreibt den lexikalischen Scan, keine gemessene Erkennungsgenauigkeit. Die Library importiert RAID nicht und führt keine Detektor-Evaluationen aus.",
+      "missingCapability": "Review-Prompts in angegebenen Anwendungsbereichen, Sprachen und bearbeiteten Eingaben evaluieren; die Herkunft von Ergebnissen validieren und die Abdeckung von Testfällen von gemessenen Prüfergebnissen unterscheiden.",
+      "releaseFunctionIds": [
+        "prompt-benchmarks",
+        "result-validation"
+      ]
+    }
+  },
+  {
+    "id": "zhang-mixset-2024",
+    "title": "LLM-as-a-Coauthor: Can Mixed Human-Written and Machine-Generated Text Be Detected?",
+    "authors": [
+      "Qihui Zhang",
+      "Chujie Gao",
+      "Dongping Chen",
+      "Yue Huang",
+      "Yixin Huang",
+      "Zhenyang Sun",
+      "Shilin Zhang",
+      "Weiye Li",
+      "Zhengyan Fu",
+      "Yao Wan",
+      "Lichao Sun"
+    ],
+    "date": "2024-06",
+    "url": "https://aclanthology.org/2024.findings-naacl.29.pdf",
+    "kind": "study",
+    "question": "Was geschieht, wenn sowohl Menschen als auch Modelle ein Dokument überarbeiten?",
+    "method": "MixSet kombiniert sprachliche Glättung, Vervollständigung, Neufassung und Anpassung in sechs Texttypen mit GPT-4, Llama-2-70B und acht menschlichen Bearbeitenden. Experimente vergleichen binäre und dreiklassige Erkennung sowie die Übertragbarkeit zwischen Bearbeitungsarten.",
+    "findings": [
+      "Feine Überarbeitungen erschwerten die Erkennung. Training mit gemischten Beispielen verbesserte einige Ergebnisse; die Übertragbarkeit hing jedoch von Bearbeitungsart und Generator ab."
+    ],
+    "limitations": [
+      "Konstruierte englische Szenarien verwenden nur wenige Generatoren; ein Teil der als menschlich wirkend überarbeiteten Fassungen ist modellsimuliert. Binäre Experimente kennzeichnen sämtliche gemischten Texte als maschinell generiert. Dies ist eine Konvention der Studie, keine Tatsache über die Autorschaft."
+    ],
+    "voiceImplication": "Quellversionen und akzeptierte Änderungen erhalten; den Zweck jeder Passage prüfen, ohne gemeinschaftliches Schreiben auf eine binäre Herkunftskennzeichnung zu reduzieren.",
+    "readingDepth": "Veröffentlichtes NAACL-Findings-PDF: Datensatzaufbau, Definitionen der Bearbeitungsarten, Klassenzuordnungen, Übertragungsexperimente und angegebene Einschränkungen.",
+    "relatedRuleIds": [
+      "claims-evidence",
+      "calibrated-uncertainty",
+      "reported-evidence"
+    ],
+    "apiUse": {
+      "availableNow": [
+        {
+          "symbol": "mountVoiceReview",
+          "purpose": "Von der Host-Anwendung gelieferte Befunde an passende gerenderte Texteinheiten binden."
+        },
+        {
+          "symbol": "composeWritingReviewPrompt",
+          "purpose": "Quellverweise anfordern und dabei akzeptierte Entscheidungen erhalten."
+        }
+      ],
+      "currentUse": "Eine Host-Anwendung kann eine gemeinsam bearbeitete Passage ohne Herkunftskennzeichnung prüfen. Das Overlay prüft die Textzuordnung, führt jedoch keine Versionshistorie.",
+      "missingCapability": "Entscheidungen an Git-Versionen und validierte Quellbereiche binden; erkennen, wenn spätere Änderungen die von einer prüfenden Person akzeptierte Passage ungültig machen.",
+      "releaseFunctionIds": [
+        "decision-preservation",
+        "result-validation"
+      ]
+    }
+  }
+]

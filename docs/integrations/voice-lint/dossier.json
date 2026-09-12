@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "id": "voice-concept-revision",
+  "key": "VL-W1",
+  "title": "Voice Lint and Voice Studio: readiness",
+  "statusText": "2026-09-12: local website onboarded; EN/DE Research; resizable Studio panes and compact connection badge",
+  "summary": "Voice Studio remains a supervised local preview. The running Voice website is registered from 27 original JSON and Markdown sources with explicit route mapping. JSON review preserves exact Unicode/source spans, applies guarded JSON-safe replacements and rejects stale or malformed changes. Review stays beside the website in every navigation mode; review and sidebar widths are resizable, Projects and Files collapse independently, and the floating handle is movable. A toolbar badge opens connection and mapping details. Research prose and API relationships are available in English and German. 120 layout checks and 96 website views passed, with 320 local targets. Backend verification passed 106 assertions; real Chrome onboarding verified exact German selection and original Markdown navigation without source or model writes. The two libraries separate writing knowledge and four host-driven tools from HTML visualization. Public pages expose no LLM capability. Reproducible offline quality evaluation is implemented; no model-quality run or measured winner exists. Publication remains pending exact approval requested by automatic review; the earlier pushed baseline is 2b235ab."
+}

@@ -1,0 +1,66 @@
+[
+  {
+    "id": "batch-prompting-2023",
+    "title": "Batch Prompting: Efficient Inference with Large Language Model APIs",
+    "url": "https://aclanthology.org/2023.emnlp-industry.74.pdf",
+    "kind": "Begutachteter Beitrag im Industry Track",
+    "read": "Abschnitte 2–4, Abschnitt 6 sowie Anhang B/Tabelle 6; geprüft am 12.09.2026.",
+    "finding": "Unabhängige Fragen werden mit gemeinsamen Beispielen gebündelt; die Antworten erhalten zugehörige Indizes. Die Hauptexperimente verwenden code-davinci-002 und zehn Datensätze zu Fragebeantwortung, Arithmetik, logischen Beziehungen zwischen Aussagen und Sprachverständnis. Gemeinsame Beispiele verringern wiederholte Eingaben. Größere Bündel senken häufig die Genauigkeit; die beste Größe hängt von der Aufgabe ab.",
+    "limits": "Untersucht wurden weder redaktionelle Reviews auf Englisch und Deutsch noch aktuelle Modelle oder die Qualität von Überarbeitungen. Umfangreiche Ausgaben und lange Eingaben können den Nutzen verringern. Getestet werden mehrere Beispiele gemeinsam, nicht mehrere Regeln für ein einzelnes Beispiel.",
+    "apiUse": {
+      "availableNow": [
+        "selectWritingRules",
+        "composeWritingReviewPrompt"
+      ],
+      "currentUse": "Ein einheitliches Bewertungsraster festschreiben und den Prompt für jede Versuchsbedingung reproduzieren.",
+      "proposed": "composeWritingReviewBatch benötigt Textstellen-IDs und Ergebnisse pro Textstelle. evaluateReviewPrompts sollte Auslassungen, falsche Zuordnungen, Qualität und Gesamtkosten über verschiedene Bündelgrößen hinweg messen.",
+      "releaseFunctionIds": [
+        "review-batching",
+        "prompt-benchmarks"
+      ]
+    }
+  },
+  {
+    "id": "lost-middle-2024",
+    "title": "Lost in the Middle: How Language Models Use Long Contexts",
+    "url": "https://aclanthology.org/2024.tacl-1.9.pdf",
+    "kind": "Begutachteter TACL-Beitrag",
+    "read": "Abschnitte 2–4 und die Fallstudie zur Informationssuche in Abschnitt 5; geprüft am 12.09.2026.",
+    "finding": "Relevante Informationen werden innerhalb kontrollierter Eingaben zur dokumentübergreifenden Fragebeantwortung und zur Suche nach Schlüssel-Wert-Paaren verschoben. Untersucht werden unter anderem MPT, LongChat, GPT-3.5 und Claude-1.3. Bei Belegen in der Mitte fällt die Leistung der Fragebeantwortung häufig ab. Claude löst die synthetische Suchaufgabe fast fehlerfrei. Eine Wiederholung der Frage hilft bei der Informationssuche stärker als bei der Fragebeantwortung.",
+    "limits": "Ältere Modelle und Suchaufgaben belegen kein Versagen eines redaktionellen Prompts mit zwanzig Regeln. Die Größe des Kontextfensters allein belegt nicht, dass alle relevanten Vorgaben berücksichtigt werden.",
+    "apiUse": {
+      "availableNow": [
+        "selectWritingRules",
+        "composeWritingReviewPrompt"
+      ],
+      "currentUse": "Den vorgesehenen Prüfumfang ausdrücklich benennen und die ausgewählten Anweisungen reproduzieren.",
+      "proposed": "evaluateReviewPrompts sollte wichtige Fakten, Regeln und Fälle zum Beibehalten bei gleichem Inhalt an Anfang, Mitte und Ende verschieben. composeWritingReviewBatch sollte den Seitenkontext erhalten und messen, wie stark die Ergebnisse von der Position abhängen.",
+      "releaseFunctionIds": [
+        "prompt-benchmarks",
+        "review-batching"
+      ]
+    }
+  },
+  {
+    "id": "robatch-2026",
+    "title": "Towards Cost-effective LLMs Routing with Batch Prompting",
+    "url": "https://arxiv.org/html/2605.28268v1",
+    "kind": "Preprint vom Mai 2026",
+    "read": "Abschnitte 2–6 einschließlich Implementierung und Ablationsstudien; geprüft am 12.09.2026.",
+    "finding": "Modell und Anzahl unabhängiger Anfragen pro Prompt werden gemeinsam ausgewählt. Getestet werden Qwen3 4B/14B/32B und Gemma3 4B/12B/27B auf sechs Benchmarks mit getrennten Trainings-, Validierungs- und Testmengen. Die Studie berichtet in vielen Einstellungen ein verbessertes Verhältnis von Kosten und Genauigkeit. Wie gut sich Anfragen bündeln lassen, hängt von Modell und Aufgabe ab; größere Bündel können zu fehlerhaft strukturierten Ausgaben führen.",
+    "limits": "Die Studie validiert weder Voice-Reviews noch aktuelle proprietäre Modelle. Die Kalibrierung benötigt Belege. Die angegebene Planungszeit enthält keine Latenz der Modell-API; unvollständige Bündel erschweren die Kostenzuordnung gemeinsamer Eingaben.",
+    "apiUse": {
+      "availableNow": [
+        "selectWritingRules",
+        "composeWritingReviewPrompt"
+      ],
+      "currentUse": "Regeln und Prompt-Versionen für paarweise Modellvergleiche festschreiben.",
+      "proposed": "evaluateReviewPrompts sollte Modell und Prompt-Struktur gemeinsam vergleichen. composeWritingReviewBatch kann Ausführungsvarianten vorbereiten; die Auswahl der Ausführungsroute bleibt bei Token Economy und der Host-Anwendung.",
+      "releaseFunctionIds": [
+        "prompt-benchmarks",
+        "review-batching",
+        "usage-budget"
+      ]
+    }
+  }
+]

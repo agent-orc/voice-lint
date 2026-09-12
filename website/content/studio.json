@@ -1,0 +1,12 @@
+{
+  "en": {
+    "eyebrow": "Application · Preview 0.3",
+    "title": "Review text on your website.",
+    "lead": "Open your website in Studio. Review passages in context and see the corresponding source file in the review panel."
+  },
+  "de": {
+    "eyebrow": "Anwendung · Preview 0.3",
+    "title": "Texte direkt auf deiner Website prüfen.",
+    "lead": "Öffne deine Website in Studio. Prüfe Textstellen im Seitenkontext und sieh die zugehörige Quelldatei im Review-Panel."
+  }
+}

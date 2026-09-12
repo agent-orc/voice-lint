@@ -1,12 +1,33 @@
-# AGENTS.md — Voice Lint
+# AGENTS.md — Voice
 
-This file applies to the entire repository.
+## Repository and implemented product
 
-## Current project phase
+This is the standalone `agent-orc/voice-lint` repository. Studio, both libraries, the website, benchmarks and the VL-W1 dossier live directly in this repository. Do not create or maintain a second product checkout inside the Devspace repository. Product commits and releases belong here.
 
-Voice Lint is in the design and bootstrapping phase. Public commands, schemas, and APIs in the documentation are proposed contracts until an implementation and tests exist.
+Voice Studio Preview 0.3 and the JavaScript packages are implemented. The broader Voice Lint analyzer CLI, API and CI contracts remain proposed unless their implementation and tests exist. Distinguish these states in documentation.
 
-Do not describe a planned capability as shipped. Keep README status, usage documentation, schemas, and implementation status aligned.
+Build the local product with Angular, .NET and reusable JavaScript packages.
+Keep the review library framework-independent. Backend, frontend and packages
+share `packages/contracts/src/index.ts`; coordinate incompatible changes.
+
+Use bash/sh. Keep project-owned source and metadata changes behind backend
+operations. Bind development services to loopback. No automatic commit, push,
+deployment or paid inference. Preserve user edits with version preconditions.
+
+Claims checks are advisory. Reports state coverage and never invent a numeric
+voice score. Render generated document previews, including Markdown, in a sandbox without scripts.
+The explicitly enabled live browser loads the real local application on its separate
+configured origin, with scripts and normal navigation; use the validated review bridge.
+Review API v0 uses explicitly tagged UTF-16 source spans; an adapter must
+convert to/from the Voice Lint core's proposed code-point spans.
+
+Keep docs and the Voice Lint dossier aligned with implementation and actual
+verification. Report limitations plainly. Test source changes, persistence,
+stale-version conflicts, Markdown/HTML mapping and library lifecycle.
+
+## Proposed analyzer contract
+
+The following invariants describe the planned Voice Lint analyzer and its runtime contracts. They do not claim that those engines, runtime modes or CLI commands are implemented in Studio. Existing Studio review persistence and explicit host-driven operations keep their tested contracts.
 
 ## Product invariants
 

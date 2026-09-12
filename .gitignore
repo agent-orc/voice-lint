@@ -15,3 +15,18 @@ coverage/
 !.env.example
 .voice-lint/runtime.yml
 .voice-lint/runtime.yaml
+
+# Studio builds and private local state.
+node_modules/
+**/dist/
+**/bin/
+**/obj/
+.voice-studio/
+test-results/
+examples/**/.voice-lint/
+.angular/
+frontend/.angular/
+*.log
+.voice-runtime/
+# Local maintenance history and private investigation residue.
+.local/

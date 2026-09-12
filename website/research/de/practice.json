@@ -1,0 +1,273 @@
+[
+  {
+    "id": "furze-problem-patterns",
+    "title": "Problem Patterns in AI: Beyond Hallucinations",
+    "authors": [
+      "Leon Furze"
+    ],
+    "date": "2026-07-26",
+    "url": "https://leonfurze.com/2026/07/26/problem-patterns-in-ai-beyond-hallucinations/",
+    "kind": "practice",
+    "observation": "Furze beschreibt, wie Claude angeforderten Folienüberschriften interpretierende Untertitel hinzufügt. Seine vorgeschlagenen Kategorien umfassen neben Wahrheit auch Treue zur Vorlage, Urteilsvermögen, Kommunikation und Ästhetik: Eine sachlich richtige Ergänzung kann trotzdem die Gewichtung verschieben oder Aufmerksamkeit verbrauchen.",
+    "limits": "Eine Systematik mit Beispielen aus der Praxis und einer ausdrücklich informellen Umfrage. Sie misst weder Fehlerraten von Modellen noch belegt sie die vermuteten technischen Ursachen.",
+    "voiceImplication": "Prüfen, was jede Überschrift und Erklärung zur Aufgabe der Leser beiträgt. Die Gewichtung mit der vorliegenden Quelle vergleichen und unbelegte Deutungen entfernen.",
+    "readingDepth": "Artikel, Beispiele, vorgeschlagene Kategorien und Einschränkung zur Umfrage am 2026-09-12 gelesen.",
+    "relatedRuleIds": [
+      "meta-framing",
+      "reader-goal",
+      "task-relevance",
+      "unsupported-causality",
+      "forced-template"
+    ],
+    "apiUse": {
+      "availableNow": [
+        {
+          "symbol": "composeWritingReviewPrompt",
+          "purpose": "Die Prüfung von Überschriften an der angegebenen Zielgruppe und Zielsetzung ausrichten."
+        },
+        {
+          "symbol": "selectWritingRules",
+          "purpose": "Die Anweisungen zu reader-goal, task-relevance und meta-framing auswählen."
+        }
+      ],
+      "currentUse": "Eine Host-Anwendung kann einem Agenten die Aufgabenbeschreibung zusammen mit den generierten Überschriften zur Prüfung geben. Die Library stellt die Anweisungen zusammen; sie vergleicht deren Gewichtung nicht.",
+      "missingCapability": "Ein Kontextaufbau, der Seitenziel, Quellaussagen und die Funktion von Überschriften verbindet, gefolgt von einem Prüfergebnis mit nachvollziehbaren Verweisen.",
+      "releaseFunctionIds": [
+        "contextual-review",
+        "result-validation"
+      ]
+    }
+  },
+  {
+    "id": "gorrie-rhetorical-slop",
+    "title": "Why ChatGPT writes like that: A rhetorical analysis of AI ‘slop’",
+    "authors": [
+      "Colin Gorrie"
+    ],
+    "date": "2025-07-09",
+    "url": "https://www.deadlanguagesociety.com/p/rhetorical-analysis-ai",
+    "kind": "practice",
+    "observation": "Gorrie analysiert Parallelismen, Antithesen und dreiteilige Formulierungen. Dazu legt er einen Brief-Prompt für Claude Sonnet 4 offen. Diese Mittel haben eine menschliche rhetorische Tradition; ihre Häufung und vorhersehbare Wiederholung können künstlich wirken.",
+    "limits": "Eine veranschaulichende rhetorische Analyse, keine Korpusstichprobe oder kontrollierte Gegenüberstellung von Anbietern. Ein wirkungsvoller Gegensatz oder eine dreiteilige Überschrift ist nicht automatisch ein Mangel.",
+    "voiceImplication": "Wiederkehrende Formen und ihre Bedeutung auf der gesamten Seite prüfen. Bewusste, akzeptierte Überschriften erhalten; Alternativen vorschlagen, wenn eine rhetorische Form einen Gegensatz erfindet oder Rhythmus an die Stelle von Inhalt setzt.",
+    "readingDepth": "Artikel und Fußnote zu Modell und Prompt am 2026-09-12 gelesen.",
+    "relatedRuleIds": [
+      "unsupported-contrast",
+      "forced-template",
+      "repetition",
+      "format-fit"
+    ],
+    "apiUse": {
+      "availableNow": [
+        {
+          "symbol": "findWritingSignals",
+          "purpose": "Die unterstützten Formulierungsmuster der Regel unsupported-contrast finden."
+        },
+        {
+          "symbol": "getWritingRule",
+          "purpose": "Ausnahmen für Gegensätze und Beispiele mit ihren Gültigkeitsbedingungen abrufen."
+        }
+      ],
+      "currentUse": "Aktuelle Treffer können eine rhetorische Prüfung anstoßen. Sie erkennen jedoch nicht jede Antithese, parallele Struktur oder bewusst dreiteilige Überschrift.",
+      "missingCapability": "Rhetorische Entscheidungen mit dem Seitenziel und wiederkehrenden Strukturen in Git-Dateien vergleichen; wirksame Gegensätze erhalten und inhaltlich unterschiedliche Alternativen anbieten.",
+      "releaseFunctionIds": [
+        "contextual-review",
+        "alternative-comparison",
+        "project-consistency"
+      ]
+    }
+  },
+  {
+    "id": "amatriain-assisted-writing",
+    "title": "On AI-assisted writing, AI slop, and the line between them",
+    "authors": [
+      "Xavier Amatriain"
+    ],
+    "date": "2026-08-30",
+    "url": "https://amatria.in/blog/aislop",
+    "kind": "practice",
+    "observation": "Amatriain beschreibt KI-gestützte Überarbeitung als hilfreich für Sprache und Struktur. Er warnt zugleich davor, dass Änderungen Gewichtung, Einschränkungen und Aussagen verschieben können. Er legt die Unterstützung am Essay selbst offen und sieht die Verantwortung für dessen Gedanken beim Autor.",
+    "limits": "Eine persönliche Position, einschließlich anekdotischer Erfahrungen mit Detektoren. Sie belegt weder einen allgemeinen Produktivitätsgewinn noch eine Grenze für Autorschaft oder die Genauigkeit von Detektoren.",
+    "voiceImplication": "Prüfen, ob die Unterstützung die beabsichtigte Aussage erhält. Sachliche Einschränkungen und Entscheidungen des Autors beim Vergleich von Fassungen sichtbar halten, einschließlich der Entscheidung, das Original beizubehalten.",
+    "readingDepth": "Vollständigen Essay, Überarbeitungsbeispiele und Offenlegung der Unterstützung am 2026-09-12 gelesen.",
+    "relatedRuleIds": [
+      "reader-goal",
+      "claims-evidence",
+      "calibrated-uncertainty",
+      "word-choice"
+    ],
+    "apiUse": {
+      "availableNow": [
+        {
+          "symbol": "composeWritingReviewPrompt",
+          "purpose": "Alternativen anfordern, die Fakten, Einschränkungen und akzeptierte Entscheidungen erhalten."
+        },
+        {
+          "symbol": "mountVoiceReview",
+          "purpose": "Von der Host-Anwendung gelieferte Befunde neben der ursprünglichen Passage anzeigen."
+        }
+      ],
+      "currentUse": "Der Prompt formuliert, was erhalten bleiben soll; im Overlay können Prüfende die zitierten Passagen ansehen. Keine der beiden APIs weist nach, dass eine vorgeschlagene Neufassung die Gewichtung erhält.",
+      "missingCapability": "Änderungen an Aussagen zwischen Alternativen vergleichen und dokumentierte Autorenentscheidungen für die genaue Quellversion schützen.",
+      "releaseFunctionIds": [
+        "alternative-comparison",
+        "decision-preservation",
+        "claim-evidence"
+      ]
+    }
+  },
+  {
+    "id": "hughes-negative-contrast",
+    "title": "The ‘Negative Contrast Trap’: Why AI Writing Overuses ‘Not X, But Y’",
+    "authors": [
+      "Ernan Hughes"
+    ],
+    "date": null,
+    "url": "https://www.programmer.ie/post/not/",
+    "kind": "practice",
+    "observation": "Hughes zeigt, wie sich die bejahende Neufassung eines verneinenden Gegensatzes anfordern lässt. Er empfiehlt außerdem, wiederholte Satzanfänge nach der Generierung zu prüfen. Der Artikel veranschaulicht, wie aus einer Stilkritik eine konkrete Überarbeitungsanweisung wird.",
+    "limits": "Die Beispiele und veranschaulichenden Heuristiken sind kein evaluierter Detektor. Aussagen zu Häufigkeit und Trainingsmechanismen bleiben hier Hypothesen, keine Messergebnisse.",
+    "voiceImplication": "Den zitierten Gegensatz markieren und klären, ob die verworfene Alternative relevant ist. Anschließend eine direkte Aussage anbieten. Gegensätze erhalten, die ein tatsächliches Missverständnis auflösen.",
+    "readingDepth": "Artikel, Überarbeitungsbeispiel und heuristische Beispiele am 2026-09-12 gelesen. Das Veröffentlichungsdatum ließ sich nicht feststellen.",
+    "relatedRuleIds": [
+      "unsupported-contrast",
+      "repetition",
+      "complete-sentences"
+    ],
+    "apiUse": {
+      "availableNow": [
+        {
+          "symbol": "findWritingSignals",
+          "purpose": "Die unterstützten englischen und deutschen Gegensatzanfänge im Katalog finden."
+        },
+        {
+          "symbol": "composeWritingReviewPrompt",
+          "purpose": "Mit unsupported-contrast sachlich begründete Alternativen anfordern."
+        }
+      ],
+      "currentUse": "Der Musterabgleich erfasst ausgewählte Anfänge, nicht jede Konstruktion nach dem Schema „nicht X, sondern Y“. Prüfende müssen klären, ob die verworfene Alternative von Bedeutung ist.",
+      "missingCapability": "Das relevante Missverständnis als Kontext erfassen und eine bejahende Neufassung mit dem Original vergleichen, ohne eine hilfreiche Unterscheidung zu verlieren.",
+      "releaseFunctionIds": [
+        "contextual-review",
+        "alternative-comparison"
+      ]
+    }
+  },
+  {
+    "id": "ossama-tropes",
+    "title": "Tropes: AI Writing Pattern Directory",
+    "authors": [
+      "ossama.is"
+    ],
+    "date": null,
+    "url": "https://tropes.fyi/",
+    "kind": "practice",
+    "observation": "Dieses Praxisverzeichnis benennt wiederkehrende Muster in Wortwahl, Satzbau, Ton und Textaufbau und stellt Prompt-Anweisungen bereit. Beispiele sind verneinende Parallelismen, ankündigungsartige Schlüsse und die Verwässerung eines Gedankens durch wiederholte Umformulierungen.",
+    "limits": "Ein stark wertendes Verzeichnis, kein validierter Benchmark zur Bestimmung der Autorschaft. Sein Prompt enthält pauschale Verbote, die hilfreichen Erklärungen oder Aufzählungen entgegenstehen können. Die angekündigten Tools auf der Seite belegen keine Wirksamkeit.",
+    "voiceImplication": "Solche Beobachtungen als bedingte Prüfhypothesen nutzen. Gegenbeispiele und die konkreten Nachteile für Leser ergänzen, statt eine allgemeine Verbotsliste für Wörter oder Satzzeichen zu übernehmen.",
+    "readingDepth": "Startseite des Verzeichnisses, sichtbare Prompt-Auszüge und Angaben zum Geltungsbereich am 2026-09-12 gelesen; verlinkte Tools wurden nicht evaluiert.",
+    "relatedRuleIds": [
+      "unsupported-contrast",
+      "meta-framing",
+      "repetition",
+      "exhaustive-checklist",
+      "forced-template"
+    ],
+    "apiUse": {
+      "availableNow": [
+        {
+          "symbol": "getWritingRule",
+          "purpose": "Eine bedingte Regel mit berechtigten Beispielen für das Beibehalten prüfen."
+        },
+        {
+          "symbol": "selectWritingRules",
+          "purpose": "Passende Katalogregeln statt einer allgemeinen Verbotsliste auswählen."
+        }
+      ],
+      "currentUse": "Voice stellt eigene kuratierte Regeln bereit. Es importiert weder dieses Verzeichnis noch führt es dessen Prompt-Dateien aus. Urteile über den Textaufbau benötigen weiterhin eine prüfende Instanz.",
+      "missingCapability": "Ausgewählte Anweisungen sowohl an unerwünschten Wiederholungen als auch an berechtigten Aufzählungen testen und dabei Fehlalarme sowie Entscheidungen zum Beibehalten erfassen.",
+      "releaseFunctionIds": [
+        "prompt-benchmarks",
+        "decision-preservation"
+      ]
+    }
+  },
+  {
+    "id": "wikipedia-signs",
+    "title": "Wikipedia: Signs of AI writing",
+    "authors": [
+      "WikiProject AI Cleanup contributors"
+    ],
+    "date": null,
+    "url": "https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing",
+    "kind": "practice",
+    "observation": "Bearbeitende sammeln Beispiele für übertriebene Bedeutungszuschreibungen, oberflächliche Analysen, vage Quellenangaben, werbliche Sprache und versehentlich ausgegebene Assistenten-Markierungen. Die Ratgeberseite bezeichnet ihre Liste ausdrücklich als Beobachtungen und weist darauf hin, dass sichtbare Anzeichen tiefere Quellenprobleme verdecken können.",
+    "limits": "Ein Ratgeber der Community, keine Wikipedia-Richtlinie oder Detektor-Evaluation; einige Beispiele hängen von enzyklopädischen Konventionen ab. Menschliche Texte können dieselben Merkmale aufweisen. Die Seite weist außerdem darauf hin, dass neuere Modelle noch nicht aktuell abgedeckt sind.",
+    "voiceImplication": "Aussagen und zitierte Belege gemeinsam mit der Wortwahl prüfen. Regeln für bestimmte Textgattungen getrennt halten und fehlerhafte Zitierartefakte von gewöhnlicher Zeichensetzung oder Wortwahl unterscheiden.",
+    "readingDepth": "Geltungsbereich und Einschränkungen sowie Abschnitte zu Bedeutungszuschreibungen, oberflächlicher Analyse, Werbung, Quellenangaben und Zitierartefakten am 2026-09-12 gelesen.",
+    "relatedRuleIds": [
+      "claims-evidence",
+      "unsupported-causality",
+      "word-choice",
+      "meta-framing",
+      "reported-evidence"
+    ],
+    "apiUse": {
+      "availableNow": [
+        {
+          "symbol": "composeWritingReviewPrompt",
+          "purpose": "claims-evidence und reported-evidence für eine Prüfung der Belege auswählen."
+        },
+        {
+          "symbol": "findWritingSignals",
+          "purpose": "Die begrenzten Muster des Katalogs für Aussagen und Verifikationsbehauptungen finden."
+        }
+      ],
+      "currentUse": "Ein Agent kann zitierte Materialien separat erhalten. Die aktuellen Signale lösen weder Verweise auf noch erkennen sie alle fehlerhaften Zitierartefakte; enzyklopädische Konventionen benötigen Kontext aus der Host-Anwendung.",
+      "missingCapability": "Jede Aussage mit abrufbaren Belegen verbinden und Quellenverweise sowie Zitierartefakte innerhalb der gewählten Textgattung validieren.",
+      "releaseFunctionIds": [
+        "claim-evidence",
+        "result-validation",
+        "contextual-review"
+      ]
+    }
+  },
+  {
+    "id": "slopt-prompt-market",
+    "title": "slopt: Stop sounding like ChatGPT",
+    "authors": [
+      "slopt"
+    ],
+    "date": null,
+    "url": "https://www.slopt.org/",
+    "kind": "practice",
+    "observation": "Ein kommerzieller Katalog bündelt Anweisungen gegen unerwünschte Sprachmuster als Prompt- oder Skill-Dateien. Die öffentlichen Beispiele verbieten bestimmte Satzzeichen und rhetorische Formen; die FAQ räumt ein, dass Prompts deren Einhaltung nicht garantieren können.",
+    "limits": "Werbeaussagen zu Musterzahlen, Crawls und abgedeckten Modellen wurden nicht unabhängig überprüft. Auf der Seite ließ sich keine nachvollziehbare Evaluation für die beworbene Wirkung feststellen; kostenpflichtige Inhalte oder Produkte wurden nicht getestet.",
+    "voiceImplication": "Gegen-Prompts an erhaltenswerten Originalen und berechtigten Ausnahmen evaluieren. Ein größerer Anweisungskatalog allein belegt keine besseren Texte; Aussagen zu Englisch belegen keine Qualität im Deutschen.",
+    "readingDepth": "Öffentliche Beispiele, Aussagen zur Abdeckung und FAQ am 2026-09-12 gelesen. Das Veröffentlichungsdatum ließ sich nicht feststellen.",
+    "relatedRuleIds": [
+      "forced-template",
+      "format-fit",
+      "reported-evidence",
+      "word-choice"
+    ],
+    "apiUse": {
+      "availableNow": [
+        {
+          "symbol": "composeWritingReviewPrompt",
+          "purpose": "Lokal Anweisungen aus ausgewählten Regeln und Beispielen mit Gültigkeitsbedingungen zusammenstellen."
+        },
+        {
+          "symbol": "selectWritingRules",
+          "purpose": "Die Anweisungen auf die jeweilige Schreibaufgabe begrenzen."
+        }
+      ],
+      "currentUse": "Nutzende können den erzeugten Prompt vor dem Einsatz mit ihrem eigenen Agenten prüfen. Voice enthält keine kostenpflichtigen Inhalte dieses Anbieters, führt sie nicht aus und verspricht keine Einhaltung von Prompts.",
+      "missingCapability": "Ein reproduzierbarer Prompt-Vergleich für Englisch und Deutsch mit erhaltenswerten Originalen, begründeten Überarbeitungen und berechtigten Ausnahmen von Stilvorgaben.",
+      "releaseFunctionIds": [
+        "prompt-benchmarks",
+        "alternative-comparison"
+      ]
+    }
+  }
+]
