@@ -216,7 +216,7 @@
   <h1>Voice Studio: review text in context</h1>
   <p class="lede">Voice Studio opens your running website or a folder of Markdown files. Select passages, save feedback, and inspect proposed changes before applying them to the source. This dossier documents the workflow, source mapping, and semantic review.</p>
   <div class="meta">
-    <span><b>Status:</b> 2026-09-12, Preview 0.3: seven-day sessions and typed Library verified; 16 HTML guides; broader review and AGT planned</span>
+    <span><b>Status:</b> 2026-09-12: local Studio preview; 20 AI anti-patterns; native research area with practice, studies and libraries</span>
     <span><b>Trigger:</b> Quality Studio website copy of 2026-09-01, status section</span>
     <span><b>Scope:</b> voice-lint (VL), public copy of WEB, AOW and QSW, runner prompts in AGT</span>
     <span><b>Decisions:</b> <a href="#programme">§11</a></span>
@@ -235,6 +235,7 @@
 </section>
 
 <!-- voice-studio:current:start -->
+<section class="box" id="voice-research"><h4>AI writing research: product area and reusable evidence</h4><p>The native <a href="http://127.0.0.1:5187/voice/research/">Voice Research area</a> contains seven firsthand practice sources, nine original studies, four strategy studies and eight library comparisons. Methods, measured results, limitations and Voice implications are separate. The source collection includes lexical drift, homogenization, sycophancy, slop judgments, mixed authorship and detector robustness; contradictory evidence is retained.</p><p>The maintained JSON records live in <code>voice-studio/website/research/</code>, are included in build hashes, and open in formatted website dialogs. They cross-reference the 20 named anti-patterns in <code>@voice/writing-rules</code>. Official library documentation, licenses and dated maintenance observations support the integration comparison. This is a product research area, not a public implementation plan or a provider ranking.</p><p><b>Verification:</b> 17 writing-rules package tests passed; the full website check covered 92 route/language/viewport combinations and 255 local links/assets/fragments. Focused checks passed for all 20 anti-patterns (25 checks) and the 28 research records (13 checks), including four research JSON dialogs, keyboard access and mobile/no-JavaScript content. These are implementation checks, not model-effectiveness results. Dated earlier evidence retains its original counts.</p><p>Current capability remains transparent: eight rules have local surface matching; contextual prompts are available to hosts. No model-effectiveness benchmark, installed third-party analyzer, authorship probability or automatic project-wide review is claimed. Studio retains its existing four local checks.</p></section>
 <section class="box" id="voice-production-readiness" aria-labelledby="voice-readiness-heading">
   <h4 id="voice-readiness-heading">12 September 2026: readiness for productive use</h4>
   <p><b>Assessment: use Voice Studio Preview 0.3 for supervised local editorial work.
@@ -591,6 +592,17 @@ voice score is shown.</p>
 <code>docs/model-strategy.md</code>, <code>docs/language-tooling.md</code> and
 <code>docs/reviews/agent-studio-website-2026-09-06.md</code>. Earlier dossier sections preserve historical
 research; this section is the current implementation record.</p>
+
+<section class="box" id="voice-writing-rules" aria-labelledby="voice-writing-rules-heading">
+<h3 id="voice-writing-rules-heading">AI writing anti-patterns and public documentation</h3>
+<p><b>Implemented as a separate reusable package:</b> <code>@voice/writing-rules</code> contains 20 named anti-patterns with reader costs, paired review rules and four profiles selecting six rules each, English/German examples, counterexamples, source references and review prompts. <code>composeWritingReviewPrompt</code> prepares task-specific instructions requesting exact evidence, one to three warranted alternatives or keeping the wording. <code>findWritingSignals</code> returns exact UTF-16 candidate spans and discloses which eight rules have local surface patterns.</p>
+<p>The catalogue covers reader-task relevance, current behavior, misplaced work history, empty narration, vague objects, invented labels, irrelevant contrasts, calibrated uncertainty, unsupported causality, claims, repetition, formatting, compressed shorthand, word choice, observed result reporting, unearned praise, false balance, unprioritized checklists and forced rhetorical templates. Rules protect necessary uncertainty, domain terminology and accepted decisions. Their examples and prompt strategies are editorial applications of cited primary guidance, not measured model defects.</p>
+<p><b>Current integration:</b> the website's <a href="http://127.0.0.1:5187/voice/writing-patterns/">writing-pattern catalogue and local playground</a> use the actual package. The <a href="http://127.0.0.1:5187/voice/guides/writing-rules/">API guide</a> explains host integration. The Studio backend still uses its existing four rules and configured Runner prompts; it does not automatically consume the new catalogue. Prompt effectiveness has not been benchmarked against Claude, Codex or another provider.</p>
+<p><b>AI-text assessment:</b> local style cues are implemented. They produce no authorship verdict, AI percentage or editorial quality score. The <a href="http://127.0.0.1:5187/voice/guides/ai-text-signals/">research guide</a> distinguishes writing quality, known generation history and statistical detection, including language-background and editing limitations. Detector qualification remains an internal research plan.</p>
+<p><b>Public documentation:</b> seven product pages with EN/DE navigation and 16 HTML guides cover the current product and research. The homepage uses neutral surfaces, Studio has three additional genuine screenshots, and storage documentation shows actual file trees and synthetic JSON. Verification records open as formatted JSON dialogs. AGT integration, holistic task contracts and migration history remain in <code>docs/plans/</code>; current Git workflows remain public.</p>
+<p><b>Verification:</b> retained browser reports record 88 desktop/mobile EN/DE views, 21 targeted writing-playground and integration checks, and 12 isolated JSON-viewer checks. The package's separate tests cover data, typed consumption, selection, prompt composition, UTF-16 spans and mutation isolation. The <a href="http://127.0.0.1:5187/voice/guides/verification/">dated JSON evidence</a> preserves capture times and tested build hashes. No model call, source rewrite or public deployment was performed for this work.</p>
+</section>
+
 <!-- voice-studio:current:end -->
 
 <nav class="box" aria-label="Contents">

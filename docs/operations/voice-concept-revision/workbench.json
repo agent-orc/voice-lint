@@ -2,11 +2,11 @@
   "schemaVersion": 1,
   "id": "voice-concept-revision",
   "title": "Voice Lint and Voice Studio: readiness",
-  "summary": "Updated 12 September 2026: Voice Studio supports supervised local review with seven-day browser access and logout, English/German UI, compact/overlay navigation, keep decisions, alternatives and file/Git provenance. Session verification passed 34 backend, 16 UI and 18 Chrome checks without model or source writes. The Library has tested TS/checkJs declarations and actual language-service completion/hover checks. Its bilingual website pairs a genuine Studio capture with typed code and renders 16 allowlisted English HTML guides; the expanded website passed 84 desktop/mobile EN/DE views, 168 links/assets/fragments, code copy and the actual Library demo. The owner-approved Agent Studio hero was restored again after the later b9d84b2 override. Goal-based reviews, SEO/consistency/visual tasks and AGT integration remain documented designs. No public deployment, Voice Lint analyzer/CLI/CI release or model qualification is claimed. Voice source changes are committed and pushed (51ae359); the approved Agent Studio hero is committed and pushed (a33b926). Separate project launch entries open Studio and the product/documentation website.",
+  "summary": "Voice Studio supports supervised local file review with saved decisions, reviewed source changes and seven-day browser sessions. @voice/writing-rules supplies 20 named AI anti-patterns, four six-rule profiles, EN/DE examples and counter-prompts; eight rules have transparent local surface checks. The native Research website area contains seven practice sources, nine studies, four strategy studies and eight library comparisons with methods, limits, official references and reusable JSON. It connects research to the pattern catalogue without treating anecdotes as model benchmarks. Public HTML guides describe current behavior, file trees and saved JSON; internal AGT and holistic implementation plans remain in repository docs. No authorship detector, measured model effectiveness, automatic holistic evaluator or public deployment is claimed. Studio retains its existing four local checks; the expanded catalogue is independently reusable by hosts.",
   "entrypoint": "index.html",
   "status": "decision-pending",
   "phase": "decision-ready",
-  "updatedAt": "2026-09-12T11:38:26.106Z",
+  "updatedAt": "2026-09-12T13:09:40.934Z",
   "sourceTaskKeys": [],
   "relatedTaskKeys": [
     "AGT-2237",
