@@ -1,0 +1,73 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Product files, tools and evidence · Voice docs</title><meta name="description" content="Which files belong to the product, which commands are reusable and which outputs are historical."><link rel="canonical" href="https://agent-orchestrator.dev/voice/guides/maintaining/"><link rel="stylesheet" href="/voice/site.css"><link rel="stylesheet" href="/voice/docs.css"><meta name="theme-color" content="#14271f"><link rel="alternate" hreflang="en" href="https://agent-orchestrator.dev/voice/guides/maintaining/"><link rel="alternate" hreflang="de" href="https://agent-orchestrator.dev/voice/de/guides/maintaining/"><link rel="alternate" hreflang="x-default" href="https://agent-orchestrator.dev/voice/guides/maintaining/"><meta property="og:type" content="website"><meta property="og:site_name" content="Voice Lint"><meta property="og:title" content="Product files, tools and evidence · Voice docs"><meta property="og:description" content="Which files belong to the product, which commands are reusable and which outputs are historical."><meta property="og:url" content="https://agent-orchestrator.dev/voice/guides/maintaining/"><meta property="og:locale" content="en_US"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Product files, tools and evidence · Voice docs","description":"Which files belong to the product, which commands are reusable and which outputs are historical.","url":"https://agent-orchestrator.dev/voice/guides/maintaining/","inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Voice Lint","url":"https://agent-orchestrator.dev/voice/"}}</script></head><body class="guide-page"><a class="skip" href="#content" data-en="Skip to content" data-de="Zum Inhalt">Skip to content</a><header class="site-header"><a class="brand" href="/voice/" aria-label="Voice home">voice <i>/</i></a><nav class="site-nav" aria-label="Main"><div class="nav-tools" role="group" aria-label="Tools / Werkzeuge"><a href="/voice/studio/" data-en="Studio" data-de="Studio">Studio</a><a href="/voice/library/" data-en="Library" data-de="Library">Library</a></div><div class="nav-resources" role="group" aria-label="Knowledge / Wissen"><a href="/voice/research/" data-en="Research" data-de="Forschung">Research</a><a href="/voice/writing-patterns/" data-en="AI anti-patterns" data-de="KI-Negativmuster">AI anti-patterns</a><a href="/voice/docs/" aria-current="page" data-en="Docs" data-de="Doku">Docs</a></div></nav><div class="language" role="group" aria-label="Language / Sprache"><a data-locale="en" href="/voice/guides/maintaining/" hreflang="en" lang="en" aria-label="English" aria-current="true">EN</a><a data-locale="de" href="/voice/de/guides/maintaining/" hreflang="de" lang="de" aria-label="Deutsch">DE</a></div></header><main id="content"><div class="docs-breadcrumb"><a href="/voice/docs/" data-en="Docs" data-de="Doku">Docs</a><span aria-hidden="true">/</span><span>Maintenance</span></div><div class="docs-layout"><aside class="guide-sidebar"><details class="guide-menu" open=""><summary data-en="All guides" data-de="Alle Guides">All guides</summary><nav aria-label="Documentation"><div class="guide-group"><p>Start here</p><a href="/voice/guides/writing-tools/">Writing tools for agents</a><a href="/voice/guides/workflow/">The Studio workflow</a><a href="/voice/guides/library/">Mount the review library</a><a href="/voice/guides/agent-integration/">Use AI findings in your application</a></div><details class="guide-group guide-group-details"><summary>Reference</summary><a href="/voice/guides/review-benchmarks/">Review benchmarks</a><a href="/voice/guides/writing-rules/">Writing rules and prompt composition</a><a href="/voice/guides/ai-text-signals/">Inspect AI-like writing patterns</a><a href="/voice/guides/session/">Pair once. Resume for seven days.</a><a href="/voice/guides/usability/">Decisions and source versions</a><a href="/voice/guides/library-types/">Types, IntelliSense and examples</a><a href="/voice/guides/live-bridge/">The live-page bridge protocol</a><a href="/voice/guides/runner-integration/">Runner requests and source proposals</a><a href="/voice/guides/checks/">Local build and test checks</a><a href="/voice/guides/holistic-review/">Review source in a Git repository</a></details><details class="guide-group guide-group-details" open=""><summary>Maintenance</summary><a href="/voice/guides/maintaining/" aria-current="page">Product files, tools and evidence</a><a href="/voice/guides/commands/">Operator command catalogue</a><a href="/voice/guides/verification/">Dated verification evidence</a><a href="/voice/guides/notices/">Third-party notices</a></details></nav></details></aside><article class="guide-article" lang="en"><header class="guide-heading"><h1>Product files, tools and evidence</h1><p class="lead">Which files belong to the product, which commands are reusable and which outputs are historical.</p></header><details class="mobile-outline"><summary data-en="On this page" data-de="Auf dieser Seite">On this page</summary><nav aria-label="Page sections"><a href="#file-locations">File locations</a><a href="#run-maintained-tools">Run maintained tools</a><a href="#keep-evidence-that-can-be-reused">Keep evidence that can be reused</a><a href="#maintain-reusable-commands">Maintain reusable commands</a></nav></details><div class="guide-content"><h2 id="file-locations">File locations<a class="heading-anchor" href="#file-locations" aria-label="Link to this section">#</a></h2><div class="table-scroll" tabindex="0" role="region" aria-label="Documentation table"><table>
+<thead>
+<tr>
+<th>Location</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>frontend/</code>, <code>backend/</code>, <code>packages/</code></td>
+<td>Application, source adapters, contracts and reusable review Library.</td>
+</tr>
+<tr>
+<td><code>knowledge/</code>, <code>examples/</code></td>
+<td>Rule explanations and maintained integration/sample sources.</td>
+</tr>
+<tr>
+<td><code>website/</code></td>
+<td>Static product site and documentation renderer; publish its built output.</td>
+</tr>
+<tr>
+<td><code>scripts/</code></td>
+<td>Build, operator and verification commands.</td>
+</tr>
+<tr>
+<td><code>benchmarks/writing-review/</code></td>
+<td>Authored EN/DE fixtures, offline comparison runner and reviewed-result retention.</td>
+</tr>
+<tr>
+<td><code>website/research/</code></td>
+<td>Maintained source-to-API research and the retained measurement summary.</td>
+</tr>
+<tr>
+<td><code>docs/integrations/</code>, <code>scripts/integrations/</code></td>
+<td>Maintained inputs and commands for external repository integrations.</td>
+</tr>
+<tr>
+<td><code>docs/verification/&lt;date&gt;/</code></td>
+<td>Selected reports and evidence for a dated verification claim.</td>
+</tr>
+<tr>
+<td><code>test-results/</code>, <code>**/dist/</code>, <code>**/bin/</code>, <code>**/obj/</code></td>
+<td>Generated output; ignored in Git and reproducible from source.</td>
+</tr>
+<tr>
+<td><code>.local/</code>, <code>.voice-runtime/</code>, <code>.voice-studio/</code>, private user application data</td>
+<td>Local maintenance, registry, session and runtime data; excluded from publication.</td>
+</tr>
+</tbody></table>
+</div><p>A reviewed project's decisions and tasks live in that project's <code>.voice-lint/</code>
+folder. See the <a href="/voice/guides/workflow/#files-beside-the-source">storage reference</a> for its
+actual file tree and JSON formats.</p>
+<h2 id="run-maintained-tools">Run maintained tools<a class="heading-anchor" href="#run-maintained-tools" aria-label="Link to this section">#</a></h2><p>Use the <a href="/voice/guides/commands/">command catalogue</a> for prerequisites, inputs and
+outputs. From the Voice Studio workspace:</p>
+<figure class="code-block"><figcaption><span>sh</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="sh code"><code>npm run build
+npm run website:build
+npm run test:evidence</code></pre></figure><p><code>test:evidence</code> checks retained manifests and file hashes; it does not rerun the
+historical checks. Source and task changes go through the Studio backend.</p>
+<h2 id="keep-evidence-that-can-be-reused">Keep evidence that can be reused<a class="heading-anchor" href="#keep-evidence-that-can-be-reused" aria-label="Link to this section">#</a></h2><p>After a verification run, select the report and captures needed to support its
+result. Store them under a dated <code>docs/verification/</code> directory with the source
+revision or working-copy snapshot, capture time, tested scope and remaining gaps.
+Add byte sizes and SHA-256 hashes to the manifest. Keep capture time separate from
+copy time. A new run gets a new record rather than replacing an old observation.</p>
+<p>Raw output stays in <code>test-results/</code>. Before promoting it, remove credentials,
+unnecessary host paths and raw instructions. Preserve the source or an authorized
+snapshot reference when content must remain reproducible; hashes alone are not
+backups. The website includes only its selected document sources and evidence
+whose manifest hashes match.</p>
+<h2 id="maintain-reusable-commands">Maintain reusable commands<a class="heading-anchor" href="#maintain-reusable-commands" aria-label="Link to this section">#</a></h2><p>Build and operator commands belong in <code>scripts/</code>; benchmark runners and their
+fixtures belong in <code>benchmarks/</code>. Document each command's inputs, side effects, output locations and failure behavior
+in the command catalogue.
+Keep one-off patch and investigation scripts in ignored local maintenance storage;
+product code and supported commands must not import that storage.</p>
+</div><details class="source-details"><summary data-en="Git and source reference" data-de="Git- und Quellbezug">Git and source reference</summary><p>Source for this page: <code>docs/maintaining.md</code>. Content hash and Git revision: <a href="/voice/build-info.json">Build record</a>.</p><a href="/voice/sources/maintaining.md" download="" data-en="Download the Markdown source" data-de="Markdown-Quelle herunterladen">Download the Markdown source</a></details><a class="next-guide" href="/voice/guides/commands/"><span data-en="Next guide" data-de="Nächster Guide">Next guide</span><strong>Operator command catalogue →</strong></a></article><aside class="page-outline"><p data-en="On this page" data-de="Auf dieser Seite">On this page</p><nav aria-label="On this page"><a href="#file-locations">File locations</a><a href="#run-maintained-tools">Run maintained tools</a><a href="#keep-evidence-that-can-be-reused">Keep evidence that can be reused</a><a href="#maintain-reusable-commands">Maintain reusable commands</a></nav></aside></div></main><footer class="site-footer"><a href="https://agent-orchestrator.dev/">Agent Orchestrator ecosystem</a><p data-en="Git and folders · Explicit source changes" data-de="Git und Ordner · Bewusste Quelländerungen">Git and folders · Explicit source changes</p><a href="/voice/build-info.json" data-en="Build record" data-de="Build-Nachweis">Build record</a></footer><script src="/voice/site.js" defer=""></script></body></html>

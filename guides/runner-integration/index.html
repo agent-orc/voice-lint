@@ -1,0 +1,159 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Runner requests and source proposals · Voice docs</title><meta name="description" content="Explicit model execution, staged context, validated output and guarded file writes."><link rel="canonical" href="https://agent-orchestrator.dev/voice/guides/runner-integration/"><link rel="stylesheet" href="/voice/site.css"><link rel="stylesheet" href="/voice/docs.css"><meta name="theme-color" content="#14271f"><link rel="alternate" hreflang="en" href="https://agent-orchestrator.dev/voice/guides/runner-integration/"><link rel="alternate" hreflang="de" href="https://agent-orchestrator.dev/voice/de/guides/runner-integration/"><link rel="alternate" hreflang="x-default" href="https://agent-orchestrator.dev/voice/guides/runner-integration/"><meta property="og:type" content="website"><meta property="og:site_name" content="Voice Lint"><meta property="og:title" content="Runner requests and source proposals · Voice docs"><meta property="og:description" content="Explicit model execution, staged context, validated output and guarded file writes."><meta property="og:url" content="https://agent-orchestrator.dev/voice/guides/runner-integration/"><meta property="og:locale" content="en_US"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Runner requests and source proposals · Voice docs","description":"Explicit model execution, staged context, validated output and guarded file writes.","url":"https://agent-orchestrator.dev/voice/guides/runner-integration/","inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Voice Lint","url":"https://agent-orchestrator.dev/voice/"}}</script></head><body class="guide-page"><a class="skip" href="#content" data-en="Skip to content" data-de="Zum Inhalt">Skip to content</a><header class="site-header"><a class="brand" href="/voice/" aria-label="Voice home">voice <i>/</i></a><nav class="site-nav" aria-label="Main"><div class="nav-tools" role="group" aria-label="Tools / Werkzeuge"><a href="/voice/studio/" data-en="Studio" data-de="Studio">Studio</a><a href="/voice/library/" data-en="Library" data-de="Library">Library</a></div><div class="nav-resources" role="group" aria-label="Knowledge / Wissen"><a href="/voice/research/" data-en="Research" data-de="Forschung">Research</a><a href="/voice/writing-patterns/" data-en="AI anti-patterns" data-de="KI-Negativmuster">AI anti-patterns</a><a href="/voice/docs/" aria-current="page" data-en="Docs" data-de="Doku">Docs</a></div></nav><div class="language" role="group" aria-label="Language / Sprache"><a data-locale="en" href="/voice/guides/runner-integration/" hreflang="en" lang="en" aria-label="English" aria-current="true">EN</a><a data-locale="de" href="/voice/de/guides/runner-integration/" hreflang="de" lang="de" aria-label="Deutsch">DE</a></div></header><main id="content"><div class="docs-breadcrumb"><a href="/voice/docs/" data-en="Docs" data-de="Doku">Docs</a><span aria-hidden="true">/</span><span>Reference</span></div><div class="docs-layout"><aside class="guide-sidebar"><details class="guide-menu" open=""><summary data-en="All guides" data-de="Alle Guides">All guides</summary><nav aria-label="Documentation"><div class="guide-group"><p>Start here</p><a href="/voice/guides/writing-tools/">Writing tools for agents</a><a href="/voice/guides/workflow/">The Studio workflow</a><a href="/voice/guides/library/">Mount the review library</a><a href="/voice/guides/agent-integration/">Use AI findings in your application</a></div><details class="guide-group guide-group-details" open=""><summary>Reference</summary><a href="/voice/guides/review-benchmarks/">Review benchmarks</a><a href="/voice/guides/writing-rules/">Writing rules and prompt composition</a><a href="/voice/guides/ai-text-signals/">Inspect AI-like writing patterns</a><a href="/voice/guides/session/">Pair once. Resume for seven days.</a><a href="/voice/guides/usability/">Decisions and source versions</a><a href="/voice/guides/library-types/">Types, IntelliSense and examples</a><a href="/voice/guides/live-bridge/">The live-page bridge protocol</a><a href="/voice/guides/runner-integration/" aria-current="page">Runner requests and source proposals</a><a href="/voice/guides/checks/">Local build and test checks</a><a href="/voice/guides/holistic-review/">Review source in a Git repository</a></details><details class="guide-group guide-group-details"><summary>Maintenance</summary><a href="/voice/guides/maintaining/">Product files, tools and evidence</a><a href="/voice/guides/commands/">Operator command catalogue</a><a href="/voice/guides/verification/">Dated verification evidence</a><a href="/voice/guides/notices/">Third-party notices</a></details></nav></details></aside><article class="guide-article" lang="en"><header class="guide-heading"><h1>Runner requests and source proposals</h1><p class="lead">Explicit model execution, staged context, validated output and guarded file writes.</p></header><details class="mobile-outline"><summary data-en="On this page" data-de="Auf dieser Seite">On this page</summary><nav aria-label="Page sections"><a href="#dependency">Dependency</a><a href="#server-configuration">Server configuration</a><a href="#backend-contract">Backend contract</a><a href="#context-and-source-integrity">Context and source integrity</a><a href="#output-validation-and-persistence">Output validation and persistence</a><a href="#task-outcomes-and-combined-proposals">Task outcomes and combined proposals</a><a href="#local-buildtest-verification">Local build/test verification</a><a href="#verification">Verification</a></nav></details><div class="guide-content"><p>Voice Studio uses the <code>CodingAgentRunner</code> .NET library for full-file semantic
+reviews and saved improvement tasks. It launches the configured coding agent
+CLI using that CLI's existing authentication. Configure a server-side route
+before starting either kind of run.</p>
+<h2 id="dependency">Dependency<a class="heading-anchor" href="#dependency" aria-label="Link to this section">#</a></h2><p>Pin the portable NuGet package in <code>VoiceStudio.Api.csproj</code>:</p>
+<figure class="code-block"><figcaption><span>xml</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="xml code"><code>&lt;PackageReference Include="CodingAgentRunner" Version="0.7.0" /&gt;</code></pre></figure><p>Restore and build with <code>dotnet restore</code> and <code>dotnet build</code>. The pinned package
+provides the streaming, permission and clean-context APIs used by the adapter;
+an external source checkout is not required.</p>
+<h2 id="server-configuration">Server configuration<a class="heading-anchor" href="#server-configuration" aria-label="Link to this section">#</a></h2><p>Configure all three values before starting the server:</p>
+<figure class="code-block"><figcaption><span>sh</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="sh code"><code>export VOICE_REVIEW_CLI=codex
+export VOICE_REVIEW_MODEL=gpt-5.6-sol
+export VOICE_REVIEW_THINKING=medium</code></pre></figure><p>The example route is provisional; choose a model and effort supported by the
+installed CLI and pinned Runner. The other supported CLI selection is <code>claude</code>.
+Routing uses this server configuration, without Token Economy admission or
+automatic model fallback. <code>VOICE_REVIEW_CLI_PATH</code> optionally
+names the trusted local CLI executable. <code>VOICE_REVIEW_TIMEOUT_SECONDS</code> controls
+the bounded run duration (15-1800 seconds, default 300). Request bodies cannot
+provide a CLI path, model endpoint, credential, permission bypass or model route.</p>
+<p>The configured CLI must already be installed and signed in. The status call
+uses Runner's version and credential-presence probes only. Credential presence
+does not validate an expired session, and static capability recognition is not
+a live availability or Voice-quality benchmark. Status requests wait at most ten
+seconds; a timed-out probe remains shared, so polling cannot create concurrent
+background version probes. A status timeout never launches inference.</p>
+<h2 id="backend-contract">Backend contract<a class="heading-anchor" href="#backend-contract" aria-label="Link to this section">#</a></h2><p><code>RunnerReviewService</code> exposes:</p>
+<ul>
+<li><code>GetStatusAsync(ct)</code>: configured/available route, read-only and clean-context
+posture, provisional qualification, reason and duration limit. No inference.</li>
+<li><code>StartAsync(projectId, documentId, SemanticReviewInput, ct)</code>: checks source
+version, stages a full-file review and returns its persisted running record.
+Only an explicit operator action should call this method.</li>
+<li><code>GetRun(projectId, documentId, runId)</code>: returns the durable current outcome.</li>
+<li><code>ListRuns(projectId, documentId)</code>: newest 100 persisted runs for that file,
+revalidating completed evidence against current source and related context.</li>
+<li><code>Cancel(projectId, documentId, runId)</code>: cancels a running process through Runner.</li>
+</ul>
+<p>The start input contains <code>expectedVersion</code>, an idempotent <code>requestId</code> and an
+optional <code>instruction</code>. The host exposes authenticated endpoints and the explicit
+Studio button; automatic document loading never starts a model call.</p>
+<p><code>ImprovementTaskService</code> exposes a separate durable workflow below
+<code>/api/projects/{projectId}/documents/{documentId}/tasks</code>: list/create, get,
+<code>/{id}/prompt</code>, and explicit <code>/{id}/start</code>, <code>/{id}/cancel</code>, <code>/{id}/apply</code> and <code>/{id}/resolve</code>
+actions. A task stores the instruction, selected feedback IDs, source version,
+feedback revision, component-context fingerprint and revision. Creation and start
+each require an idempotent request ID. Changed input under the same ID is rejected.</p>
+<p>Saving or copying the prepared prompt does not start inference. Starting calls
+the same Runner adapter in task mode. Capability checks are followed by another
+source/feedback/context check before the durable launch claim, so a slow probe
+cannot silently launch an already stale task. Requests cannot choose an arbitrary
+model, executable or write permission.</p>
+<p>A run retains configured CLI/model/effort, the actual model reported by the
+CLI when available, source version, context manifest, timestamps, status,
+advisory findings with evidence, notes, usage summaries and errors. The actual
+model remains unknown when the CLI does not report it. No cost is invented from
+missing usage or from a subscription quota percentage.</p>
+<h2 id="context-and-source-integrity">Context and source integrity<a class="heading-anchor" href="#context-and-source-integrity" aria-label="Link to this section">#</a></h2><p>The primary document is supplied in full with every supported text unit and
+its exact UTF-16 coordinate space. For Markdown this is the selected file; a
+folder report remains a separate aggregation, not an implicit all-folder model
+call. Angular component context comes from the project's explicit
+<code>sourceContexts</code> mapping, supplied by <code>ProjectStore.GetReviewRunContext</code>.
+Related templates, component code and styles explain the text's rendered role;
+they are not additional source targets for model-generated findings.</p>
+<p>Related-file truncation is declared by the source adapter and retained in the
+context manifest. If the serialized full request exceeds the configured context
+bound (default 200000 characters), the run is rejected before inference rather
+than silently reduced to the viewport. This character bound is not a token
+estimate. The primary file is never silently truncated.</p>
+<p>The host stages <code>review-context.json</code> in its own per-run workspace and
+initializes that scratch directory with <code>git init</code> for CLI compatibility. It
+does not use the original source checkout as the agent working directory.
+Runner runs with explicit <code>CliPermissionModes.ReadOnly</code> and clean context;
+delegation and automatic quota waiting/retries are disabled. Clean context
+isolates CLI state; it is not a general filesystem or network sandbox. Claude's
+read-only mapping is plan mode, Codex's is its native read-only sandbox.</p>
+<p>Time and output-size bounds, cancellation and the Runner watchdog stop runaway
+runs. They are not a guaranteed token or monetary cap. The UI must describe this
+before an explicit run and retain the configured route and uncertainty.</p>
+<h2 id="output-validation-and-persistence">Output validation and persistence<a class="heading-anchor" href="#output-validation-and-persistence" aria-label="Link to this section">#</a></h2><p>The prompt requests a versioned JSON object with the original source version,
+all reviewed unit IDs, findings and notes. A final JSON object may follow a
+short preface or be wrapped in a JSON code fence. The backend validates JSON
+structure, exact source version, whole-file unit coverage, allowed categories,
+non-split UTF-16 ranges, exact quotes and required evidence text fields. It does
+not independently verify factual or semantic grounding. The coverage
+list is the model's declaration about supplied units, not independent proof of
+semantic correctness or coverage of parser exclusions.</p>
+<p>An exit failure, cancellation, absent terminal event, malformed output or stale
+source/context cannot become a completed accepted review. The source and each
+supplied component-context snapshot are checked again before findings are
+accepted. Findings are advisory and returned separately from deterministic
+rules. Suggestions from an ordinary semantic review do not create or apply a source
+proposal automatically. An explicitly started improvement task may prepare one
+validated combined proposal; no Runner path applies it.</p>
+<p>Each request has a durable claim and run record under
+<code>.voice-lint/semantic-runs/&lt;runId&gt;/</code>, with <code>input.json</code>, <code>run.json</code> and
+<code>output.txt</code>. Identical retries return the existing run; changed input under the
+same request ID is rejected. A leftover running record after restart becomes
+interrupted and is not automatically relaunched. Runner's raw logs and staged
+workspace remain under the host's configured runtime directory. These artifacts
+contain reviewed content; use the project's existing local retention policy.</p>
+<h2 id="task-outcomes-and-combined-proposals">Task outcomes and combined proposals<a class="heading-anchor" href="#task-outcomes-and-combined-proposals" aria-label="Link to this section">#</a></h2><p>Task mode adds two required output fields: <code>taskDisposition</code> and
+<code>taskExplanation</code>. The explanation must state a concrete reason grounded in the
+request and supplied context. The disposition is one of:</p>
+<ul>
+<li><code>changes</code>: at least one supported replacement suggestion is present.</li>
+<li><code>already_satisfied</code>: no replacement and no open finding remain; the task may
+close as <code>completed</code> with resolution <code>agent_no_changes</code>.</li>
+<li><code>needs_information</code>: necessary facts are missing; the task becomes <code>needs_review</code>.</li>
+<li><code>unsupported</code>: the request needs structural, multi-file or unsupported source
+operations; the task becomes <code>needs_review</code>.</li>
+</ul>
+<p>A successful CLI exit with no replacements is not enough to close a task. Missing
+or contradictory disposition fields fail validation. A model’s reason remains
+reviewable and is not independently certified by the JSON validator. The
+<code>needs_review</code> state retains the unresolved explanation without inventing a fix.</p>
+<p>A <code>changes</code> task may prepare 1–50 non-overlapping edits across supported text units
+<strong>within the selected file</strong>. <code>ProjectStore.CreateTaskProposal</code> rechecks source
+version, feedback revision and configured component-context fingerprint; validates
+quotes and safe mappings; preserves HTML/Markdown/TypeScript syntax through the
+source adapter; and constructs one complete before/after proposal. Overlap, unsafe
+source boundaries and invalid TypeScript are rejected as a set, not partially
+applied. Related context files are never source targets.</p>
+<p>The proposal makes the task <code>ready</code>. Only the separate task apply endpoint, with
+current task revision, source version and feedback revision, can write it. It
+rechecks component context and uses the existing backup and transaction journal.
+The ordinary proposal endpoint cannot bypass the owning task’s checks. A crash
+after the source transaction is recovered from the applied proposal instead of
+repeating the write. Applied tasks remain historical outcomes.</p>
+<p>Task records persist under <code>.voice-lint/tasks/&lt;documentId&gt;/&lt;taskId&gt;.json</code> and link
+the Runner run and proposal. Repeated starts do not launch again, failed or
+interrupted records do not restart on page load, and cancellation leaves source
+unchanged. A manual resolution is a distinct explicit action with a required
+reason and current source/feedback state.</p>
+<h2 id="local-buildtest-verification">Local build/test verification<a class="heading-anchor" href="#local-buildtest-verification" aria-label="Link to this section">#</a></h2><p>After applying a proposal, explicitly start the project's configured local check
+in Studio. <code>ProjectCheckService</code> runs the host-configured build/test command and
+retains its logs, exit code and source fingerprint. Results become <code>stale</code> when
+the configured inputs or command profile change.</p>
+<p>This process runs with the host user's permissions, outside the semantic Runner's
+read-only mode. Missing prerequisites block start; source application does not
+start a check. See <a href="/voice/guides/checks/">local project checks</a> to configure the
+command and input scope or use the check API.</p>
+<h2 id="verification">Verification<a class="heading-anchor" href="#verification" aria-label="Link to this section">#</a></h2><figure class="code-block"><figcaption><span>sh</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="sh code"><code>dotnet run --project backend/VoiceStudio.RunnerTests/VoiceStudio.RunnerTests.csproj
+dotnet run --project backend/VoiceStudio.TaskTests/VoiceStudio.TaskTests.csproj
+npm run test:checks</code></pre></figure><p>The tests inject <code>IVoiceReviewRunner</code>: they verify exact output validation,
+read-only/clean requests, staged context, persistence, idempotency, failed/missing
+terminal events, stale-source rejection and cancellation without starting a
+coding-agent model run. The task suite additionally checks saved-task lifecycle,
+context drift, dispositions, combined proposals and the explicit apply boundary.
+The separate project-check suite uses fake processes and tiny executable fixtures
+to test status, persistence, source drift, logs and process-tree cancellation
+without running a model or building the target website.
+These tests do not verify live CLI authentication or editorial quality. Verify
+the configured route with an explicit review and inspect its findings before
+using its output for source changes.</p>
+<p>The four non-LLM local rules and their wiki use <code>knowledge/rules.json</code>. Evaluated
+LanguageTool/Vale/CSpell/Hunspell/textlint adapters are not part of Runner and are
+not installed analyzers. See <span class="repository-reference" title="Reference in the source repository">language tooling</span>,
+<a href="/voice/guides/notices/">third-party notices</a> and the resolved npm inventory for
+the distinction between actual packages and candidate engines/data.</p>
+</div><details class="source-details"><summary data-en="Git and source reference" data-de="Git- und Quellbezug">Git and source reference</summary><p>Source for this page: <code>docs/runner-integration.md</code>. Content hash and Git revision: <a href="/voice/build-info.json">Build record</a>.</p><a href="/voice/sources/runner-integration.md" download="" data-en="Download the Markdown source" data-de="Markdown-Quelle herunterladen">Download the Markdown source</a><p>Additional references in the repository:</p><ul><li><code>docs/language-tooling.md</code></li></ul></details><a class="next-guide" href="/voice/guides/checks/"><span data-en="Next guide" data-de="Nächster Guide">Next guide</span><strong>Local build and test checks →</strong></a></article><aside class="page-outline"><p data-en="On this page" data-de="Auf dieser Seite">On this page</p><nav aria-label="On this page"><a href="#dependency">Dependency</a><a href="#server-configuration">Server configuration</a><a href="#backend-contract">Backend contract</a><a href="#context-and-source-integrity">Context and source integrity</a><a href="#output-validation-and-persistence">Output validation and persistence</a><a href="#task-outcomes-and-combined-proposals">Task outcomes and combined proposals</a><a href="#local-buildtest-verification">Local build/test verification</a><a href="#verification">Verification</a></nav></aside></div></main><footer class="site-footer"><a href="https://agent-orchestrator.dev/">Agent Orchestrator ecosystem</a><p data-en="Git and folders · Explicit source changes" data-de="Git und Ordner · Bewusste Quelländerungen">Git and folders · Explicit source changes</p><a href="/voice/build-info.json" data-en="Build record" data-de="Build-Nachweis">Build record</a></footer><script src="/voice/site.js" defer=""></script></body></html>

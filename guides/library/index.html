@@ -1,0 +1,154 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mount the review library · Voice docs</title><meta name="description" content="Connect source units, findings and native text selection to your own application."><link rel="canonical" href="https://agent-orchestrator.dev/voice/guides/library/"><link rel="stylesheet" href="/voice/site.css"><link rel="stylesheet" href="/voice/docs.css"><meta name="theme-color" content="#14271f"><link rel="alternate" hreflang="en" href="https://agent-orchestrator.dev/voice/guides/library/"><link rel="alternate" hreflang="de" href="https://agent-orchestrator.dev/voice/de/guides/library/"><link rel="alternate" hreflang="x-default" href="https://agent-orchestrator.dev/voice/guides/library/"><meta property="og:type" content="website"><meta property="og:site_name" content="Voice Lint"><meta property="og:title" content="Mount the review library · Voice docs"><meta property="og:description" content="Connect source units, findings and native text selection to your own application."><meta property="og:url" content="https://agent-orchestrator.dev/voice/guides/library/"><meta property="og:locale" content="en_US"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Mount the review library · Voice docs","description":"Connect source units, findings and native text selection to your own application.","url":"https://agent-orchestrator.dev/voice/guides/library/","inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Voice Lint","url":"https://agent-orchestrator.dev/voice/"}}</script></head><body class="guide-page"><a class="skip" href="#content" data-en="Skip to content" data-de="Zum Inhalt">Skip to content</a><header class="site-header"><a class="brand" href="/voice/" aria-label="Voice home">voice <i>/</i></a><nav class="site-nav" aria-label="Main"><div class="nav-tools" role="group" aria-label="Tools / Werkzeuge"><a href="/voice/studio/" data-en="Studio" data-de="Studio">Studio</a><a href="/voice/library/" data-en="Library" data-de="Library">Library</a></div><div class="nav-resources" role="group" aria-label="Knowledge / Wissen"><a href="/voice/research/" data-en="Research" data-de="Forschung">Research</a><a href="/voice/writing-patterns/" data-en="AI anti-patterns" data-de="KI-Negativmuster">AI anti-patterns</a><a href="/voice/docs/" aria-current="page" data-en="Docs" data-de="Doku">Docs</a></div></nav><div class="language" role="group" aria-label="Language / Sprache"><a data-locale="en" href="/voice/guides/library/" hreflang="en" lang="en" aria-label="English" aria-current="true">EN</a><a data-locale="de" href="/voice/de/guides/library/" hreflang="de" lang="de" aria-label="Deutsch">DE</a></div></header><main id="content"><div class="docs-breadcrumb"><a href="/voice/docs/" data-en="Docs" data-de="Doku">Docs</a><span aria-hidden="true">/</span><span>Start here</span></div><div class="docs-layout"><aside class="guide-sidebar"><details class="guide-menu" open=""><summary data-en="All guides" data-de="Alle Guides">All guides</summary><nav aria-label="Documentation"><div class="guide-group"><p>Start here</p><a href="/voice/guides/writing-tools/">Writing tools for agents</a><a href="/voice/guides/workflow/">The Studio workflow</a><a href="/voice/guides/library/" aria-current="page">Mount the review library</a><a href="/voice/guides/agent-integration/">Use AI findings in your application</a></div><details class="guide-group guide-group-details"><summary>Reference</summary><a href="/voice/guides/review-benchmarks/">Review benchmarks</a><a href="/voice/guides/writing-rules/">Writing rules and prompt composition</a><a href="/voice/guides/ai-text-signals/">Inspect AI-like writing patterns</a><a href="/voice/guides/session/">Pair once. Resume for seven days.</a><a href="/voice/guides/usability/">Decisions and source versions</a><a href="/voice/guides/library-types/">Types, IntelliSense and examples</a><a href="/voice/guides/live-bridge/">The live-page bridge protocol</a><a href="/voice/guides/runner-integration/">Runner requests and source proposals</a><a href="/voice/guides/checks/">Local build and test checks</a><a href="/voice/guides/holistic-review/">Review source in a Git repository</a></details><details class="guide-group guide-group-details"><summary>Maintenance</summary><a href="/voice/guides/maintaining/">Product files, tools and evidence</a><a href="/voice/guides/commands/">Operator command catalogue</a><a href="/voice/guides/verification/">Dated verification evidence</a><a href="/voice/guides/notices/">Third-party notices</a></details></nav></details></aside><article class="guide-article" lang="en"><header class="guide-heading"><h1>Mount the review library</h1><p class="lead">Connect source units, findings and native text selection to your own application.</p></header><details class="mobile-outline"><summary data-en="On this page" data-de="Auf dieser Seite">On this page</summary><nav aria-label="Page sections"><a href="#build-and-consume">Build and consume</a><a href="#typescript-and-javascript-intellisense">TypeScript and JavaScript IntelliSense</a><a href="#mount-on-existing-html">Mount on existing HTML</a><a href="#durable-feedback-through-the-local-backend">Durable feedback through the local backend</a><a href="#browser-and-source-coordinates">Browser and source coordinates</a><a href="#live-development-websites">Live development websites</a></nav></details><div class="guide-content"><p>A framework-independent JavaScript library for reviewing text on a local web
+page. Angular, plain HTML and same-origin iframe hosts use the same controller.
+It draws supplied analysis findings as solid underlines and human feedback as
+dotted underlines, while native text selection supplies new feedback anchors.
+The host supplies the analysis; source editing is outside the library API.</p>
+<h2 id="build-and-consume">Build and consume<a class="heading-anchor" href="#build-and-consume" aria-label="Link to this section">#</a></h2><p>From the Voice Studio workspace:</p>
+<figure class="code-block"><figcaption><span>sh</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="sh code"><code>npm run build -w @voice/review
+npm test -w @voice/review</code></pre></figure><p>The package exports ESM and TypeScript declarations through <code>@voice/review</code>.
+<code>dist/voice-review.js</code> is a standalone browser bundle exposing <code>window.VoiceReview</code>;
+it includes no Angular dependency or runtime package dependency. A host can copy
+that file into its local development assets. The Studio serves it at
+<code>/library/voice-review.js</code>; see <code>examples/library-embed/index.html</code> in the repo.</p>
+<h2 id="typescript-and-javascript-intellisense">TypeScript and JavaScript IntelliSense<a class="heading-anchor" href="#typescript-and-javascript-intellisense" aria-label="Link to this section">#</a></h2><p>The public ESM API carries declaration files and JSDoc for completion, callback
+inference and hover help. Import types such as <code>TextUnit</code>, <code>Finding</code>,
+<code>SourceSpan</code> and <code>VoiceReviewController</code> directly from <code>@voice/review</code>.
+Plain JavaScript can use <code>// @ts-check</code> and JSDoc <code>import('@voice/review')</code>
+types. Checked examples ship in <span class="repository-reference" title="Reference in the source repository">examples/</span>:
+<a href="/voice/sources/repository/packages/review/examples/typescript.ts">TypeScript</a>, <a href="/voice/sources/repository/packages/review/examples/javascript.js">JavaScript</a>,
+and <a href="/voice/sources/repository/packages/review/examples/standalone.js">classic-script global</a>.</p>
+<p>For a normal browser script, use
+<code>/// &lt;reference types="@voice/review/standalone" /&gt;</code> to add editor types;
+load <code>voice-review.js</code> separately with a classic <code>&lt;script&gt;</code> tag. The reference
+does not load runtime code. Use the main entry for ESM imports.</p>
+<p>Run <code>npm run test:types -w @voice/review</code> to verify the declarations and editor
+metadata. <a href="/voice/guides/library-types/">Typed Library integration</a> contains
+complete setup examples and describes the consumer checks.</p>
+<h2 id="mount-on-existing-html">Mount on existing HTML<a class="heading-anchor" href="#mount-on-existing-html" aria-label="Link to this section">#</a></h2><p>Assign explicit text-unit identifiers in development markup. Units should be
+non-overlapping blocks or spans. Their concatenated DOM text must match the
+corresponding <code>TextUnit.text</code> exactly, including whitespace. The adapter skips
+script, style, template, hidden, <code>aria-hidden="true"</code> and <code>data-voice-exclude</code> regions.
+Use <code>data-voice-exclude</code> for visible inline code that the text adapter excludes.</p>
+<figure class="code-block"><figcaption><span>html</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="html code"><code>&lt;main id="preview"&gt;
+  &lt;p data-voice-unit="intro"&gt;Eine &lt;strong&gt;präzise&lt;/strong&gt; Aussage.&lt;/p&gt;
+&lt;/main&gt;</code></pre></figure><figure class="code-block"><figcaption><span>js</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="js code"><code><span class="syntax-keyword">import</span> { getUnitText, mountVoiceReview } <span class="syntax-keyword">from</span> <span class="syntax-string">'@voice/review'</span>;
+
+<span class="syntax-keyword">const</span> root = document.querySelector(<span class="syntax-string">'#preview'</span>);
+<span class="syntax-keyword">const</span> text = getUnitText(root.querySelector(<span class="syntax-string">'[data-voice-unit="intro"]'</span>));
+<span class="syntax-keyword">const</span> controller = mountVoiceReview({
+  root,
+  units: [{
+    id: <span class="syntax-string">'intro'</span>, text, kind: <span class="syntax-string">'paragraph'</span>, language: <span class="syntax-string">'de'</span>,
+    <span class="syntax-comment">// For this isolated browser-only example these are text coordinates.</span>
+    <span class="syntax-comment">// A source adapter must supply the actual file range before source edits.</span>
+    sourceSpan: { start: <span class="syntax-number">0</span>, end: text.length, encoding: <span class="syntax-string">'utf16'</span> }
+  }],
+  findings: [{
+    id: <span class="syntax-string">'finding-1'</span>, ruleId: <span class="syntax-string">'example.precision'</span>, category: <span class="syntax-string">'wording'</span>,
+    severity: <span class="syntax-string">'info'</span>, message: <span class="syntax-string">'Was bedeutet präzise hier?'</span>,
+    explanation: <span class="syntax-string">'Beispielbefund für die Einbindung, keine automatische Analyse.'</span>,
+    quote: <span class="syntax-string">'präzise'</span>, unitId: <span class="syntax-string">'intro'</span>, start: <span class="syntax-number">5</span>, end: <span class="syntax-number">12</span>,
+    suggestion: <span class="syntax-keyword">null</span>, engine: <span class="syntax-string">'example'</span>
+  }],
+  feedback: [],
+  onSelect: selection =&gt; showFeedbackForm(selection),
+  onFindingSelect: finding =&gt; showFinding(finding),
+  onFeedbackSelect: feedback =&gt; showFeedback(feedback)
+});
+
+<span class="syntax-comment">// After new analysis or a saved note:</span>
+controller.update({ findings: latestFindings, feedback: savedFeedback });
+controller.selectFinding(<span class="syntax-string">'finding-1'</span>);
+console.log(controller.getDiagnostics());
+
+<span class="syntax-comment">// On route changes, component destruction or iframe replacement:</span>
+controller.dispose();</code></pre></figure><p><code>showFeedbackForm</code>, <code>showFinding</code>, <code>showFeedback</code>, <code>latestFindings</code> and
+<code>savedFeedback</code> above are integration callbacks/data supplied by the host.
+An already-mounted root is disposed automatically before a second mount, so
+repeated initialization does not duplicate handlers or underline layers.</p>
+<p>For the standalone bundle, load <code>&lt;script src="/library/voice-review.js"&gt;&lt;/script&gt;</code>
+and call <code>VoiceReview.mountVoiceReview(...)</code> with the same options. No build
+framework is required on the consuming page.</p>
+<h2 id="durable-feedback-through-the-local-backend">Durable feedback through the local backend<a class="heading-anchor" href="#durable-feedback-through-the-local-backend" aria-label="Link to this section">#</a></h2><p>The host pairs with the local Studio once and supplies the resulting token.
+The client sends source-version and review-revision preconditions unchanged.
+Saved feedback is written by the backend to project metadata sidecars; it is
+not stored by this package in <code>localStorage</code>.</p>
+<figure class="code-block"><figcaption><span>js</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="js code"><code><span class="syntax-keyword">import</span> { createReviewClient, ReviewApiError } <span class="syntax-keyword">from</span> <span class="syntax-string">'@voice/review'</span>;
+
+<span class="syntax-keyword">const</span> api = createReviewClient({
+  baseUrl: <span class="syntax-string">'/api'</span>,
+  token: () =&gt; currentPairingToken
+});
+<span class="syntax-keyword">let</span> detail = <span class="syntax-keyword">await</span> api.getDocument(projectId, documentId);
+
+<span class="syntax-comment">/**
+ * @param {import('@voice/review').SelectionTarget} selection
+ * @param {string} comment
+ * @param {string} category
+ * @returns {Readonly&lt;import('@voice/review').FeedbackInput&gt;}
+ */</span>
+<span class="syntax-keyword">function</span> prepareFeedback(selection, comment, category) {
+  <span class="syntax-keyword">return</span> Object.freeze({
+    ...selection, comment, category,
+    expectedVersion: detail.version,
+    expectedReviewRevision: detail.reviewRevision,
+    requestId: crypto.randomUUID()
+  });
+}
+
+<span class="syntax-comment">/** @param {Readonly&lt;import('@voice/review').FeedbackInput&gt;} input */</span>
+<span class="syntax-keyword">async</span> <span class="syntax-keyword">function</span> persistFeedback(input) {
+  <span class="syntax-keyword">try</span> {
+    detail = <span class="syntax-keyword">await</span> api.saveFeedback(projectId, documentId, input);
+    controller.update({ units: detail.units, findings: detail.findings, feedback: detail.feedback });
+  } <span class="syntax-keyword">catch</span> (error) {
+    <span class="syntax-keyword">if</span> (error <span class="syntax-keyword">instanceof</span> ReviewApiError &amp;&amp; error.status === <span class="syntax-number">409</span>) {
+      <span class="syntax-comment">// Keep the user's draft, reload the document and ask them to review the</span>
+      <span class="syntax-comment">// anchor against the new source before submitting a new request.</span>
+      showConflict(error.details);
+      <span class="syntax-keyword">return</span>;
+    }
+    <span class="syntax-keyword">throw</span> error;
+  }
+}</code></pre></figure><p>Call <code>prepareFeedback</code> once for a new or edited note, retain the returned payload,
+then pass it to <code>persistFeedback</code>. After an uncertain network failure, retry
+<code>persistFeedback</code> with that same payload, including its request ID and version
+preconditions. After a 409 conflict, reload and review the anchor before preparing
+a new payload. Pairing is performed by the host at <code>POST /api/session/pair</code>;
+do not put tokens in page URLs, source code or reports.
+The backend has no cross-origin API access. Host the preview on the Studio origin,
+or configure the consuming app's local development proxy.</p>
+<h2 id="browser-and-source-coordinates">Browser and source coordinates<a class="heading-anchor" href="#browser-and-source-coordinates" aria-label="Link to this section">#</a></h2><p>All review offsets are <strong>UTF-16 code units</strong>, zero-based and half-open. This is
+the coordinate system used by JavaScript string slices and browser text ranges.
+<code>codePointOffsetToUtf16(text, offset)</code> explicitly converts offsets from a
+Unicode-code-point analysis engine. Do not pass Voice Lint core spans directly
+without converting their declared encoding.</p>
+<p><code>createTextRange(element, start, end, expectedText)</code> maps offsets across inline
+markup without wrapping or replacing content. The optional <code>expectedText</code>
+rejects stale text. <code>selectionToTarget(root, units, selection)</code> returns
+<code>{ unitId, quote, start, end }</code> for a selection within one mapped unit; a selection
+across multiple units or across excluded inline code is rejected rather than
+silently shortened. Selections on either side of code use the correct offsets.
+<code>createTextRanges(...)</code> returns per-text-node ranges for drawing across inline
+markup without accidentally marking excluded content.</p>
+<p>The library validates both unit text and exact quoted substrings before drawing
+marks. <code>getDiagnostics()</code> reports missing/mismatched units and stale anchors.
+Resolved notes and notes needing reattachment are not shown as current marks.
+Overlapping findings and human notes receive separate underline lanes.</p>
+<p>Category colors are structure blue, claims orange, wording purple and meta ochre.
+The layer uses range geometry and pointer events pass through it. Clicking text selects its most precise annotation; native
+links, buttons and editable controls retain their normal interaction. Supply an
+accessible findings list in the host for keyboard navigation and annotations
+inside links. <code>selectFinding(id)</code> highlights and scrolls to a selected finding.</p>
+<p>For an iframe, mount after its <code>load</code> event using
+<code>root: iframe.contentDocument.body</code>, and dispose on reload. Its document must
+be same-origin. The Studio's imported preview uses a sandbox without scripts.
+Arbitrary remote cross-origin pages and closed shadow roots cannot be inspected
+by this adapter; they need an explicit integration/import route. A site's CSP
+must permit the library asset and its inline annotation styles in development.</p>
+<h2 id="live-development-websites">Live development websites<a class="heading-anchor" href="#live-development-websites" aria-label="Link to this section">#</a></h2><p>Use the exported <code>connectVoiceStudio({studioOrigin})</code> bridge to review a running
+application in Studio while preserving its real CSS, JavaScript and native
+routing. The target website explicitly integrates the library and retains its
+own origin. See <a href="/voice/guides/live-bridge/">LIVE-BRIDGE.md</a> for the exact origin/session
+protocol, source mapping, iframe requirements and limitations.</p>
+</div><details class="source-details"><summary data-en="Git and source reference" data-de="Git- und Quellbezug">Git and source reference</summary><p>Source for this page: <code>packages/review/README.md</code>. Content hash and Git revision: <a href="/voice/build-info.json">Build record</a>.</p><a href="/voice/sources/library.md" download="" data-en="Download the Markdown source" data-de="Markdown-Quelle herunterladen">Download the Markdown source</a><p>Additional references in the repository:</p><ul><li><code>packages/review/examples/</code></li></ul></details><a class="next-guide" href="/voice/guides/library-types/"><span data-en="Next guide" data-de="Nächster Guide">Next guide</span><strong>Types, IntelliSense and examples →</strong></a></article><aside class="page-outline"><p data-en="On this page" data-de="Auf dieser Seite">On this page</p><nav aria-label="On this page"><a href="#build-and-consume">Build and consume</a><a href="#typescript-and-javascript-intellisense">TypeScript and JavaScript IntelliSense</a><a href="#mount-on-existing-html">Mount on existing HTML</a><a href="#durable-feedback-through-the-local-backend">Durable feedback through the local backend</a><a href="#browser-and-source-coordinates">Browser and source coordinates</a><a href="#live-development-websites">Live development websites</a></nav></aside></div></main><footer class="site-footer"><a href="https://agent-orchestrator.dev/">Agent Orchestrator ecosystem</a><p data-en="Git and folders · Explicit source changes" data-de="Git und Ordner · Bewusste Quelländerungen">Git and folders · Explicit source changes</p><a href="/voice/build-info.json" data-en="Build record" data-de="Build-Nachweis">Build record</a></footer><script src="/voice/site.js" defer=""></script></body></html>

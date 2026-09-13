@@ -1,0 +1,143 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Writing rules and prompt composition · Voice docs</title><meta name="description" content="Select a review profile, inspect rule examples and compose a task-specific prompt."><link rel="canonical" href="https://agent-orchestrator.dev/voice/guides/writing-rules/"><link rel="stylesheet" href="/voice/site.css"><link rel="stylesheet" href="/voice/docs.css"><meta name="theme-color" content="#14271f"><link rel="alternate" hreflang="en" href="https://agent-orchestrator.dev/voice/guides/writing-rules/"><link rel="alternate" hreflang="de" href="https://agent-orchestrator.dev/voice/de/guides/writing-rules/"><link rel="alternate" hreflang="x-default" href="https://agent-orchestrator.dev/voice/guides/writing-rules/"><meta property="og:type" content="website"><meta property="og:site_name" content="Voice Lint"><meta property="og:title" content="Writing rules and prompt composition · Voice docs"><meta property="og:description" content="Select a review profile, inspect rule examples and compose a task-specific prompt."><meta property="og:url" content="https://agent-orchestrator.dev/voice/guides/writing-rules/"><meta property="og:locale" content="en_US"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Writing rules and prompt composition · Voice docs","description":"Select a review profile, inspect rule examples and compose a task-specific prompt.","url":"https://agent-orchestrator.dev/voice/guides/writing-rules/","inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Voice Lint","url":"https://agent-orchestrator.dev/voice/"}}</script></head><body class="guide-page"><a class="skip" href="#content" data-en="Skip to content" data-de="Zum Inhalt">Skip to content</a><header class="site-header"><a class="brand" href="/voice/" aria-label="Voice home">voice <i>/</i></a><nav class="site-nav" aria-label="Main"><div class="nav-tools" role="group" aria-label="Tools / Werkzeuge"><a href="/voice/studio/" data-en="Studio" data-de="Studio">Studio</a><a href="/voice/library/" data-en="Library" data-de="Library">Library</a></div><div class="nav-resources" role="group" aria-label="Knowledge / Wissen"><a href="/voice/research/" data-en="Research" data-de="Forschung">Research</a><a href="/voice/writing-patterns/" data-en="AI anti-patterns" data-de="KI-Negativmuster">AI anti-patterns</a><a href="/voice/docs/" aria-current="page" data-en="Docs" data-de="Doku">Docs</a></div></nav><div class="language" role="group" aria-label="Language / Sprache"><a data-locale="en" href="/voice/guides/writing-rules/" hreflang="en" lang="en" aria-label="English" aria-current="true">EN</a><a data-locale="de" href="/voice/de/guides/writing-rules/" hreflang="de" lang="de" aria-label="Deutsch">DE</a></div></header><main id="content"><div class="docs-breadcrumb"><a href="/voice/docs/" data-en="Docs" data-de="Doku">Docs</a><span aria-hidden="true">/</span><span>Reference</span></div><div class="docs-layout"><aside class="guide-sidebar"><details class="guide-menu" open=""><summary data-en="All guides" data-de="Alle Guides">All guides</summary><nav aria-label="Documentation"><div class="guide-group"><p>Start here</p><a href="/voice/guides/writing-tools/">Writing tools for agents</a><a href="/voice/guides/workflow/">The Studio workflow</a><a href="/voice/guides/library/">Mount the review library</a><a href="/voice/guides/agent-integration/">Use AI findings in your application</a></div><details class="guide-group guide-group-details" open=""><summary>Reference</summary><a href="/voice/guides/review-benchmarks/">Review benchmarks</a><a href="/voice/guides/writing-rules/" aria-current="page">Writing rules and prompt composition</a><a href="/voice/guides/ai-text-signals/">Inspect AI-like writing patterns</a><a href="/voice/guides/session/">Pair once. Resume for seven days.</a><a href="/voice/guides/usability/">Decisions and source versions</a><a href="/voice/guides/library-types/">Types, IntelliSense and examples</a><a href="/voice/guides/live-bridge/">The live-page bridge protocol</a><a href="/voice/guides/runner-integration/">Runner requests and source proposals</a><a href="/voice/guides/checks/">Local build and test checks</a><a href="/voice/guides/holistic-review/">Review source in a Git repository</a></details><details class="guide-group guide-group-details"><summary>Maintenance</summary><a href="/voice/guides/maintaining/">Product files, tools and evidence</a><a href="/voice/guides/commands/">Operator command catalogue</a><a href="/voice/guides/verification/">Dated verification evidence</a><a href="/voice/guides/notices/">Third-party notices</a></details></nav></details></aside><article class="guide-article" lang="en"><header class="guide-heading"><h1>Writing rules and prompt composition</h1><p class="lead">Select a review profile, inspect rule examples and compose a task-specific prompt.</p></header><details class="mobile-outline"><summary data-en="On this page" data-de="Auf dieser Seite">On this page</summary><nav aria-label="Page sections"><a href="#recognize-the-negative-pattern">Recognize the negative pattern</a><a href="#choose-the-readers-task">Choose the reader's task</a><a href="#find-candidate-spans">Find candidate spans</a><a href="#compose-review-instructions">Compose review instructions</a><a href="#read-the-catalogue-directly">Read the catalogue directly</a><a href="#sources-and-model-specific-guidance">Sources and model-specific guidance</a><a href="#maintain-and-verify">Maintain and verify</a></nav></details><div class="guide-content"><p><code>@voice/writing-rules</code> provides 20 contextual review rules, four task profiles and
+English/German examples. Use it to prepare review instructions or locate a small
+set of visible wording cues. Each rule includes an acceptable counterexample and
+the conditions under which its suggested revision preserves the meaning.</p>
+<h2 id="recognize-the-negative-pattern">Recognize the negative pattern<a class="heading-anchor" href="#recognize-the-negative-pattern" aria-label="Link to this section">#</a></h2><p>Each rule starts with an <code>antiPattern</code>: a concrete name, the observable symptom
+and its cost to the reader, in EN and DE. Names include <strong>Development diary</strong>,
+<strong>Not X, but Y</strong>, <strong>Hedge stacking</strong>, <strong>Summary loops</strong>, <strong>Unearned praise</strong>,
+<strong>False balance</strong>, <strong>Unprioritized laundry list</strong> and <strong>Forced triads and canned Q&amp;A</strong>.
+The positive <code>title</code> and <code>prompt</code> describe how to review or remedy it.</p>
+<p>A pattern is a contextual criticism, not proof that AI wrote the passage. A real
+comparison, useful history, uncertainty caused by missing or conflicting evidence or deliberate style choice can
+remain. <code>relatedRuleIds</code> identifies overlap: a laundry list concerns relevance
+and priority; formatting overload concerns presentation; a forced template can
+repeat form even when its facts differ.</p>
+<h2 id="choose-the-readers-task">Choose the reader's task<a class="heading-anchor" href="#choose-the-readers-task" aria-label="Link to this section">#</a></h2><div class="table-scroll" tabindex="0" role="region" aria-label="Documentation table"><table>
+<thead>
+<tr>
+<th>Profile</th>
+<th>Review focus</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>public-docs</code></td>
+<td>Help readers use the available product without development history or distracting side topics.</td>
+</tr>
+<tr>
+<td><code>technical-reference</code></td>
+<td>Explain exact objects, operations and terminology while preserving necessary conditions.</td>
+</tr>
+<tr>
+<td><code>product-copy</code></td>
+<td>Connect the explanation and claims to a reader goal and supporting evidence.</td>
+</tr>
+<tr>
+<td><code>agent-report</code></td>
+<td>Explain the observed outcome clearly, with useful evidence and coverage limits.</td>
+</tr>
+</tbody></table>
+</div><p>Each profile selects six rules. The four added patterns are available through
+individual rule IDs and do not enlarge those defaults. A host can select
+individual rule IDs instead.
+For example, <code>concrete-subject</code> asks what an abstract phrase actually refers to;
+<code>calibrated-uncertainty</code> protects real uncertainty while questioning redundant
+qualifiers. Neither rule declares the word “preferred” inherently wrong.</p>
+<p>The package builds from this workspace:</p>
+<figure class="code-block"><figcaption><span>sh</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="sh code"><code>npm --prefix packages/writing-rules run build
+npm --prefix packages/writing-rules test</code></pre></figure><p>The package is local and has not been published to npm. TypeScript declarations
+and JSDoc ship with its ESM build. JavaScript consumers can use <code>// @ts-check</code>.</p>
+<h2 id="find-candidate-spans">Find candidate spans<a class="heading-anchor" href="#find-candidate-spans" aria-label="Link to this section">#</a></h2><figure class="code-block"><figcaption><span>ts</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="ts code"><code><span class="syntax-keyword">import</span> { findWritingSignals } <span class="syntax-keyword">from</span> <span class="syntax-string">'@voice/writing-rules'</span>;
+
+<span class="syntax-keyword">const</span> text = <span class="syntax-string">'😀 A powerful example.'</span>;
+<span class="syntax-keyword">const</span> result = findWritingSignals(text, { language: <span class="syntax-string">'en'</span> });
+<span class="syntax-keyword">const</span> first = result.signals[<span class="syntax-number">0</span>];
+<span class="syntax-comment">// quote: "powerful", start: 5, end: 13, encoding: "utf16"</span>
+<span class="syntax-comment">// kind: "surface-cue", reviewRequired: true</span>
+
+console.log(result.coverage.scannedRuleIds);
+console.log(result.coverage.unscannedRuleIds);</code></pre></figure><p>The scanner uses 16 published regular expressions covering eight rules across
+EN/DE. The other twelve rules require contextual review. They find candidates such as stock adjectives, paired hedges or familiar
+contrast openings. They do not determine whether a qualifier is unnecessary,
+whether a claim is true or whether a document has a useful structure.</p>
+<p>Offsets are zero-based, half-open UTF-16 positions in the supplied string.
+Quoted examples and code are included. Before converting a candidate into a
+Studio finding, the host must validate its unit, exact quote, source mapping and
+source version. The scanner does not write <code>Finding</code> objects, save feedback or
+edit source files.</p>
+<p><code>maxSignals</code> defaults to 50 and accepts 1–500. The returned <code>truncated</code> flag
+identifies omitted matches. Input is limited to 250,000 UTF-16 units. A selected
+rule without a lexical pattern appears in <code>unscannedRuleIds</code>; empty results do
+not establish that the text is good. These are writing signals, not evidence of
+authorship. See <a href="/voice/guides/ai-text-signals/">AI text signals and their limits</a>.</p>
+<h2 id="compose-review-instructions">Compose review instructions<a class="heading-anchor" href="#compose-review-instructions" aria-label="Link to this section">#</a></h2><figure class="code-block"><figcaption><span>ts</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="ts code"><code><span class="syntax-keyword">import</span> { composeWritingReviewPrompt } <span class="syntax-keyword">from</span> <span class="syntax-string">'@voice/writing-rules'</span>;
+
+<span class="syntax-keyword">const</span> review = composeWritingReviewPrompt({
+  profile: <span class="syntax-string">'public-docs'</span>,
+  audience: <span class="syntax-string">'Developers using Studio for the first time'</span>,
+  goal: <span class="syntax-string">'Open a source folder and complete one review'</span>,
+  language: <span class="syntax-string">'en'</span>,
+  maxFindings: <span class="syntax-number">5</span>
+});
+
+console.log(review.catalogueVersion, review.ruleIds);
+console.log(review.prompt);</code></pre></figure><p>Composition happens locally. The result contains instructions, selected rule IDs
+and the catalogue version. No model, provider or Runner starts. Audience and goal
+are trusted host configuration; supply source material separately as review data.</p>
+<p>The prompt requests exact quotes, source locators, impact on the reader's task and
+reasons. Where a change is warranted, it asks for one to three distinct
+alternatives; otherwise it permits a justified keep decision. Examples never
+authorize invented facts or automatic replacement. Necessary qualifications,
+technical terms and accepted decisions remain protected.</p>
+<p>The host chooses execution, validates any model response and presents the decision.
+This package does not validate generated findings or guarantee a model's output
+count. <code>maxFindings</code> is an instruction, not a cost or token limit.</p>
+<h2 id="read-the-catalogue-directly">Read the catalogue directly<a class="heading-anchor" href="#read-the-catalogue-directly" aria-label="Link to this section">#</a></h2><figure class="code-block"><figcaption><span>ts</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="ts code"><code><span class="syntax-keyword">import</span> {
+  writingCatalogue, getWritingRule, selectWritingRules
+} <span class="syntax-keyword">from</span> <span class="syntax-string">'@voice/writing-rules'</span>;
+
+<span class="syntax-keyword">const</span> rule = getWritingRule(<span class="syntax-string">'concrete-subject'</span>);
+<span class="syntax-keyword">const</span> rules = selectWritingRules({
+  profile: <span class="syntax-string">'public-docs'</span>,
+  ruleIds: [<span class="syntax-string">'current-state'</span>, <span class="syntax-string">'calibrated-uncertainty'</span>]
+});</code></pre></figure><p>Selection keeps catalogue order and removes duplicate IDs. Unknown IDs and
+profiles throw. If both a profile and IDs are supplied, each ID must belong to
+that profile. An empty selection is allowed for inspection, but prompt composition
+requires at least one rule. Objects returned by the API are deeply frozen.
+The separate JSON exports are ordinary data objects; modifying them does not
+configure the API.</p>
+<p>The package also exports <code>@voice/writing-rules/catalogue.json</code> and
+<code>@voice/writing-rules/surface-patterns.json</code>. Browser hosts can serve the built
+<code>index.js</code> directly or bundle its ESM entry. That module embeds private data and
+works independently of the optional JSON downloads. There are no runtime
+dependencies or network calls.</p>
+<h2 id="sources-and-model-specific-guidance">Sources and model-specific guidance<a class="heading-anchor" href="#sources-and-model-specific-guidance" aria-label="Link to this section">#</a></h2><p>Every rule links to source records with a URL, access date, relevant section,
+supported point and limitation. The <code>relation</code> separates provider prompt advice,
+editorial guidance, Voice's editorial derivation and contextual research.
+The bilingual examples are Voice-authored applications, except for the identified
+user-provided Voice documentation passage under Development diary. None is
+presented as an unlabelled captured model output or a measured model defect.</p>
+<p><a href="https://developers.openai.com/api/docs/guides/latest-model#personality-and-writing-style">OpenAI's style guidance</a>
+and <a href="https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices">Anthropic's prompting guidance</a>
+inform prompt composition. They do not establish that every Claude or
+OpenAI/Codex output shares the same weaknesses. The host retains its actual model
+identity and evaluates the selected profile on its own task examples.</p>
+<p><a href="https://learn.microsoft.com/en-us/contribute/content/style-quick-start">Microsoft's documentation guidance</a>
+and <a href="https://developers.google.com/style/tense">Google's tense guidance</a> inform the
+documentation profiles. <a href="https://aclanthology.org/2025.emnlp-main.1163/">The cited linguistic study</a>
+provides research context; its aggregate observations are not a quality test for
+an individual passage.</p>
+<p>OpenAI's <a href="https://openai.com/index/sycophancy-in-gpt-4o/">April 2025 sycophancy report</a>
+documents a particular rolled-back GPT-4o update. It supports examining unearned
+agreement, not assigning that behavior to every current model. The
+<a href="https://model-spec.openai.com/2025-12-18.html#assume-an-objective-point-of-view">dated Model Spec</a>
+informs evidence-weighted comparisons; it describes intended behavior.</p>
+<h2 id="maintain-and-verify">Maintain and verify<a class="heading-anchor" href="#maintain-and-verify" aria-label="Link to this section">#</a></h2><p>The canonical data lives in <code>packages/writing-rules/src/catalogue.json</code> and
+<code>surface-patterns.json</code>. Change the catalogue version when rules, examples,
+profiles or matching behavior change. Preserve stable IDs and revisit sources
+when provider guidance changes.</p>
+<p>Tests cover catalogue integrity, references, keep cases, selection, prompt
+composition, distributed TypeScript declarations and exact lexical spans,
+including Unicode and truncation. These checks verify software behavior. They
+do not measure editorial benefit, detector accuracy or a provider's response
+quality. The existing four Studio local rules remain a separate implementation.</p>
+</div><details class="source-details"><summary data-en="Git and source reference" data-de="Git- und Quellbezug">Git and source reference</summary><p>Source for this page: <code>docs/writing-rules.md</code>. Content hash and Git revision: <a href="/voice/build-info.json">Build record</a>.</p><a href="/voice/sources/writing-rules.md" download="" data-en="Download the Markdown source" data-de="Markdown-Quelle herunterladen">Download the Markdown source</a></details><a class="next-guide" href="/voice/guides/agent-integration/"><span data-en="Next guide" data-de="Nächster Guide">Next guide</span><strong>Use AI findings in your application →</strong></a></article><aside class="page-outline"><p data-en="On this page" data-de="Auf dieser Seite">On this page</p><nav aria-label="On this page"><a href="#recognize-the-negative-pattern">Recognize the negative pattern</a><a href="#choose-the-readers-task">Choose the reader's task</a><a href="#find-candidate-spans">Find candidate spans</a><a href="#compose-review-instructions">Compose review instructions</a><a href="#read-the-catalogue-directly">Read the catalogue directly</a><a href="#sources-and-model-specific-guidance">Sources and model-specific guidance</a><a href="#maintain-and-verify">Maintain and verify</a></nav></aside></div></main><footer class="site-footer"><a href="https://agent-orchestrator.dev/">Agent Orchestrator ecosystem</a><p data-en="Git and folders · Explicit source changes" data-de="Git und Ordner · Bewusste Quelländerungen">Git and folders · Explicit source changes</p><a href="/voice/build-info.json" data-en="Build record" data-de="Build-Nachweis">Build record</a></footer><script src="/voice/site.js" defer=""></script></body></html>

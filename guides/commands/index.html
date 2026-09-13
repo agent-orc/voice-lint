@@ -1,0 +1,203 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Operator command catalogue · Voice docs</title><meta name="description" content="Supported commands with prerequisites, side effects and output locations."><link rel="canonical" href="https://agent-orchestrator.dev/voice/guides/commands/"><link rel="stylesheet" href="/voice/site.css"><link rel="stylesheet" href="/voice/docs.css"><meta name="theme-color" content="#14271f"><link rel="alternate" hreflang="en" href="https://agent-orchestrator.dev/voice/guides/commands/"><link rel="alternate" hreflang="de" href="https://agent-orchestrator.dev/voice/de/guides/commands/"><link rel="alternate" hreflang="x-default" href="https://agent-orchestrator.dev/voice/guides/commands/"><meta property="og:type" content="website"><meta property="og:site_name" content="Voice Lint"><meta property="og:title" content="Operator command catalogue · Voice docs"><meta property="og:description" content="Supported commands with prerequisites, side effects and output locations."><meta property="og:url" content="https://agent-orchestrator.dev/voice/guides/commands/"><meta property="og:locale" content="en_US"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Operator command catalogue · Voice docs","description":"Supported commands with prerequisites, side effects and output locations.","url":"https://agent-orchestrator.dev/voice/guides/commands/","inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Voice Lint","url":"https://agent-orchestrator.dev/voice/"}}</script></head><body class="guide-page"><a class="skip" href="#content" data-en="Skip to content" data-de="Zum Inhalt">Skip to content</a><header class="site-header"><a class="brand" href="/voice/" aria-label="Voice home">voice <i>/</i></a><nav class="site-nav" aria-label="Main"><div class="nav-tools" role="group" aria-label="Tools / Werkzeuge"><a href="/voice/studio/" data-en="Studio" data-de="Studio">Studio</a><a href="/voice/library/" data-en="Library" data-de="Library">Library</a></div><div class="nav-resources" role="group" aria-label="Knowledge / Wissen"><a href="/voice/research/" data-en="Research" data-de="Forschung">Research</a><a href="/voice/writing-patterns/" data-en="AI anti-patterns" data-de="KI-Negativmuster">AI anti-patterns</a><a href="/voice/docs/" aria-current="page" data-en="Docs" data-de="Doku">Docs</a></div></nav><div class="language" role="group" aria-label="Language / Sprache"><a data-locale="en" href="/voice/guides/commands/" hreflang="en" lang="en" aria-label="English" aria-current="true">EN</a><a data-locale="de" href="/voice/de/guides/commands/" hreflang="de" lang="de" aria-label="Deutsch">DE</a></div></header><main id="content"><div class="docs-breadcrumb"><a href="/voice/docs/" data-en="Docs" data-de="Doku">Docs</a><span aria-hidden="true">/</span><span>Maintenance</span></div><div class="docs-layout"><aside class="guide-sidebar"><details class="guide-menu" open=""><summary data-en="All guides" data-de="Alle Guides">All guides</summary><nav aria-label="Documentation"><div class="guide-group"><p>Start here</p><a href="/voice/guides/writing-tools/">Writing tools for agents</a><a href="/voice/guides/workflow/">The Studio workflow</a><a href="/voice/guides/library/">Mount the review library</a><a href="/voice/guides/agent-integration/">Use AI findings in your application</a></div><details class="guide-group guide-group-details"><summary>Reference</summary><a href="/voice/guides/review-benchmarks/">Review benchmarks</a><a href="/voice/guides/writing-rules/">Writing rules and prompt composition</a><a href="/voice/guides/ai-text-signals/">Inspect AI-like writing patterns</a><a href="/voice/guides/session/">Pair once. Resume for seven days.</a><a href="/voice/guides/usability/">Decisions and source versions</a><a href="/voice/guides/library-types/">Types, IntelliSense and examples</a><a href="/voice/guides/live-bridge/">The live-page bridge protocol</a><a href="/voice/guides/runner-integration/">Runner requests and source proposals</a><a href="/voice/guides/checks/">Local build and test checks</a><a href="/voice/guides/holistic-review/">Review source in a Git repository</a></details><details class="guide-group guide-group-details" open=""><summary>Maintenance</summary><a href="/voice/guides/maintaining/">Product files, tools and evidence</a><a href="/voice/guides/commands/" aria-current="page">Operator command catalogue</a><a href="/voice/guides/verification/">Dated verification evidence</a><a href="/voice/guides/notices/">Third-party notices</a></details></nav></details></aside><article class="guide-article" lang="en"><header class="guide-heading"><h1>Operator command catalogue</h1><p class="lead">Supported commands with prerequisites, side effects and output locations.</p></header><details class="mobile-outline"><summary data-en="On this page" data-de="Auf dieser Seite">On this page</summary><nav aria-label="Page sections"><a href="#public-website-browser-checks">Public website browser checks</a><a href="#scenario-scripts">Scenario scripts</a><a href="#writing-review-measurements">Writing-review measurements</a></nav></details><div class="guide-content"><p>Run these commands from the Voice Studio workspace. Node.js, Bash and .NET
+requirements are in the <span class="repository-reference" title="Reference in the source repository">main README</span>.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Documentation table"><table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Purpose and prerequisites</th>
+<th>Writes / output</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>npm start</code></td>
+<td>Build and start the local Studio and example website</td>
+<td>Generated builds and private local session state</td>
+</tr>
+<tr>
+<td><code>npm run pairing-code</code></td>
+<td>Recover the running installation's local pairing code</td>
+<td>Prints the pairing code, never the bearer token</td>
+</tr>
+<tr>
+<td><code>npm run build</code></td>
+<td>Build both libraries, Angular frontend and .NET backend</td>
+<td><code>dist/</code>, <code>bin/</code>, <code>obj/</code></td>
+</tr>
+<tr>
+<td><code>npm run build:frontend:staged</code></td>
+<td>Build frontend without replacing currently served assets</td>
+<td><code>frontend/dist/voice-studio-next/</code></td>
+</tr>
+<tr>
+<td><code>npm run frontend:publish-local</code></td>
+<td>Copy an already completed staged frontend, entry point last</td>
+<td>Replaces the local served frontend; no backend restart or remote publication</td>
+</tr>
+<tr>
+<td><code>npm run website:build</code></td>
+<td>Build bilingual product pages, the library demo and styled HTML technical guides</td>
+<td><code>website/dist/voice/</code>; no deployment</td>
+</tr>
+<tr>
+<td><code>npm run website:preview</code></td>
+<td>Build and serve the public-site preview on loopback 5187</td>
+<td>Same static output and a local process</td>
+</tr>
+<tr>
+<td><code>npm run website:verify-artifact</code></td>
+<td>Validate the static publication inventory, source hashes, Git revision, routes and public browser boundaries; requires a clean committed build</td>
+<td>Read-only; <code>-- --allow-dirty</code> is limited to local preparation</td>
+</tr>
+<tr>
+<td><code>npm run website:verify-deployment</code></td>
+<td>Compare the fixed public Voice target with the exact local artifact; verify routes, content types and hosting boundaries</td>
+<td>Read-only public requests; report under <code>test-results/voice-deployment/</code></td>
+</tr>
+<tr>
+<td><code>npm run test:source-provenance -- --help</code></td>
+<td>Configurable source/hash/Git and optional task-provenance verification for a running local Studio</td>
+<td>Compact report under ignored <code>test-results/</code>; no source-write/model request</td>
+</tr>
+<tr>
+<td><code>npm run docs:dossier:check -- --repository .</code></td>
+<td>Compare the maintained VL-W1 section with the dossier in this checkout</td>
+<td>No writes; nonzero exit when synchronization is needed</td>
+</tr>
+<tr>
+<td><code>npm run docs:dossier:sync -- --repository .</code></td>
+<td>Synchronize maintained dossier content/presentation while preserving lifecycle fields</td>
+<td>Explicit writes to this checkout’s dossier files; no Git operation</td>
+</tr>
+<tr>
+<td><code>npm run test:dossier</code></td>
+<td>Verify the served dossier and desktop/mobile layout</td>
+<td><code>test-results/dossier-integration/</code>; no API mutation</td>
+</tr>
+<tr>
+<td><code>npm run test:evidence</code></td>
+<td>Check all curated evidence manifests, path containment and file hashes</td>
+<td>Read-only; does not rerun historical tests</td>
+</tr>
+<tr>
+<td><code>npm run test:holistic-schema</code></td>
+<td>Validate the proposed JSON examples, references and hashes; reject malformed variants</td>
+<td>Offline only; no repository/site review and no model</td>
+</tr>
+<tr>
+<td><code>npm run build:writing-rules</code></td>
+<td>Build the local writing catalogue, prompt composer and surface-cue API</td>
+<td>Package ESM files, JSON and declarations under <code>packages/writing-rules/dist/</code></td>
+</tr>
+<tr>
+<td><code>npm run test:writing-rules</code></td>
+<td>Check rule/source consistency, prompt boundaries, signals and typed consumers</td>
+<td>Offline fixtures; no model call</td>
+</tr>
+<tr>
+<td><code>npm run test:json-viewer</code></td>
+<td>Check JSON dialogs with an isolated loopback fixture</td>
+<td>Browser report under <code>test-results/voice-website/</code>; no Studio access</td>
+</tr>
+<tr>
+<td><code>npm run test:writing-patterns</code></td>
+<td>Check the published writing catalogue, EN/DE filters, examples and absence of executable writing tools</td>
+<td>Browser report; local preview by default, or the fixed public target below</td>
+</tr>
+<tr>
+<td><code>npm run test:website</code></td>
+<td>Browser-check routes, EN/DE, mobile layout and the supplied HTML-annotation example</td>
+<td>Ignored screenshots/report; local preview by default, or the fixed public target below</td>
+</tr>
+<tr>
+<td><code>npm run test:website-seo</code></td>
+<td>Check 48 static EN/DE routes, language coverage and SEO metadata</td>
+<td>Read-only local-preview or fixed public-target requests; report under ignored <code>test-results/</code></td>
+</tr>
+<tr>
+<td><code>npm run test:research</code></td>
+<td>Check bilingual Research records, source/API links and JSON dialogs</td>
+<td>Ignored browser report; local preview by default, or the fixed public target below</td>
+</tr>
+<tr>
+<td><code>npm run test:library-types</code></td>
+<td>Compile isolated TS/JS consumers and check real IntelliSense completions/hover documentation</td>
+<td>Offline package fixtures; no VS Code UI automation</td>
+</tr>
+<tr>
+<td><code>npm run test:session</code></td>
+<td>Backend browser trust, expiry, restart and revocation contracts</td>
+<td>Isolated temporary session state; no live backend</td>
+</tr>
+<tr>
+<td><code>npm run test:session-ui</code></td>
+<td>Resume/401/race regressions in the actual UI methods</td>
+<td>Fake HTTP only</td>
+</tr>
+<tr>
+<td><code>npm run test:browser-session</code></td>
+<td>Chrome close/reopen, reload, new tabs, logout and temporary sessions</td>
+<td>Isolated browser profile and session trust; no project/source/model writes</td>
+</tr>
+<tr>
+<td><code>npm run test:selection-ui</code></td>
+<td>Deferred HTTP/state regressions for keep, alternatives, retries and cancellation</td>
+<td>Fake HTTP only</td>
+</tr>
+<tr>
+<td><code>npm run test:selection-workflow</code></td>
+<td>Real browser source/keep/proposal workflow against its own temporary fixture</td>
+<td>Registers and edits only its fixture, then unregisters/removes it; no model</td>
+</tr>
+<tr>
+<td><code>npm run test:navigation</code></td>
+<td>Language, compact/focus navigation and overlay browser scenarios</td>
+<td>Browser-local preferences and ignored evidence; requires Studio and the configured pilot website</td>
+</tr>
+<tr>
+<td><code>npm run test:loading-overlay</code></td>
+<td>Check delayed loading without layout shifts; requires running Studio with <code>quality-website</code> and <code>markdown-handbook</code> projects and Chrome</td>
+<td>Read-only project API calls and temporary test-session pairing; ignored screenshots/report under <code>test-results/loading-overlay/</code></td>
+</tr>
+<tr>
+<td><code>npm run test:wiki-i18n</code></td>
+<td>Wiki translation coverage and source-quote preservation</td>
+<td>Offline only</td>
+</tr>
+</tbody></table>
+</div><p>Backend suites (<code>test:backend</code>, <code>test:runner</code>, <code>test:tasks</code>, <code>test:checks</code>,
+<code>test:selection</code>, <code>test:session</code>) and library/UI suites verify their respective
+contracts. Runner tests use fakes. Use an isolated .NET artifacts path when a
+running API could otherwise lock its build files.</p>
+<p><code>session.mjs</code> is an internal helper that reads private session state; it is not
+an evidence exporter. <code>publish-built-frontend.mjs</code> is a local deployment helper,
+not the public ecosystem website deployer.</p>
+<h2 id="public-website-browser-checks">Public website browser checks<a class="heading-anchor" href="#public-website-browser-checks" aria-label="Link to this section">#</a></h2><p>These commands use the fixed public deployment target instead of the local preview:</p>
+<figure class="code-block"><figcaption><span>sh</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="sh code"><code>VOICE_WEBSITE_URL=https://agent-orchestrator.dev/voice/ npm run test:website
+VOICE_WEBSITE_URL=https://agent-orchestrator.dev/voice/ npm run test:research
+VOICE_WEBSITE_URL=https://agent-orchestrator.dev/voice/ npm run test:writing-patterns</code></pre></figure><p>The allowed target is explicit. Public reports are separated from local preview reports; the checks use no Studio session and make no model requests.</p>
+<h2 id="scenario-scripts">Scenario scripts<a class="heading-anchor" href="#scenario-scripts" aria-label="Link to this section">#</a></h2><p>The Agent Studio website pilot requires its actual local source root. Supply
+<code>--website PATH</code>; the scripts do not assume the website is beside this checkout.
+<code>PATH</code> must contain the configured Angular website and its <code>voice.config.json</code>.</p>
+<figure class="code-block"><figcaption><span>sh</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="sh code"><code>npm run test:live -- --website PATH
+node scripts/verify-website-revision.mjs --run --website PATH
+node scripts/reconcile-website-review.mjs --website PATH --dry-run</code></pre></figure><p>The first two checks require the pilot website to be running; <code>test:live</code> also
+requires Studio and registers the supplied folder. Reconciliation requires the
+original audit/import records and matching website root; its dry run writes only
+a local plan. Applying that plan remains a separate, digest-checked operation.</p>
+<p>Existing <code>pilot-*.mjs</code>, <code>import-website-review.mjs</code> and
+<code>reconcile-website-review.mjs</code> are scenario-specific workflows with their own
+source/version assumptions. Some explicitly create tasks, invoke the configured
+model or apply source proposals. They are not generic smoke checks; inspect the
+script and the associated <span class="repository-reference" title="Reference in the source repository">review record</span> before an authorized
+run. Older <code>verify-*.mjs</code> files may target a recorded German pilot interface.
+The current supported entry points are listed above and in <code>package.json</code>.</p>
+<p>See <a href="/voice/guides/maintaining/">file ownership and retention</a> for tracked sources,
+generated output and private runtime files.</p>
+<h2 id="writing-review-measurements">Writing-review measurements<a class="heading-anchor" href="#writing-review-measurements" aria-label="Link to this section">#</a></h2><p><code>npm run benchmark:writing-review</code> builds the writing-rules package and runs
+<code>benchmarks/writing-review/run.mjs</code> over the maintained EN/DE fixtures. It writes
+<code>test-results/writing-review/report.json</code> and makes no provider requests.</p>
+<p>After reviewing the result, <code>npm run benchmark:writing-review:retain</code> verifies
+its input hashes and updates the website measurement summary. Rebuild the site
+to display it. The retained record distinguishes bytes from tokens and local
+scanner candidates from model effectiveness.</p>
+</div><details class="source-details"><summary data-en="Git and source reference" data-de="Git- und Quellbezug">Git and source reference</summary><p>Source for this page: <code>scripts/README.md</code>. Content hash and Git revision: <a href="/voice/build-info.json">Build record</a>.</p><a href="/voice/sources/commands.md" download="" data-en="Download the Markdown source" data-de="Markdown-Quelle herunterladen">Download the Markdown source</a><p>Additional references in the repository:</p><ul><li><code>README.md</code></li><li><code>docs/reviews/</code></li></ul></details><a class="next-guide" href="/voice/guides/verification/"><span data-en="Next guide" data-de="Nächster Guide">Next guide</span><strong>Dated verification evidence →</strong></a></article><aside class="page-outline"><p data-en="On this page" data-de="Auf dieser Seite">On this page</p><nav aria-label="On this page"><a href="#public-website-browser-checks">Public website browser checks</a><a href="#scenario-scripts">Scenario scripts</a><a href="#writing-review-measurements">Writing-review measurements</a></nav></aside></div></main><footer class="site-footer"><a href="https://agent-orchestrator.dev/">Agent Orchestrator ecosystem</a><p data-en="Git and folders · Explicit source changes" data-de="Git und Ordner · Bewusste Quelländerungen">Git and folders · Explicit source changes</p><a href="/voice/build-info.json" data-en="Build record" data-de="Build-Nachweis">Build record</a></footer><script src="/voice/site.js" defer=""></script></body></html>

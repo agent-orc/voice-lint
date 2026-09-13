@@ -1,0 +1,85 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Use AI findings in your application · Voice docs</title><meta name="description" content="Validate model output, attach source spans and pass findings to the review UI."><link rel="canonical" href="https://agent-orchestrator.dev/voice/guides/agent-integration/"><link rel="stylesheet" href="/voice/site.css"><link rel="stylesheet" href="/voice/docs.css"><meta name="theme-color" content="#14271f"><link rel="alternate" hreflang="en" href="https://agent-orchestrator.dev/voice/guides/agent-integration/"><link rel="alternate" hreflang="de" href="https://agent-orchestrator.dev/voice/de/guides/agent-integration/"><link rel="alternate" hreflang="x-default" href="https://agent-orchestrator.dev/voice/guides/agent-integration/"><meta property="og:type" content="website"><meta property="og:site_name" content="Voice Lint"><meta property="og:title" content="Use AI findings in your application · Voice docs"><meta property="og:description" content="Validate model output, attach source spans and pass findings to the review UI."><meta property="og:url" content="https://agent-orchestrator.dev/voice/guides/agent-integration/"><meta property="og:locale" content="en_US"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Use AI findings in your application · Voice docs","description":"Validate model output, attach source spans and pass findings to the review UI.","url":"https://agent-orchestrator.dev/voice/guides/agent-integration/","inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Voice Lint","url":"https://agent-orchestrator.dev/voice/"}}</script></head><body class="guide-page"><a class="skip" href="#content" data-en="Skip to content" data-de="Zum Inhalt">Skip to content</a><header class="site-header"><a class="brand" href="/voice/" aria-label="Voice home">voice <i>/</i></a><nav class="site-nav" aria-label="Main"><div class="nav-tools" role="group" aria-label="Tools / Werkzeuge"><a href="/voice/studio/" data-en="Studio" data-de="Studio">Studio</a><a href="/voice/library/" data-en="Library" data-de="Library">Library</a></div><div class="nav-resources" role="group" aria-label="Knowledge / Wissen"><a href="/voice/research/" data-en="Research" data-de="Forschung">Research</a><a href="/voice/writing-patterns/" data-en="AI anti-patterns" data-de="KI-Negativmuster">AI anti-patterns</a><a href="/voice/docs/" aria-current="page" data-en="Docs" data-de="Doku">Docs</a></div></nav><div class="language" role="group" aria-label="Language / Sprache"><a data-locale="en" href="/voice/guides/agent-integration/" hreflang="en" lang="en" aria-label="English" aria-current="true">EN</a><a data-locale="de" href="/voice/de/guides/agent-integration/" hreflang="de" lang="de" aria-label="Deutsch">DE</a></div></header><main id="content"><div class="docs-breadcrumb"><a href="/voice/docs/" data-en="Docs" data-de="Doku">Docs</a><span aria-hidden="true">/</span><span>Start here</span></div><div class="docs-layout"><aside class="guide-sidebar"><details class="guide-menu" open=""><summary data-en="All guides" data-de="Alle Guides">All guides</summary><nav aria-label="Documentation"><div class="guide-group"><p>Start here</p><a href="/voice/guides/writing-tools/">Writing tools for agents</a><a href="/voice/guides/workflow/">The Studio workflow</a><a href="/voice/guides/library/">Mount the review library</a><a href="/voice/guides/agent-integration/" aria-current="page">Use AI findings in your application</a></div><details class="guide-group guide-group-details"><summary>Reference</summary><a href="/voice/guides/review-benchmarks/">Review benchmarks</a><a href="/voice/guides/writing-rules/">Writing rules and prompt composition</a><a href="/voice/guides/ai-text-signals/">Inspect AI-like writing patterns</a><a href="/voice/guides/session/">Pair once. Resume for seven days.</a><a href="/voice/guides/usability/">Decisions and source versions</a><a href="/voice/guides/library-types/">Types, IntelliSense and examples</a><a href="/voice/guides/live-bridge/">The live-page bridge protocol</a><a href="/voice/guides/runner-integration/">Runner requests and source proposals</a><a href="/voice/guides/checks/">Local build and test checks</a><a href="/voice/guides/holistic-review/">Review source in a Git repository</a></details><details class="guide-group guide-group-details"><summary>Maintenance</summary><a href="/voice/guides/maintaining/">Product files, tools and evidence</a><a href="/voice/guides/commands/">Operator command catalogue</a><a href="/voice/guides/verification/">Dated verification evidence</a><a href="/voice/guides/notices/">Third-party notices</a></details></nav></details></aside><article class="guide-article" lang="en"><header class="guide-heading"><h1>Use AI findings in your application</h1><p class="lead">Validate model output, attach source spans and pass findings to the review UI.</p></header><details class="mobile-outline"><summary data-en="On this page" data-de="Auf dieser Seite">On this page</summary><nav aria-label="Page sections"><a href="#prepare-the-model-input">Prepare the model input</a><a href="#display-a-checked-result">Display a checked result</a><a href="#connect-a-running-website-to-studio">Connect a running website to Studio</a><a href="#save-feedback-or-propose-an-edit">Save feedback or propose an edit</a><a href="#a-task-for-the-integration-agent">A task for the integration agent</a></nav></details><div class="guide-content"><p>Pass validated model findings to <code>@voice/review</code> to display them on the page and
+let a person review the affected text. Your application runs the model and owns
+the source adapter, review UI and persistence. The Library draws the findings and
+returns native text selections.</p>
+<h2 id="prepare-the-model-input">Prepare the model input<a class="heading-anchor" href="#prepare-the-model-input" aria-label="Link to this section">#</a></h2><p>Capture the source version and its mapped text units before starting a review.
+Supply the model with those units, the page's purpose, approved claims and the
+specific questions to assess. Keep the original source version on the result.</p>
+<p>Validate the returned JSON before displaying it. Each inline finding needs the
+fields in <code>Finding</code>: its rule/category/severity, explanation, unit ID, exact quote
+and range. Ranges use zero-based, half-open UTF-16 offsets within the unit.
+Convert explicitly if your model adapter returns code-point offsets. A claim
+without a usable text anchor belongs in the host's report rather than a guessed
+underline. Record omissions and missing evidence in that report.</p>
+<h2 id="display-a-checked-result">Display a checked result<a class="heading-anchor" href="#display-a-checked-result" aria-label="Link to this section">#</a></h2><p>The following TypeScript function takes a result whose JSON shape your host has
+already validated. It also checks the source version and quote before mounting.
+<code>root</code> must contain the adapter's matching <code>data-voice-unit</code> elements; their
+eligible DOM text must equal <code>TextUnit.text</code>.</p>
+<figure class="code-block"><figcaption><span>ts</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="ts code"><code><span class="syntax-keyword">import</span> {
+  mountVoiceReview,
+  <span class="syntax-keyword">type</span> Finding, <span class="syntax-keyword">type</span> SelectionTarget, <span class="syntax-keyword">type</span> TextUnit,
+} <span class="syntax-keyword">from</span> <span class="syntax-string">'@voice/review'</span>;
+
+<span class="syntax-keyword">type</span> Snapshot = { version: <span class="syntax-keyword">string</span>; units: <span class="syntax-keyword">readonly</span> TextUnit[] };
+<span class="syntax-keyword">type</span> CheckedResult = { sourceVersion: <span class="syntax-keyword">string</span>; findings: <span class="syntax-keyword">readonly</span> Finding[] };
+
+<span class="syntax-keyword">export</span> <span class="syntax-keyword">function</span> showModelReview(
+  root: HTMLElement,
+  snapshot: Snapshot,
+  result: CheckedResult,
+  onSelect: (selection: SelectionTarget) =&gt; <span class="syntax-keyword">void</span>,
+) {
+  <span class="syntax-keyword">if</span> (result.sourceVersion !== snapshot.version) {
+    <span class="syntax-keyword">throw</span> <span class="syntax-keyword">new</span> Error(<span class="syntax-string">'Reload the source before reviewing this result.'</span>);
+  }
+  <span class="syntax-keyword">for</span> (<span class="syntax-keyword">const</span> finding <span class="syntax-keyword">of</span> result.findings) {
+    <span class="syntax-keyword">const</span> unit = snapshot.units.find(item =&gt; item.id === finding.unitId);
+    <span class="syntax-keyword">if</span> (!unit || !Number.isInteger(finding.start) || !Number.isInteger(finding.end)
+      || finding.start &lt; <span class="syntax-number">0</span> || finding.end &lt;= finding.start
+      || finding.end &gt; unit.text.length
+      || unit.text.slice(finding.start, finding.end) !== finding.quote) {
+      <span class="syntax-keyword">throw</span> <span class="syntax-keyword">new</span> Error(<span class="syntax-string">'A finding does not match the reviewed source.'</span>);
+    }
+  }
+  <span class="syntax-keyword">return</span> mountVoiceReview({
+    root, units: snapshot.units, findings: result.findings, feedback: [], onSelect,
+  });
+}</code></pre></figure><p>Use the returned controller's <code>getDiagnostics()</code> to inspect unmapped units and
+stale anchors. Call <code>update({ findings, feedback })</code> when the same view receives
+new review data. Call <code>dispose()</code> on route teardown or iframe replacement.
+Provide an accessible findings list alongside the marks. The
+<a href="/voice/guides/library-types/">typed integration guide</a> covers package setup and complete
+TypeScript/JavaScript examples.</p>
+<h2 id="connect-a-running-website-to-studio">Connect a running website to Studio<a class="heading-anchor" href="#connect-a-running-website-to-studio" aria-label="Link to this section">#</a></h2><p>For a site reviewed inside Studio, install the built Library and call
+<code>connectVoiceStudio({ studioOrigin: 'http://127.0.0.1:5188' })</code> behind your
+application's development and review opt-in guard. Configure the route's source
+file and related renderer files in <code>voice.config.json</code>. The
+<a href="/voice/guides/live-bridge/">bridge guide</a> defines origin checks, route
+changes and disposal. The website needs an explicit integration and framing
+permission for the local Studio origin.</p>
+<p>Studio supplies the review controller through this bridge; do not mount another
+one over the same page. Backend tokens belong in the Studio host session and are
+not sent to the website.</p>
+<h2 id="save-feedback-or-propose-an-edit">Save feedback or propose an edit<a class="heading-anchor" href="#save-feedback-or-propose-an-edit" aria-label="Link to this section">#</a></h2><p>An authorized host can use <code>createReviewClient</code> for <code>getDocument</code> and
+<code>saveFeedback</code>. Pass the current in-memory token through its token getter and
+carry <code>expectedVersion</code>, <code>expectedReviewRevision</code> and <code>requestId</code> unchanged.
+Use the same request ID for a retry of the same payload. On a conflict, preserve
+the draft and review it against the refreshed source.</p>
+<p>Studio's backend also provides keep decisions, generated alternatives, semantic
+file reviews and source tasks. Their endpoints and version checks are described
+in the <a href="/voice/guides/workflow/">workflow</a> and <a href="/voice/guides/runner-integration/">Runner guide</a>.
+Choosing an alternative prepares a diff; applying it is a separate action.
+Model execution needs an explicitly configured Runner route and a start request.</p>
+<h2 id="a-task-for-the-integration-agent">A task for the integration agent<a class="heading-anchor" href="#a-task-for-the-integration-agent" aria-label="Link to this section">#</a></h2><figure class="code-block"><figcaption><span>text</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="text code"><code>Add opt-in Voice review to [application/route].
+
+Map the rendered text to [source file] with exact TextUnit IDs and UTF-16 ranges.
+Use the built @voice/review package and [exact local Studio origin].
+Keep model execution in the host; validate results against the captured source.
+Provide an accessible findings list, native selection and review callbacks.
+Save feedback through the backend with source/review preconditions.
+Dispose the integration on teardown and clear stale anchors on navigation.
+
+Verify inline markup, an emoji before the selected text, native links/buttons,
+missing mappings, reload/disposal and a narrow and wide viewport.
+Return the changed files, source/build identity, results and remaining gaps.
+Use the task's existing authorization for model starts and source/Git changes.</code></pre></figure></div><details class="source-details"><summary data-en="Git and source reference" data-de="Git- und Quellbezug">Git and source reference</summary><p>Source for this page: <code>docs/agent-integration.md</code>. Content hash and Git revision: <a href="/voice/build-info.json">Build record</a>.</p><a href="/voice/sources/agent-integration.md" download="" data-en="Download the Markdown source" data-de="Markdown-Quelle herunterladen">Download the Markdown source</a></details><a class="next-guide" href="/voice/guides/runner-integration/"><span data-en="Next guide" data-de="Nächster Guide">Next guide</span><strong>Runner requests and source proposals →</strong></a></article><aside class="page-outline"><p data-en="On this page" data-de="Auf dieser Seite">On this page</p><nav aria-label="On this page"><a href="#prepare-the-model-input">Prepare the model input</a><a href="#display-a-checked-result">Display a checked result</a><a href="#connect-a-running-website-to-studio">Connect a running website to Studio</a><a href="#save-feedback-or-propose-an-edit">Save feedback or propose an edit</a><a href="#a-task-for-the-integration-agent">A task for the integration agent</a></nav></aside></div></main><footer class="site-footer"><a href="https://agent-orchestrator.dev/">Agent Orchestrator ecosystem</a><p data-en="Git and folders · Explicit source changes" data-de="Git und Ordner · Bewusste Quelländerungen">Git and folders · Explicit source changes</p><a href="/voice/build-info.json" data-en="Build record" data-de="Build-Nachweis">Build record</a></footer><script src="/voice/site.js" defer=""></script></body></html>

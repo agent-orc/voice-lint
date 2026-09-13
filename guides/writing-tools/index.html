@@ -1,0 +1,173 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Writing tools for agents · Voice docs</title><meta name="description" content="Register four LLM tools for rule knowledge, review prompts, local signals and host-supplied model evidence."><link rel="canonical" href="https://agent-orchestrator.dev/voice/guides/writing-tools/"><link rel="stylesheet" href="/voice/site.css"><link rel="stylesheet" href="/voice/docs.css"><meta name="theme-color" content="#14271f"><link rel="alternate" hreflang="en" href="https://agent-orchestrator.dev/voice/guides/writing-tools/"><link rel="alternate" hreflang="de" href="https://agent-orchestrator.dev/voice/de/guides/writing-tools/"><link rel="alternate" hreflang="x-default" href="https://agent-orchestrator.dev/voice/guides/writing-tools/"><meta property="og:type" content="website"><meta property="og:site_name" content="Voice Lint"><meta property="og:title" content="Writing tools for agents · Voice docs"><meta property="og:description" content="Register four LLM tools for rule knowledge, review prompts, local signals and host-supplied model evidence."><meta property="og:url" content="https://agent-orchestrator.dev/voice/guides/writing-tools/"><meta property="og:locale" content="en_US"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Writing tools for agents · Voice docs","description":"Register four LLM tools for rule knowledge, review prompts, local signals and host-supplied model evidence.","url":"https://agent-orchestrator.dev/voice/guides/writing-tools/","inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Voice Lint","url":"https://agent-orchestrator.dev/voice/"}}</script></head><body class="guide-page"><a class="skip" href="#content" data-en="Skip to content" data-de="Zum Inhalt">Skip to content</a><header class="site-header"><a class="brand" href="/voice/" aria-label="Voice home">voice <i>/</i></a><nav class="site-nav" aria-label="Main"><div class="nav-tools" role="group" aria-label="Tools / Werkzeuge"><a href="/voice/studio/" data-en="Studio" data-de="Studio">Studio</a><a href="/voice/library/" data-en="Library" data-de="Library">Library</a></div><div class="nav-resources" role="group" aria-label="Knowledge / Wissen"><a href="/voice/research/" data-en="Research" data-de="Forschung">Research</a><a href="/voice/writing-patterns/" data-en="AI anti-patterns" data-de="KI-Negativmuster">AI anti-patterns</a><a href="/voice/docs/" aria-current="page" data-en="Docs" data-de="Doku">Docs</a></div></nav><div class="language" role="group" aria-label="Language / Sprache"><a data-locale="en" href="/voice/guides/writing-tools/" hreflang="en" lang="en" aria-label="English" aria-current="true">EN</a><a data-locale="de" href="/voice/de/guides/writing-tools/" hreflang="de" lang="de" aria-label="Deutsch">DE</a></div></header><main id="content"><div class="docs-breadcrumb"><a href="/voice/docs/" data-en="Docs" data-de="Doku">Docs</a><span aria-hidden="true">/</span><span>Start here</span></div><div class="docs-layout"><aside class="guide-sidebar"><details class="guide-menu" open=""><summary data-en="All guides" data-de="Alle Guides">All guides</summary><nav aria-label="Documentation"><div class="guide-group"><p>Start here</p><a href="/voice/guides/writing-tools/" aria-current="page">Writing tools for agents</a><a href="/voice/guides/workflow/">The Studio workflow</a><a href="/voice/guides/library/">Mount the review library</a><a href="/voice/guides/agent-integration/">Use AI findings in your application</a></div><details class="guide-group guide-group-details"><summary>Reference</summary><a href="/voice/guides/review-benchmarks/">Review benchmarks</a><a href="/voice/guides/writing-rules/">Writing rules and prompt composition</a><a href="/voice/guides/ai-text-signals/">Inspect AI-like writing patterns</a><a href="/voice/guides/session/">Pair once. Resume for seven days.</a><a href="/voice/guides/usability/">Decisions and source versions</a><a href="/voice/guides/library-types/">Types, IntelliSense and examples</a><a href="/voice/guides/live-bridge/">The live-page bridge protocol</a><a href="/voice/guides/runner-integration/">Runner requests and source proposals</a><a href="/voice/guides/checks/">Local build and test checks</a><a href="/voice/guides/holistic-review/">Review source in a Git repository</a></details><details class="guide-group guide-group-details"><summary>Maintenance</summary><a href="/voice/guides/maintaining/">Product files, tools and evidence</a><a href="/voice/guides/commands/">Operator command catalogue</a><a href="/voice/guides/verification/">Dated verification evidence</a><a href="/voice/guides/notices/">Third-party notices</a></details></nav></details></aside><article class="guide-article" lang="en"><header class="guide-heading"><h1>Writing tools for agents</h1><p class="lead">Register four LLM tools for rule knowledge, review prompts, local signals and host-supplied model evidence.</p></header><details class="mobile-outline"><summary data-en="On this page" data-de="Auf dieser Seite">On this page</summary><nav aria-label="Page sections"><a href="#register-and-dispatch-tools">Register and dispatch tools</a><a href="#tool-inputs-and-results">Tool inputs and results</a><a href="#read-model-quality-evidence">Read model quality evidence</a><a href="#review-results-before-using-them">Review results before using them</a></nav></details><div class="guide-content"><p><code>@voice/writing-rules/tools</code> exposes four read-only tools for an agent. The host
+registers their JSON schemas with its model provider and dispatches returned tool
+calls. The adapter retrieves rule knowledge, composes review instructions, scans
+literal phrases, and reads quality evidence supplied by the host.</p>
+<p><code>@voice/writing-rules</code> supplies the analysis and review instructions.
+<code>@voice/review</code> supplies HTML selection and finding visualization. An agent can
+use the tools without a browser. A website can display findings supplied by any
+compatible review engine.</p>
+<h2 id="register-and-dispatch-tools">Register and dispatch tools<a class="heading-anchor" href="#register-and-dispatch-tools" aria-label="Link to this section">#</a></h2><figure class="code-block"><figcaption><span>ts</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="ts code"><code><span class="syntax-keyword">import</span> {
+  writingReviewTools,
+  createWritingToolDispatcher,
+  <span class="syntax-keyword">type</span> WritingToolCall,
+} <span class="syntax-keyword">from</span> <span class="syntax-string">'@voice/writing-rules/tools'</span>;
+
+<span class="syntax-keyword">const</span> dispatcher = createWritingToolDispatcher({
+  reviewContext: {
+    audience: <span class="syntax-string">'Developers reading the setup guide'</span>,
+    goal: <span class="syntax-string">'Open a project folder and complete the first review'</span>,
+  },
+});
+
+<span class="syntax-comment">// Adapt each { name, description, inputSchema } descriptor to the provider's</span>
+<span class="syntax-comment">// tool format. The host owns registration, model execution and conversation.</span>
+<span class="syntax-keyword">const</span> definitions = writingReviewTools;
+
+<span class="syntax-comment">// Example of an already decoded model tool call; no model is called here.</span>
+<span class="syntax-keyword">const</span> call: WritingToolCall = {
+  name: <span class="syntax-string">'find_writing_signals'</span>,
+  arguments: {
+    text: <span class="syntax-string">'A powerful review panel.'</span>,
+    language: <span class="syntax-string">'en'</span>,
+    ruleIds: [<span class="syntax-string">'word-choice'</span>],
+  },
+};
+<span class="syntax-keyword">const</span> result = <span class="syntax-keyword">await</span> dispatcher.dispatch(call);
+<span class="syntax-comment">// The host can return JSON.stringify(result) as the provider's tool result.</span></code></pre></figure><p>Descriptors are provider-neutral JSON Schema objects, not provider SDK request
+objects. The dispatcher accepts a decoded arguments object. It returns
+<code>{ ok: true, tool, data }</code> or <code>{ ok: false, tool, error: { code, message } }</code>.
+Unknown tools, extra fields, unsupported languages and invalid selections return
+structured errors. There is no silent change to the requested coverage.</p>
+<p>The host fixes the audience and goal when constructing the dispatcher. A tool
+call cannot replace them, register a callback, configure an endpoint or execute
+source text. Raw documents remain untrusted review material. The package has no
+network, filesystem, credential, provider SDK or model-execution dependency.</p>
+<h2 id="tool-inputs-and-results">Tool inputs and results<a class="heading-anchor" href="#tool-inputs-and-results" aria-label="Link to this section">#</a></h2><div class="table-scroll" tabindex="0" role="region" aria-label="Documentation table"><table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Inputs</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>get_writing_rules</code></td>
+<td>Optional <code>profile</code>, <code>ruleIds</code>, <code>language</code>, <code>detail</code></td>
+<td>Concise rule list by default. <code>detail: "full"</code> returns complete rules, localized prompts/examples, exceptions and their catalogue evidence sources.</td>
+</tr>
+<tr>
+<td><code>compose_writing_review_prompt</code></td>
+<td>Optional <code>profile</code>, <code>ruleIds</code>, <code>language</code>, <code>maxFindings</code></td>
+<td>Canonical prompt text, selected rule IDs and catalogue version. Requires host audience/goal. Defaults to the six public-docs rules.</td>
+</tr>
+<tr>
+<td><code>find_writing_signals</code></td>
+<td>Required <code>text</code>; optional <code>profile</code>, <code>ruleIds</code>, <code>language</code>, <code>maxSignals</code></td>
+<td>Published regex candidates with quoted UTF-16 spans, scanned/unscanned rules and truncation status.</td>
+</tr>
+<tr>
+<td><code>get_model_comparison_evidence</code></td>
+<td>Required <code>language</code>, <code>profile</code>, <code>role: "reviewer"</code>, <code>cohortId</code></td>
+<td>Exact-scope evidence supplied by the host, or <code>evidence-missing</code>.</td>
+</tr>
+</tbody></table>
+</div><p>Supported languages are <code>en</code> and <code>de</code>; omitted language defaults to English for
+the first three tools. Profiles are <code>public-docs</code>, <code>technical-reference</code>,
+<code>product-copy</code> and <code>agent-report</code>. Explicit rule IDs must belong to a selected
+profile. Empty or duplicate ID arrays are rejected.</p>
+<p><code>maxFindings</code> accepts 1–20 and defaults to five. It requests a response format; it
+does not constrain inference execution. <code>maxSignals</code> accepts 1–500 and defaults
+to 50. Input text is limited to 250,000 UTF-16 code units. JSON Schema's string
+length and JavaScript UTF-16 length can differ for supplementary characters;
+runtime validation enforces the UTF-16 limit.</p>
+<figure class="code-block"><figcaption><span>ts</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="ts code"><code><span class="syntax-keyword">const</span> knowledge = <span class="syntax-keyword">await</span> dispatcher.dispatch({
+  name: <span class="syntax-string">'get_writing_rules'</span>,
+  arguments: { ruleIds: [<span class="syntax-string">'reader-goal'</span>, <span class="syntax-string">'word-choice'</span>], detail: <span class="syntax-string">'full'</span> },
+});
+
+<span class="syntax-keyword">const</span> instructions = <span class="syntax-keyword">await</span> dispatcher.dispatch({
+  name: <span class="syntax-string">'compose_writing_review_prompt'</span>,
+  arguments: { profile: <span class="syntax-string">'public-docs'</span>, language: <span class="syntax-string">'en'</span>, maxFindings: <span class="syntax-number">3</span> },
+});</code></pre></figure><p>Full knowledge returns bilingual catalogue records; <code>language</code> localizes summary
+titles and selects the prompt/scanner language. The composer includes selected
+instructions and conditional examples. It does not append research articles or
+every catalogue metadata field. Adding an article to the website does not update
+the package's rule knowledge automatically.</p>
+<h2 id="read-model-quality-evidence">Read model quality evidence<a class="heading-anchor" href="#read-model-quality-evidence" aria-label="Link to this section">#</a></h2><p>The host supplies available model IDs, allowed cohort IDs and a read-only evidence
+callback. These values come from application configuration and the host's model
+catalogue. The tool call supplies only the requested review scope.</p>
+<figure class="code-block"><figcaption><span>ts</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="ts code"><code><span class="syntax-keyword">import</span> {
+  createWritingToolDispatcher,
+  <span class="syntax-keyword">type</span> ModelComparisonEvidence,
+} <span class="syntax-keyword">from</span> <span class="syntax-string">'@voice/writing-rules/tools'</span>;
+
+<span class="syntax-keyword">const</span> evidenceTools = createWritingToolDispatcher({
+  modelComparisonContext: {
+    availableModelIds: [<span class="syntax-string">'model-id-resolved-by-the-host'</span>],
+    cohortIds: [<span class="syntax-string">'public-docs-held-out-v1'</span>],
+  },
+  getModelComparisonEvidence: <span class="syntax-keyword">async</span> (query, context) =&gt; {
+    <span class="syntax-comment">// A host can read retained, independently reviewed benchmark results here.</span>
+    <span class="syntax-comment">// This example deliberately has no measured comparison to return.</span>
+    <span class="syntax-keyword">const</span> result: ModelComparisonEvidence = {
+      status: <span class="syntax-string">'evidence-missing'</span>,
+      query,
+      bestValue: <span class="syntax-keyword">null</span>,
+      highestDetection: <span class="syntax-keyword">null</span>,
+      sources: [],
+      explanation: <span class="syntax-string">'No independently reviewed comparison is available for this scope.'</span>,
+      limitations: [
+        <span class="syntax-string">'The authored pilot and researched token prices do not qualify a model.'</span>,
+      ],
+    };
+    <span class="syntax-keyword">return</span> result;
+  },
+});
+
+<span class="syntax-keyword">const</span> evidence = <span class="syntax-keyword">await</span> evidenceTools.dispatch({
+  name: <span class="syntax-string">'get_model_comparison_evidence'</span>,
+  arguments: {
+    language: <span class="syntax-string">'en'</span>,
+    profile: <span class="syntax-string">'public-docs'</span>,
+    role: <span class="syntax-string">'reviewer'</span>,
+    cohortId: <span class="syntax-string">'public-docs-held-out-v1'</span>,
+  },
+});</code></pre></figure><p>The callback contract permits reading retained evidence. It must not start
+inference, change a route, or write state. The library itself makes no such calls,
+but it cannot sandbox arbitrary host callback code. Query and context snapshots
+are frozen; later mutations of the host's input arrays do not change the dispatcher.</p>
+<p>An available comparison provides <code>bestValue</code>, <code>highestDetection</code>, or both. Each
+selection contains the host's model ID, source IDs, independent-judgment marker,
+planned/judged/accepted complete-review counts, detection counts, false-change
+counts, all-attempt cost and limitations. Source records carry a location and
+SHA-256. Locations are returned as data and never fetched by this adapter.</p>
+<ul>
+<li><code>bestValue</code> requires independently judged reviews, at least one accepted
+complete review, and known cost including failed/retried attempts.</li>
+<li><code>highestDetection</code> requires independent issue-level judgments: detected and
+expected problem counts, plus false-change counts. Sparse fixture-label
+agreement cannot supply this evidence.</li>
+<li>Unknown measures remain <code>null</code>. A comparison can provide value evidence while
+leaving detection evidence unavailable.</li>
+</ul>
+<p>The host explains its quality criteria and comparison limitations. It must use
+matched scope, supported model settings and reproducible reports when making a
+selection. The adapter validates structure, source references, available IDs,
+counts and exact language/profile/role/cohort. It does not verify report contents
+or compute an optimal model. A host may use existing Token Economy contracts for
+model resolution and cost evidence; this package provides no replacement router.</p>
+<p>Missing callbacks/context return <code>evidence-missing</code> with null selections. A failed
+callback returns <code>host-evidence-failed</code>; a malformed or mismatched response returns
+<code>invalid-host-evidence</code>. Neither path substitutes a different model or locale.</p>
+<h2 id="review-results-before-using-them">Review results before using them<a class="heading-anchor" href="#review-results-before-using-them" aria-label="Link to this section">#</a></h2><p>The static scanner recognizes eight rules through sixteen EN/DE regex records.
+It does not exclude code, quotations or negation, and it does not assess meaning,
+factual support, page structure or authorship. Every match requires review.</p>
+<p>The prompt tool prepares instructions; the host decides whether to submit them
+and validates any returned judgment. The host also maps source spans, preserves
+author decisions and provides findings to <code>@voice/review</code> when HTML visualization
+is needed. Tool execution alone never changes a document.</p>
+<p>Run the local adapter contract tests with:</p>
+<figure class="code-block"><figcaption><span>sh</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="sh code"><code>npm --prefix packages/writing-rules test</code></pre></figure><p>These tests dispatch synthetic tool calls and validate real catalogue, prompt and
+regex results. Evidence fixtures exercise missing/invalid data and the read-only
+boundary. They do not measure model quality, prices or execution latency.</p>
+</div><details class="source-details"><summary data-en="Git and source reference" data-de="Git- und Quellbezug">Git and source reference</summary><p>Source for this page: <code>packages/writing-rules/TOOLS.md</code>. Content hash and Git revision: <a href="/voice/build-info.json">Build record</a>.</p><a href="/voice/sources/writing-tools.md" download="" data-en="Download the Markdown source" data-de="Markdown-Quelle herunterladen">Download the Markdown source</a></details></article><aside class="page-outline"><p data-en="On this page" data-de="Auf dieser Seite">On this page</p><nav aria-label="On this page"><a href="#register-and-dispatch-tools">Register and dispatch tools</a><a href="#tool-inputs-and-results">Tool inputs and results</a><a href="#read-model-quality-evidence">Read model quality evidence</a><a href="#review-results-before-using-them">Review results before using them</a></nav></aside></div></main><footer class="site-footer"><a href="https://agent-orchestrator.dev/">Agent Orchestrator ecosystem</a><p data-en="Git and folders · Explicit source changes" data-de="Git und Ordner · Bewusste Quelländerungen">Git and folders · Explicit source changes</p><a href="/voice/build-info.json" data-en="Build record" data-de="Build-Nachweis">Build record</a></footer><script src="/voice/site.js" defer=""></script></body></html>

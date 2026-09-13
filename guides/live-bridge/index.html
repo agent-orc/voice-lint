@@ -1,0 +1,78 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>The live-page bridge protocol · Voice docs</title><meta name="description" content="Development opt-in, exact origins, source mapping and version 1 postMessage envelopes."><link rel="canonical" href="https://agent-orchestrator.dev/voice/guides/live-bridge/"><link rel="stylesheet" href="/voice/site.css"><link rel="stylesheet" href="/voice/docs.css"><meta name="theme-color" content="#14271f"><link rel="alternate" hreflang="en" href="https://agent-orchestrator.dev/voice/guides/live-bridge/"><link rel="alternate" hreflang="de" href="https://agent-orchestrator.dev/voice/de/guides/live-bridge/"><link rel="alternate" hreflang="x-default" href="https://agent-orchestrator.dev/voice/guides/live-bridge/"><meta property="og:type" content="website"><meta property="og:site_name" content="Voice Lint"><meta property="og:title" content="The live-page bridge protocol · Voice docs"><meta property="og:description" content="Development opt-in, exact origins, source mapping and version 1 postMessage envelopes."><meta property="og:url" content="https://agent-orchestrator.dev/voice/guides/live-bridge/"><meta property="og:locale" content="en_US"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"The live-page bridge protocol · Voice docs","description":"Development opt-in, exact origins, source mapping and version 1 postMessage envelopes.","url":"https://agent-orchestrator.dev/voice/guides/live-bridge/","inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Voice Lint","url":"https://agent-orchestrator.dev/voice/"}}</script></head><body class="guide-page"><a class="skip" href="#content" data-en="Skip to content" data-de="Zum Inhalt">Skip to content</a><header class="site-header"><a class="brand" href="/voice/" aria-label="Voice home">voice <i>/</i></a><nav class="site-nav" aria-label="Main"><div class="nav-tools" role="group" aria-label="Tools / Werkzeuge"><a href="/voice/studio/" data-en="Studio" data-de="Studio">Studio</a><a href="/voice/library/" data-en="Library" data-de="Library">Library</a></div><div class="nav-resources" role="group" aria-label="Knowledge / Wissen"><a href="/voice/research/" data-en="Research" data-de="Forschung">Research</a><a href="/voice/writing-patterns/" data-en="AI anti-patterns" data-de="KI-Negativmuster">AI anti-patterns</a><a href="/voice/docs/" aria-current="page" data-en="Docs" data-de="Doku">Docs</a></div></nav><div class="language" role="group" aria-label="Language / Sprache"><a data-locale="en" href="/voice/guides/live-bridge/" hreflang="en" lang="en" aria-label="English" aria-current="true">EN</a><a data-locale="de" href="/voice/de/guides/live-bridge/" hreflang="de" lang="de" aria-label="Deutsch">DE</a></div></header><main id="content"><div class="docs-breadcrumb"><a href="/voice/docs/" data-en="Docs" data-de="Doku">Docs</a><span aria-hidden="true">/</span><span>Reference</span></div><div class="docs-layout"><aside class="guide-sidebar"><details class="guide-menu" open=""><summary data-en="All guides" data-de="Alle Guides">All guides</summary><nav aria-label="Documentation"><div class="guide-group"><p>Start here</p><a href="/voice/guides/writing-tools/">Writing tools for agents</a><a href="/voice/guides/workflow/">The Studio workflow</a><a href="/voice/guides/library/">Mount the review library</a><a href="/voice/guides/agent-integration/">Use AI findings in your application</a></div><details class="guide-group guide-group-details" open=""><summary>Reference</summary><a href="/voice/guides/review-benchmarks/">Review benchmarks</a><a href="/voice/guides/writing-rules/">Writing rules and prompt composition</a><a href="/voice/guides/ai-text-signals/">Inspect AI-like writing patterns</a><a href="/voice/guides/session/">Pair once. Resume for seven days.</a><a href="/voice/guides/usability/">Decisions and source versions</a><a href="/voice/guides/library-types/">Types, IntelliSense and examples</a><a href="/voice/guides/live-bridge/" aria-current="page">The live-page bridge protocol</a><a href="/voice/guides/runner-integration/">Runner requests and source proposals</a><a href="/voice/guides/checks/">Local build and test checks</a><a href="/voice/guides/holistic-review/">Review source in a Git repository</a></details><details class="guide-group guide-group-details"><summary>Maintenance</summary><a href="/voice/guides/maintaining/">Product files, tools and evidence</a><a href="/voice/guides/commands/">Operator command catalogue</a><a href="/voice/guides/verification/">Dated verification evidence</a><a href="/voice/guides/notices/">Third-party notices</a></details></nav></details></aside><article class="guide-article" lang="en"><header class="guide-heading"><h1>The live-page bridge protocol</h1><p class="lead">Development opt-in, exact origins, source mapping and version 1 postMessage envelopes.</p></header><details class="mobile-outline"><summary data-en="On this page" data-de="Auf dieser Seite">On this page</summary><nav aria-label="Page sections"><a href="#add-the-bridge-to-the-sites-development-entry-point">Add the bridge to the site's development entry point</a><a href="#connect-the-live-dom-to-the-source">Connect the live DOM to the source</a><a href="#protocol-version-1">Protocol version 1</a></nav></details><div class="guide-content"><p>The live bridge runs inside a website that explicitly integrates it. Studio
+embeds that site's actual development-server URL. The site's scripts, CSS,
+native links, framework rendering and router continue to run on its own origin.</p>
+<h2 id="add-the-bridge-to-the-sites-development-entry-point">Add the bridge to the site's development entry point<a class="heading-anchor" href="#add-the-bridge-to-the-sites-development-entry-point" aria-label="Link to this section">#</a></h2><figure class="code-block"><figcaption><span>ts</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="ts code"><code><span class="syntax-keyword">import</span> { connectVoiceStudio } <span class="syntax-keyword">from</span> <span class="syntax-string">'@voice/review'</span>;
+
+<span class="syntax-keyword">const</span> connection = connectVoiceStudio({
+  studioOrigin: <span class="syntax-string">'http://127.0.0.1:4188'</span>
+});
+
+<span class="syntax-comment">// Dispose when the development integration is unloaded (e.g. HMR cleanup).</span>
+<span class="syntax-comment">// connection.dispose();</span></code></pre></figure><p>For plain HTML, serve the built <code>dist/voice-review.js</code> from the target site's
+own development assets and load it normally:</p>
+<figure class="code-block"><figcaption><span>html</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="html code"><code>&lt;script src="/dev/voice-review.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  const voiceConnection = VoiceReview.connectVoiceStudio({
+    studioOrigin: 'http://127.0.0.1:4188'
+  });
+&lt;/script&gt;</code></pre></figure><p>Keep this opt-in integration in development mode. Use the Studio's exact origin:
+<code>localhost</code> and <code>127.0.0.1</code> are different origins, as are different ports. No
+wildcard is accepted. The bridge receives only review data and sends selections,
+annotation IDs, mapping diagnostics and the current page location. It never
+receives the local backend pairing token or provider credentials.</p>
+<h2 id="connect-the-live-dom-to-the-source">Connect the live DOM to the source<a class="heading-anchor" href="#connect-the-live-dom-to-the-source" aria-label="Link to this section">#</a></h2><p>Explicit <code>data-voice-unit</code> attributes are preferred. The identifier must match
+the source adapter's <code>TextUnit.id</code>, and its eligible DOM text must match that
+unit's text exactly. A framework/i18n application needs a source adapter that
+identifies its actual template or translation string. A rendered route is not
+itself a source filename, and translated runtime text is not interchangeable
+with a different-language fallback in an HTML file.</p>
+<p>Without an explicit identifier, the bridge can temporarily mark one <strong>unique,
+exact visible element-text occurrence</strong>. It chooses the deepest element when
+an element and its only text-bearing descendant represent the same occurrence.
+Repeated text, duplicate unassigned source units, mismatched explicit IDs and
+ambiguous matches remain unmapped. It does not trim/collapse text, guess from
+similar wording or wrap native text nodes. Inline source fragments that do not
+correspond to a complete element need explicit adapter support.</p>
+<p>Only temporary <code>data-voice-unit</code> attributes are added; they are restored when
+the review is replaced or disconnected. Native nodes, links and event handlers
+are preserved. Code, hidden regions, editable controls and <code>data-voice-exclude</code>
+regions are excluded. Normal DOM updates trigger remapping; <code>refresh()</code> is
+available for host-specific rendering lifecycles.</p>
+<h2 id="protocol-version-1">Protocol version 1<a class="heading-anchor" href="#protocol-version-1" aria-label="Link to this section">#</a></h2><p>The exported <code>VoiceStudioParentMessage</code> and <code>VoiceStudioChildMessage</code> types are
+the transport contract. The parent uses <code>postMessage</code> with the target site's
+exact origin and checks message origin <strong>and</strong> <code>event.source</code> itself. The bridge
+accepts only its explicitly configured Studio origin and its actual parent or
+opener window; after connection it retains that peer.</p>
+<ol>
+<li>Parent sends <code>voice-studio:connect</code> with a fresh random <code>sessionId</code> (16-128
+ASCII letters, digits, <code>_</code> or <code>-</code>; <code>crypto.randomUUID()</code> is suitable).</li>
+<li>Child replies <code>voice-studio:ready</code> with <code>sessionId</code>, <code>protocolVersion: 1</code>,
+current <code>url</code> and <code>title</code>.</li>
+<li>Parent resolves the correct source document, then sends <code>voice-studio:review</code>
+with <code>sessionId</code>, a fresh <code>reviewId</code>, exact <code>pageUrl</code>, <code>units</code>, <code>findings</code> and
+<code>feedback</code>. <code>pageUrl</code> includes query and fragment. All spans remain UTF-16.</li>
+<li>Child returns <code>voice-studio:mapping</code> with <code>reviewId</code> and diagnostics. Selection
+replies carry <code>selection</code>; annotation clicks return <code>findingId</code> or
+<code>feedbackId</code>, under <code>voice-studio:selection</code>, <code>voice-studio:finding</code> and
+<code>voice-studio:feedback</code>. Parent ignores stale session/review IDs.</li>
+<li>SPA history changes, hash/popstate events and location changes send
+<code>voice-studio:location</code>. URL changes immediately clear old review anchors.
+Parent resolves and sends a new review for the new exact page URL.</li>
+<li>Parent can send <code>voice-studio:select-finding</code> with <code>sessionId</code>, <code>reviewId</code> and
+<code>findingId</code> (or <code>null</code>) to focus a report finding, or <code>voice-studio:navigate</code>
+with <code>sessionId</code> and <code>action: 'back' | 'forward' | 'reload'</code> for native history.</li>
+<li><code>voice-studio:disconnect</code> clears the review and session. A full page reload
+creates a new bridge instance and requires a fresh connection handshake.</li>
+</ol>
+<p>Malformed reviews or a review for an outdated page URL produce a scoped
+<code>voice-studio:error</code>; messages from other origins, windows or sessions are
+ignored.</p>
+<p>The Studio host currently uses an iframe. The target site's CSP/frame headers
+must allow the Studio origin to embed it and its development CSP must allow the
+bridge asset and annotation styles. An external page opened with <code>noopener</code>
+has no connected Studio opener; opening it separately is ordinary browsing,
+not a connected review fallback. Remote pages without this opt-in bridge,
+closed shadow roots, unsupported source adapters and iframe-blocking headers
+remain explicit limitations. Live review never grants a page authority to
+write source files: persistence and reviewed diffs remain in the Studio backend.</p>
+</div><details class="source-details"><summary data-en="Git and source reference" data-de="Git- und Quellbezug">Git and source reference</summary><p>Source for this page: <code>packages/review/LIVE-BRIDGE.md</code>. Content hash and Git revision: <a href="/voice/build-info.json">Build record</a>.</p><a href="/voice/sources/live-bridge.md" download="" data-en="Download the Markdown source" data-de="Markdown-Quelle herunterladen">Download the Markdown source</a></details><a class="next-guide" href="/voice/guides/agent-integration/"><span data-en="Next guide" data-de="Nächster Guide">Next guide</span><strong>Use AI findings in your application →</strong></a></article><aside class="page-outline"><p data-en="On this page" data-de="Auf dieser Seite">On this page</p><nav aria-label="On this page"><a href="#add-the-bridge-to-the-sites-development-entry-point">Add the bridge to the site's development entry point</a><a href="#connect-the-live-dom-to-the-source">Connect the live DOM to the source</a><a href="#protocol-version-1">Protocol version 1</a></nav></aside></div></main><footer class="site-footer"><a href="https://agent-orchestrator.dev/">Agent Orchestrator ecosystem</a><p data-en="Git and folders · Explicit source changes" data-de="Git und Ordner · Bewusste Quelländerungen">Git and folders · Explicit source changes</p><a href="/voice/build-info.json" data-en="Build record" data-de="Build-Nachweis">Build record</a></footer><script src="/voice/site.js" defer=""></script></body></html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Der Ablauf in Studio · Voice docs</title><meta name="description" content="Vom registrierten Ordner und der laufenden Seite zur ausdrücklich angewendeten Quelländerung mit Versionsprüfung."><link rel="canonical" href="https://agent-orchestrator.dev/voice/de/guides/workflow/"><link rel="stylesheet" href="/voice/site.css"><link rel="stylesheet" href="/voice/docs.css"><meta name="theme-color" content="#14271f"><link rel="alternate" hreflang="en" href="https://agent-orchestrator.dev/voice/guides/workflow/"><link rel="alternate" hreflang="de" href="https://agent-orchestrator.dev/voice/de/guides/workflow/"><link rel="alternate" hreflang="x-default" href="https://agent-orchestrator.dev/voice/guides/workflow/"><meta property="og:type" content="website"><meta property="og:site_name" content="Voice Lint"><meta property="og:title" content="Der Ablauf in Studio · Voice docs"><meta property="og:description" content="Vom registrierten Ordner und der laufenden Seite zur ausdrücklich angewendeten Quelländerung mit Versionsprüfung."><meta property="og:url" content="https://agent-orchestrator.dev/voice/de/guides/workflow/"><meta property="og:locale" content="de_DE"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Der Ablauf in Studio · Voice docs","description":"Vom registrierten Ordner und der laufenden Seite zur ausdrücklich angewendeten Quelländerung mit Versionsprüfung.","url":"https://agent-orchestrator.dev/voice/de/guides/workflow/","inLanguage":"de","isPartOf":{"@type":"WebSite","name":"Voice Lint","url":"https://agent-orchestrator.dev/voice/"}}</script></head><body class="guide-page"><a class="skip" href="#content" data-en="Skip to content" data-de="Zum Inhalt">Zum Inhalt</a><header class="site-header"><a class="brand" href="/voice/de/" aria-label="Voice-Startseite">voice <i>/</i></a><nav class="site-nav" aria-label="Hauptnavigation"><div class="nav-tools" role="group" aria-label="Werkzeuge"><a href="/voice/de/studio/" data-en="Studio" data-de="Studio">Studio</a><a href="/voice/de/library/" data-en="Library" data-de="Library">Library</a></div><div class="nav-resources" role="group" aria-label="Wissen"><a href="/voice/de/research/" data-en="Research" data-de="Forschung">Forschung</a><a href="/voice/de/writing-patterns/" data-en="AI anti-patterns" data-de="KI-Negativmuster">KI-Negativmuster</a><a href="/voice/de/docs/" aria-current="page" data-en="Docs" data-de="Doku">Doku</a></div></nav><div class="language" role="group" aria-label="Sprache"><a data-locale="en" href="/voice/guides/workflow/" hreflang="en" lang="en" aria-label="English">EN</a><a data-locale="de" href="/voice/de/guides/workflow/" hreflang="de" lang="de" aria-label="Deutsch" aria-current="true">DE</a></div></header><main id="content"><div class="docs-breadcrumb"><a href="/voice/de/docs/" data-en="Docs" data-de="Doku">Doku</a><span aria-hidden="true">/</span><span>Einstieg</span></div><div class="docs-layout"><aside class="guide-sidebar"><details class="guide-menu" open=""><summary data-en="All guides" data-de="Alle Guides">Alle Guides</summary><nav aria-label="Dokumentation"><div class="guide-group"><p>Einstieg</p><a href="/voice/de/guides/writing-tools/">Schreibwerkzeuge für Agenten</a><a href="/voice/de/guides/workflow/" aria-current="page">Der Ablauf in Studio</a><a href="/voice/de/guides/library/">Die Review-Library einbinden</a><a href="/voice/de/guides/agent-integration/">KI-Befunde in der eigenen Anwendung anzeigen</a></div><details class="guide-group guide-group-details"><summary>Referenz</summary><a href="/voice/de/guides/review-benchmarks/">Benchmarks für Textreviews</a><a href="/voice/de/guides/writing-rules/">Schreibregeln und Prompts zusammenstellen</a><a href="/voice/de/guides/ai-text-signals/">KI-typische Schreibmuster prüfen</a><a href="/voice/de/guides/session/">Einmal koppeln, sieben Tage angemeldet bleiben</a><a href="/voice/de/guides/usability/">Entscheidungen und Quellversionen</a><a href="/voice/de/guides/library-types/">Typen, IntelliSense und Beispiele</a><a href="/voice/de/guides/live-bridge/">Das Protokoll der Live-Bridge</a><a href="/voice/de/guides/runner-integration/">Runner-Anfragen und Quelltextvorschläge</a><a href="/voice/de/guides/checks/">Lokale Build- und Testprüfungen</a><a href="/voice/de/guides/holistic-review/">Quelltext in einem Git-Repository prüfen</a></details><details class="guide-group guide-group-details"><summary>Wartung</summary><a href="/voice/de/guides/maintaining/">Produktdateien, Werkzeuge und Nachweise</a><a href="/voice/de/guides/commands/">Befehlskatalog für den Betrieb</a><a href="/voice/de/guides/verification/">Datierte Prüfnachweise</a><a href="/voice/de/guides/notices/">Drittanbieterhinweise</a></details></nav></details></aside><article class="guide-article" lang="de"><header class="guide-heading"><h1>Der Ablauf in Studio</h1><p class="lead">Vom registrierten Ordner und der laufenden Seite zur ausdrücklich angewendeten Quelländerung mit Versionsprüfung.</p></header><details class="mobile-outline"><summary data-en="On this page" data-de="Auf dieser Seite">Auf dieser Seite</summary><nav aria-label="Seitenabschnitte"><a href="#start-your-first-review">Den ersten Review starten</a><a href="#angular-applications-browse-the-running-app">Angular-Anwendungen: die laufende Anwendung öffnen</a><a href="#json-content-and-the-voice-website">JSON-Inhalte und die Voice-Website</a><a href="#markdown-browse-the-project-folder">Markdown: den Projektordner durchsuchen</a><a href="#review-and-source-changes">Review und Quelländerungen</a><a href="#local-project-checks-after-apply">Lokale Projektprüfungen nach dem Anwenden</a><a href="#saved-tasks-and-decisions">Gespeicherte Aufgaben und Entscheidungen</a><a href="#semantic-review-is-a-runner-task">Semantische Reviews als Runner-Aufgaben</a><a href="#explain-the-checks-and-preserve-review-evidence">Prüfungen erklären und Review-Belege aufbewahren</a></nav></details><div class="guide-content"><h2 id="start-your-first-review">Den ersten Review starten<a class="heading-anchor" href="#start-your-first-review" aria-label="Link zu diesem Abschnitt">#</a></h2><p>Starte die Anwendung im ausgecheckten Voice-Studio-Repository:</p>
+<figure class="code-block"><figcaption><span>sh</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Kopieren</button></figcaption><pre tabindex="0" aria-label="sh code"><code>npm start
+# Open http://127.0.0.1:5188/</code></pre></figure><ol>
+<li>Gib den Kopplungscode ein, den das Backend ausgibt. Mit <code>npm run pairing-code</code> in einem zweiten Terminal kannst du ihn erneut anzeigen.</li>
+<li>Öffne <strong>Projekte und Dateien</strong>, registriere deinen Quellordner und wähle eine Markdown- oder HTML-Datei aus.</li>
+<li>Markiere eine zugeordnete Passage in der gerenderten Ansicht oder öffne einen Befund im Review-Panel.</li>
+<li>Wähle <strong>So beibehalten</strong>, prüfe einen vorhandenen Vorschlag oder ergänze Feedback. Die Entscheidung zum Beibehalten speichert die Passage mit ihrer Quellversion.</li>
+<li>Prüfe bei einer Ersetzung den Diff der Quelldatei und wähle <strong>Anwenden</strong>. Kontrolliere die geänderte Datei und die gerenderte Seite vor dem Commit.</li>
+</ol>
+<p>Generierte Alternativen und semantische Aufgaben nutzen den konfigurierten Runner und müssen ausdrücklich gestartet werden. Das Lesen einer Datei und das Speichern einer Entscheidung rufen kein Modell auf.</p>
+<p>Um eine laufende Anwendung zu prüfen, verbinde ihren Entwicklungsserver wie unten beschrieben. Die gespeicherten Datensätze erklären die <a href="#saved-tasks-and-decisions">Dateiablage und JSON-Beispiele</a>.</p>
+<p><strong>Diesen Browser 7 Tage merken</strong> erhält den Zugriff unter derselben Studio-Adresse. <strong>Abmelden</strong> widerruft ihn. Die <a href="/voice/de/guides/session/">Browsersitzungen</a> beschreiben Ablauf und HTTP-Vertrag.</p>
+<h2 id="angular-applications-browse-the-running-app">Angular-Anwendungen: die laufende Anwendung öffnen<a class="heading-anchor" href="#angular-applications-browse-the-running-app" aria-label="Link zu diesem Abschnitt">#</a></h2><p>Starte den Entwicklungsserver der Anwendung. Registriere ihr Projektverzeichnis und öffne ihre lokale URL in Voice Studio. Das iframe lädt die ursprüngliche Serverantwort mit Angular-Routing, Skripten, Assets und Browserzustand. Als Quelle dient weder eine nachgebaute Seite noch ein eingeschleuster Reverse-Proxy oder eine vorgerenderte Kopie.</p>
+<p>Eine ausdrücklich aktivierte <code>@voice/review</code>-Bridge verbindet die lokale Seite mit Studio. Das übergeordnete Fenster prüft das genaue Fenster, den lokalen Origin und die Sitzung; Review-Nachrichten enthalten außerdem die Seiten-URL und Review-ID. Die Bridge überträgt keinen Bearer-Token von Studio. Das übergeordnete Fenster sendet Quelleinheiten und Review-Daten ausschließlich an den lokalen Entwicklungs-Origin, der für das registrierte Projekt konfiguriert ist. Entfernte Ziele werden abgewiesen.</p>
+<p><code>voice.config.json</code> beschreibt den Bezug zur Quelle:</p>
+<figure class="code-block"><figcaption><span>json</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Kopieren</button></figcaption><pre tabindex="0" aria-label="json code"><code>{
+  <span class="syntax-string">"version"</span>: <span class="syntax-number">1</span>,
+  <span class="syntax-string">"liveUrl"</span>: <span class="syntax-string">"http://127.0.0.1:4184/?voice-studio=1"</span>,
+  <span class="syntax-string">"sourceFiles"</span>: [<span class="syntax-string">"src/app/content/*.ts"</span>],
+  <span class="syntax-string">"routes"</span>: {<span class="syntax-string">"/"</span>: <span class="syntax-string">"src/app/content/home.ts"</span>},
+  <span class="syntax-string">"sourceContexts"</span>: {
+    <span class="syntax-string">"src/app/content/home.ts"</span>: [
+      <span class="syntax-string">"src/app/page.component.ts"</span>,
+      <span class="syntax-string">"src/app/page.component.html"</span>,
+      <span class="syntax-string">"src/app/site-content.ts"</span>
+    ]
+  }
+}</code></pre></figure><p>Die Agent-Studio-Website ist auf diese Weise eingebunden: 27 Routen verweisen auf ihre ursprünglichen Inhaltsmodule und den gemeinsamen Angular-Renderer. Wenn du Text auf der tatsächlichen Seite auswählst, zeigt der Review die Inhaltsdatei, Quellzeile und zugehörigen Komponenten. Ein angenommener Textvorschlag ändert das ursprüngliche TypeScript-Stringliteral. Der anschließende Build und die Darstellung der Anwendung zeigen das Ergebnis.</p>
+<p>Der TypeScript-Adapter nutzt den TypeScript-AST, ohne Website-Code auszuführen. Er extrahiert unterstützte Textliterale aus ausdrücklich einbezogenen Quelldateien; Importe, Code, technische Werte und Templates mit Interpolation bleiben ausgeschlossen. Ersetzungen erhalten die Maskierung von Anführungszeichen, Unicode und die umgebende TypeScript-Struktur. Die Syntax wird geprüft; Typprüfung und Build der Anwendung bleiben ein eigener Prüfschritt. Dynamischer Text und mehrdeutige DOM-Treffer werden nicht stillschweigend einer anderen Quelle zugeordnet. Eine konfigurierte Route benennt eine Datei, keinen vollständigen Abhängigkeitsgraphen. <code>sourceContexts</code> hält die bekannten relevanten Komponenten ausdrücklich fest.</p>
+<p>Die Browserrichtlinien der Website gelten weiterhin. Eine lokale Anwendung, die das Einbetten in iframes verbietet, muss Studio als übergeordnetes Entwicklungsfenster zulassen oder in einem eigenen Tab geöffnet werden. Der eigene Tab ist eine normale Browseransicht und bedeutet nicht, dass ein Review-Panel verbunden ist. Produktionsbuilds sollten die Entwicklungs-Bridge nicht automatisch aktivieren.</p>
+<h2 id="json-content-and-the-voice-website">JSON-Inhalte und die Voice-Website<a class="heading-anchor" href="#json-content-and-the-voice-website" aria-label="Link zu diesem Abschnitt">#</a></h2><p>Ausdrücklich konfigurierte JSON-Dateien werden als Quelldokumente unterstützt. Der Adapter liest benannte Textfelder wie Titel, Einleitung, Methode, Einschränkungen und API-Erläuterungen. Er erhält UTF-16-Positionen auch bei maskierten Anführungszeichen und Unicode-Zeichen. Technische IDs, URLs und Markup bleiben ausgeschlossen. Doppelte Schlüssel und ungültiges JSON werden abgewiesen. Vorschläge erhalten die JSON-Stringmaskierung und die bestehenden Prüfungen der Quellversion; beim Anwenden wird die ursprüngliche Datei geschrieben.</p>
+<p>Das Voice-Repository enthält eine eigene <code>voice.config.json</code>. So registrierst du es:</p>
+<figure class="code-block"><figcaption><span>sh</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Kopieren</button></figcaption><pre tabindex="0" aria-label="sh code"><code>npm run website:preview
+# In a second terminal:
+npm start
+# With both services running:
+npm run onboard:website</code></pre></figure><p>Das Projekt öffnet die Studio-Produktseite. Ihre Überschrift und Einleitung stammen aus <code>website/content/studio.json</code>. Zum Projekt gehören außerdem die ursprünglichen Markdown-Dateien der 18 HTML-Anleitungen und die englischen und deutschen Research-Datensätze in JSON. Über die Verbindungsanzeige kannst du eine andere Research-Quelldatei auswählen. Eine Route wählt eine Quelldatei aus; nur exakt übereinstimmender sichtbarer Text erhält Markierungen. Per JavaScript erzeugte Seitenstrukturen und Texte aus mehreren Quelldateien werden keiner vermuteten Quelle zugeordnet.</p>
+<p>Die lokale Website aktiviert ihre HTML-Review-Bridge auf der Loopback-Adresse mit <code>?voice-studio=1</code>. Beim normalen öffentlichen Seitenaufruf gibt es keine Bedienelemente für Analysen oder die Zusammenstellung von Prompts. Die Bridge überträgt Textauswahl und Befunde, ohne Zugangsdaten oder Modellausführung. Baue die statische Website nach einer JSON-Quelländerung mit <code>npm run website:build</code> neu und lade sie erneut, um das Ergebnis zu prüfen.</p>
+<h2 id="markdown-browse-the-project-folder">Markdown: den Projektordner durchsuchen<a class="heading-anchor" href="#markdown-browse-the-project-folder" aria-label="Link zu diesem Abschnitt">#</a></h2><p>Registriere einen Ordner, navigiere durch seine Unterordner und öffne eine Markdown-Datei. Die Quelle bleibt die Datei in diesem Ordner. Die gerenderte Ansicht unterstützt zugeordnete Textpassagen, Links, einfache Hervorhebungen und sichtbaren, von der Prüfung ausgeschlossenen Code. Dateiberichte erfassen alle unterstützten Einheiten einer Datei; Projektberichte fassen den registrierten Dateibestand zusammen.</p>
+<p>Das Beispielhandbuch enthält die Ordner <code>guides/</code> und <code>checklists/</code>, an denen sich Ordnernavigation und relative Markdown-Links ausprobieren lassen. Die Markdown-Darstellung unterstützt einen Teilumfang von CommonMark. Die erzeugte Dokumentansicht läuft in einer Sandbox ohne Skripte; die oben beschriebene, ausdrücklich aktivierte Live-Anwendung läuft unter ihrem eigenen konfigurierten Entwicklungs-Origin. Ersetzungen über Markup-Grenzen hinweg werden abgewiesen, wenn der Quelladapter die Struktur nicht sicher erhalten kann.</p>
+<h2 id="review-and-source-changes">Review und Quelländerungen<a class="heading-anchor" href="#review-and-source-changes" aria-label="Link zu diesem Abschnitt">#</a></h2><ol>
+<li>Öffne die Anwendung oder den Ordner im üblichen Kontext.</li>
+<li>Öffne lokale Befunde oder markiere eine unmarkierte, zugeordnete Passage.</li>
+<li>Lies die Erklärung der Regel. Behalte die Formulierung bei oder vergleiche einen Vorschlag; Feedback ist optional.</li>
+<li>Starte bei Bedarf einen semantischen Review der gesamten ausgewählten Datei.</li>
+<li>Lass ausdrücklich Alternativen erzeugen, schreibe bei Bedarf selbst eine Ersetzung oder speichere eine Aufgabe mit Anweisung und ausgewähltem Feedback.</li>
+<li>Starte die gespeicherte Aufgabe ausdrücklich über den Coding-Agent-Runner.</li>
+<li>Lies das Ergebnis und prüfe einen gegebenenfalls vorliegenden vollständigen Quelldiff.</li>
+<li>Wende den Vorschlag ausdrücklich an.</li>
+<li>Starte die konfigurierte lokale Projektprüfung ausdrücklich, prüfe ihr Ergebnis und kontrolliere die laufende Anwendung.</li>
+</ol>
+<p>Feedback, Aufgaben für Quelländerungen, Vorschläge und der Verlauf semantischer Läufe bleiben dem Projekt zugeordnet. Eine veraltete Quellversion lässt sich nicht überschreiben. Eine Quelländerung kann eine ältere Notiz oder ein semantisches Ergebnis veralten lassen; die Oberfläche kennzeichnet diesen Zustand. Vor dem Anwenden eines Vorschlags sichert das Backend die Quelle und protokolliert den ausstehenden Schreibvorgang in einem Transaktionsjournal.</p>
+<h2 id="local-project-checks-after-apply">Lokale Projektprüfungen nach dem Anwenden<a class="heading-anchor" href="#local-project-checks-after-apply" aria-label="Link zu diesem Abschnitt">#</a></h2><p>Im Panel für Projektprüfungen lässt sich der konfigurierte Build- oder Testbefehl gesondert starten. Das Angular-Pilotprojekt nutzt sein vorhandenes <code>npm run check</code>. Das Panel zeigt laufende oder abbrechende Prüfungen, begrenzte Logausgaben, den Exitcode und das Endergebnis: abgeschlossen, fehlgeschlagen oder abgebrochen. Ergebnisse werden mit dem konfigurierten Quellfingerprint gespeichert. Änderungen an der Quelle oder Prüfkonfiguration setzen sie auf <code>stale</code>; das ursprüngliche Ergebnis bleibt erhalten. Das Anwenden eines Vorschlags startet keine Prüfung automatisch und kennzeichnet kein früheres Ergebnis als aktuell.</p>
+<p>Den festen Befehl und seine Eingaben legt ausschließlich eine private Host-Konfiguration außerhalb des Ziel-Repositorys fest. HTTP-Anfragen und <code>voice.config.json</code> können keine Programme oder Argumente vorgeben. Fehlende konfigurierte Abhängigkeiten verhindern den Start. Die Prüfung führt vertrauenswürdigen Projektcode mit den Rechten des Host-Benutzers aus, ohne Modell und ohne Sandbox-Garantie. Die Anleitung zu <a href="/voice/de/guides/checks/">lokalen Projektprüfungen</a> beschreibt Einrichtung, einbezogene Quellen und Prozessgrenzen. Auch nach einem erfolgreichen Build müssen die gerenderte Seite und ihre Texte geprüft werden.</p>
+<h2 id="saved-tasks-and-decisions">Gespeicherte Aufgaben und Entscheidungen<a class="heading-anchor" href="#saved-tasks-and-decisions" aria-label="Link zu diesem Abschnitt">#</a></h2><p>Beim Speichern einer Aufgabe werden ihre Anweisung, das ausgewählte Feedback, die Quellversion, die Feedback-Revision und der Fingerprint des konfigurierten Komponentenkontexts erfasst. Das Speichern ruft kein Modell auf. Der ausdrückliche Start ist idempotent: Wiederholungen derselben Anfrage starten keinen zweiten Runner-Lauf. Für einen neuen Versuch wird nach erneuter Prüfung von Quelle und Feedback eine neue Aufgabe angelegt.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Dokumentationstabelle"><table>
+<thead>
+<tr>
+<th>Ergebnis</th>
+<th>Bedeutung</th>
+<th>Nächster Schritt</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>queued</code></td>
+<td>Gespeichert, ohne Modellausführung</td>
+<td>Anweisung und Kontext prüfen und ausdrücklich starten</td>
+</tr>
+<tr>
+<td><code>running</code> / <code>cancelling</code></td>
+<td>Ein Runner-Versuch läuft oder wird beendet</td>
+<td>Beobachten oder abbrechen; die Quelle wird nicht geschrieben</td>
+</tr>
+<tr>
+<td><code>ready</code></td>
+<td>Ein validierter, zusammengefasster Änderungsvorschlag liegt vor</td>
+<td>Den vollständigen Diff prüfen und ausdrücklich anwenden</td>
+</tr>
+<tr>
+<td><code>completed</code>, <code>agent_no_changes</code></td>
+<td>Der Agent hat ausdrücklich <code>already_satisfied</code> gemeldet, mit Begründung und ohne offene Befunde</td>
+<td>Die Begründung prüfen; kein Text wurde geändert</td>
+</tr>
+<tr>
+<td><code>needs_review</code></td>
+<td>Erforderliche Fakten oder unterstützte Quelloperationen fehlen</td>
+<td>Die Begründung lesen, Belege ergänzen oder eine umfassendere Aufgabe vorbereiten</td>
+</tr>
+<tr>
+<td><code>failed</code> / <code>cancelled</code> / <code>interrupted</code> / <code>stale</code></td>
+<td>Der Versuch kann keinen aktuellen erfolgreichen Vorschlag liefern</td>
+<td>Das gespeicherte Ergebnis prüfen; kein automatischer Neustart</td>
+</tr>
+<tr>
+<td><code>applied</code></td>
+<td>Der gesondert freigegebene Vorschlag wurde geschrieben</td>
+<td>Die tatsächliche Quelle und das gerenderte Ergebnis prüfen</td>
+</tr>
+</tbody></table>
+</div><p>Ein Aufgabenvorschlag kann 1–50 unterstützte, nicht überlappende Textersetzungen in <strong>einer ursprünglichen Datei</strong> zusammenfassen. Jede Ersetzung bezieht sich auf dieselbe ursprüngliche Quellversion. Das Backend prüft exakte Zitate, Unicode und die Quellzuordnung und wendet anschließend den gesamten Satz auf einen Quellstand an. Überlappungen, unsichere Markup-Grenzen und nicht unterstützte Strukturänderungen werden abgewiesen; es wird kein Teilsatz angewendet. Eine zugehörige Angular-Komponente bleibt Kontext und wird nicht zum zusätzlichen Schreibziel.</p>
+<p>Quelle, Feedback-Revision und Hashes des Komponentenkontexts werden rund um den Start sowie vor dem Erstellen und Anwenden eines Vorschlags erneut geprüft. Ein geänderter Kontext erfordert einen neuen Review. Eine gesonderte manuelle Erledigung braucht eine schriftliche Begründung sowie den aktuellen Quell- und Feedbackstand; die Oberfläche unterscheidet sie sichtbar von einer angewendeten Korrektur. Auch eine validierte Aussage <code>already_satisfied</code> bleibt das Urteil des Modells und ist kein unabhängiger Nachweis, dass die redaktionelle Aufgabe gelöst wurde.</p>
+<h3 id="files-beside-the-source">Dateien neben der Quelle<a class="heading-anchor" href="#files-beside-the-source" aria-label="Link zu diesem Abschnitt">#</a></h3><p>Aufgaben und Entscheidungen liegen derzeit im versteckten Ordner <code>.voice-lint/</code> des <strong>registrierten Quellprojekts</strong>. Das Projekt kann ein Git-Checkout oder ein gewöhnlicher Ordner sein. Die registrierte Wurzel kann auch in einem Unterordner eines größeren Repositorys liegen.</p>
+<figure class="code-block"><figcaption><span>text</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Kopieren</button></figcaption><pre tabindex="0" aria-label="text code"><code>&lt;registered source project&gt;/
+  guide.md
+  voice.config.json                         # optional route/source configuration
+  .voice-lint/
+    reviews/&lt;document-id&gt;.voice-meta.json    # feedback, decisions, proposals
+    tasks/&lt;document-id&gt;/&lt;task-id&gt;.json       # task, prepared prompt, fingerprints
+    semantic-runs/&lt;run-id&gt;/
+      request.claim                         # duplicate-start protection
+      input.json                            # staged source and related context
+      run.json                              # state, findings/alternatives, usage
+      output.txt                            # collected model output
+    backups/&lt;document-id&gt;/&lt;proposal-id&gt;.md   # original source before apply
+    transactions/&lt;document-id&gt;-&lt;proposal-id&gt;.json</code></pre></figure><p>Die Dateiendung der Sicherung folgt der Quelldatei: <code>.md</code>, <code>.html</code>, <code>.ts</code> usw. Entscheidungen zum Beibehalten stehen im Array <code>decisions</code> der Begleitdatei, Vorschläge in <code>proposals</code>. Es gibt keine einzelne Datei pro Entscheidung oder Vorschlag. Eine Aufgabe speichert ihren verknüpften Vorschlag zusätzlich in <code>task.proposal</code>.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Dokumentationstabelle"><table>
+<thead>
+<tr>
+<th>Aktion</th>
+<th>Gespeicherte Änderung</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Ein Dokument öffnen</td>
+<td>Kann das Review-Verzeichnis anlegen. Vorhandene Metadaten können für die erneute Quellverankerung oder zur Wiederherstellung nach unterbrochenen Schreibvorgängen neu geschrieben werden. Ein unberührtes neues Dokument benötigt noch keine Begleitdatei.</td>
+</tr>
+<tr>
+<td>Feedback speichern / So beibehalten</td>
+<td>Die Review-Begleitdatei und ihre Revision anlegen oder aktualisieren. Keine Quelländerung und kein Modellaufruf.</td>
+</tr>
+<tr>
+<td>Eine Aufgabe speichern</td>
+<td>Ihre JSON-Datei mit <code>queued</code>, vorbereitetem Prompt und den aktuellen Fingerprints für Quelle, Review und Kontext anlegen. Kein Modellaufruf.</td>
+</tr>
+<tr>
+<td>Ausdrücklich starten</td>
+<td>Die Aufgabe um <code>runId</code> ergänzen; nach den Zulassungsprüfungen die Startsperre gegen Duplikate, Eingabe und den Datensatz des laufenden Versuchs anlegen. Scheitert die Zulassung vorher, kann eine fehlgeschlagene Aufgabe ohne Laufordner zurückbleiben.</td>
+</tr>
+<tr>
+<td>Beenden oder abbrechen</td>
+<td>Ergebnis und gesammelte Ausgabe des Laufs speichern. Eine erfolgreiche Aufgabe kann einen Vorschlag in der Begleitdatei vorbereiten und im Aufgabendatensatz behalten. Die Quelle bleibt unverändert.</td>
+</tr>
+<tr>
+<td>Ausdrücklich anwenden</td>
+<td>Die Sicherung der ursprünglichen Quelle und das ausstehende Transaktionsjournal schreiben, die geprüfte Quelländerung anwenden, Metadaten aktualisieren und das Journal als abgeschlossen markieren.</td>
+</tr>
+</tbody></table>
+</div><h3 id="stored-json-and-the-reference-chain">Gespeichertes JSON und seine Verweise<a class="heading-anchor" href="#stored-json-and-the-reference-chain" aria-label="Link zu diesem Abschnitt">#</a></h3><p>Die verlinkten Dateien sind <strong>synthetische Beispiele des aktuellen Speicherformats</strong>. Sie enthalten keine echten Nutzerdaten, API-Anfragen oder das geplante ganzheitliche Review-Schema. Die fiktive Quelle ist <code>guide.md</code> mit genau <code>Clear copy.\n</code>:</p>
+<ul>
+<li><a href="/voice/sources/examples/stored-source-task.example.json" data-json-viewer="" aria-haspopup="dialog">Vollständiges Aufgaben-JSON</a>: eine Aufgabe mit Status <code>ready</code> und einem Vorschlag, der <code>copy</code> in <code>instructions</code> ändert. Der vorbereitete Prompt ist ausdrücklich als Platzhalter gekennzeichnet; kein Modell hat dieses Beispiel erzeugt.</li>
+<li><a href="/voice/sources/examples/stored-selection-decision.example.json" data-json-viewer="" aria-haspopup="dialog">Vollständiges JSON der Review-Begleitdatei</a>: der frühere Stand der Begleitdatei nach dem Beibehalten von <code>Clear</code>, bevor ein Vorschlag vorliegt.</li>
+</ul>
+<p>Die gespeicherte Aufgabe umschließt das API-Objekt <code>ImprovementTask</code>. Dieser Ausschnitt zeigt die Verknüpfungen; der Download enthält alle Felder:</p>
+<figure class="code-block"><figcaption><span>json</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Kopieren</button></figcaption><pre tabindex="0" aria-label="json code"><code>{
+  <span class="syntax-string">"task"</span>: {
+    <span class="syntax-string">"status"</span>: <span class="syntax-string">"ready"</span>,
+    <span class="syntax-string">"documentId"</span>: <span class="syntax-string">"doc-dc0dbe13416a77d1"</span>,
+    <span class="syntax-string">"id"</span>: <span class="syntax-string">"4354b61ec302dd4963c5264d0e313b25"</span>,
+    <span class="syntax-string">"runId"</span>: <span class="syntax-string">"644e8e50d6185aee1c92635408fe1af8"</span>,
+    <span class="syntax-string">"proposalId"</span>: <span class="syntax-string">"1edf21d420d5a71fa53e5a7395988f91"</span>
+  }
+}</code></pre></figure><p><code>documentId</code> verweist auf die Review-Begleitdatei, deren <code>documentPath</code> auf die Quelldatei zeigt. <code>runId</code> führt zu <code>semantic-runs/&lt;run-id&gt;/run.json</code>; dieser von der Aufgabe erzeugte Lauf verweist mit <code>taskId</code> zurück. <code>proposalId</code> wählt den Vorschlag in der Begleitdatei aus. Dessen <code>taskId</code> und <code>runId</code> müssen übereinstimmen. Der Vorschlag speichert <code>sourceBefore</code>, <code>sourceAfter</code>, die exakten zu ersetzenden Zitate und die zugeordneten Quellbereiche. Der gespeicherte Diff ist nicht der aktuelle Git-Diff.</p>
+<p>Die umschließende Struktur speichert außerdem <code>prompt</code>, <code>creationFingerprint</code>, <code>contextFingerprint</code>, <code>startRequestId</code> und <code>startFingerprint</code>. Vor dem Start sind die Startfelder null. Fingerprints weisen geänderte Eingaben unter derselben Anfrage-ID ab und binden die Aufgabe an ihre Quelle, den Review und den Komponentenkontext. Dies sind Speicherfelder, keine zusätzlichen Eingaben der Aufgaben-API. Der aktuelle Backend-Serializer gibt JSON-Eigenschaftsnamen in camelCase aus und schließt Felder mit null ein.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Dokumentationstabelle"><table>
+<thead>
+<tr>
+<th>Kennung oder Version</th>
+<th>Bedeutung</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>project-&lt;12 hex&gt;</code></td>
+<td>Aus einem Hash des absoluten Registrierungspfads abgeleitet. Ein Umzug des Checkouts kann die Kennung ändern. Mitgelieferte Beispiele verwenden benannte IDs.</td>
+</tr>
+<tr>
+<td><code>doc-&lt;16 hex&gt;</code></td>
+<td>SHA-256-Präfix des projektrelativen Pfads mit Schrägstrichen. Eine Umbenennung ändert die Kennung, eine Textänderung nicht.</td>
+</tr>
+<tr>
+<td>Aufgaben-, Lauf-, Vorschlags- und Entscheidungs-IDs</td>
+<td>32-stellige Kennungen, abgeleitet von Anfrage und zugehöriger Identität. Manuelle Vorschläge verwenden zufällige GUIDs. Keine dieser Kennungen ist ein Git-Commit.</td>
+</tr>
+<tr>
+<td><code>sourceVersion</code>, <code>expectedVersion</code> des Vorschlags</td>
+<td>SHA-256 des dekodierten, als UTF-8 kodierten Quelltexts. Kein Git-SHA und nicht unbedingt der Hash der ursprünglichen Bytes einschließlich BOM.</td>
+</tr>
+<tr>
+<td><code>revision</code> der Begleitdatei / <code>reviewRevision</code> der Aufgabe</td>
+<td>Zähler des Review-Zustands eines Dokuments. <code>revision</code> der Aufgabe ist ein gesonderter Zähler des Aufgabenzustands.</td>
+</tr>
+<tr>
+<td><code>unitsFingerprint</code>, <code>contextFingerprint</code></td>
+<td>Vom Backend erzeugte Hashes der serialisierten Quellzuordnung und des Kontexts; keine Benutzereinstellungen.</td>
+</tr>
+</tbody></table>
+</div><p>Einträge zum Beibehalten speichern ihr Zitat, den UTF-16-Bereich innerhalb der Einheit und die ursprüngliche Quellversion. Änderungen an Quelle oder Zuordnung kennzeichnen sie als veraltet. Begleitdateien sowie Aufgaben- und Laufdateien sind veränderliche Betriebsdatensätze mit Revisionsprüfungen, kein ausschließlich ergänzbares Entscheidungsprotokoll. Das ältere Array <code>improvementRequests</code> ist vom aktuellen Aufgabenspeicher getrennt.</p>
+<h3 id="private-storage-and-git">Privater Speicher und Git<a class="heading-anchor" href="#private-storage-and-git" aria-label="Link zu diesem Abschnitt">#</a></h3><p>Die Studio-Installation hält das lokale Projektregister in <code>.voice-studio/projects.json</code> und einen Verweis auf die Zugangsdaten-Datei in <code>.voice-studio/session-location.json</code>. Zugangsdaten, gespeichertes Browservertrauen und temporäre CLI-Arbeit sind von den Datensätzen im Quellprojekt getrennt:</p>
+<figure class="code-block"><figcaption><span>text</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Kopieren</button></figcaption><pre tabindex="0" aria-label="text code"><code>&lt;user LocalApplicationData&gt;/VoiceStudio/sessions/&lt;installation-hash&gt;/
+  session.json                            # private credentials
+  trusted-browsers.json                    # hashed browser trust
+  checks.json                             # host-owned check configuration
+  runner/workspaces/&lt;run-id&gt;/
+    review-context.json                   # CLI staging copy
+    .git/                                 # scratch init, no source commit</code></pre></figure><p><strong>Studio committet, pusht und synchronisiert diese Datensätze nicht automatisch. Es ergänzt auch nicht die Ignore-Regeln eines Projekts um <code>.voice-lint/</code>.</strong> Prüfe, was Git aufnehmen würde: Aufgaben und Läufe im Quellprojekt können vollständige Quellen, Prompts und Modellausgaben enthalten; Transaktionsjournale enthalten einen lokalen absoluten Sicherungspfad. Bewahre Quellen und zugehörige Metadaten samt Sicherungen gemeinsam auf. Ein Hash kann keinen Inhalt wiederherstellen, die Git-Historie der Quelle kann keine ignorierten Metadaten zurückholen, und die Sicherung eines Vorschlags deckt nur eine Datei ab. Das Journal erkennt unterbrochene Schreibvorgänge und verhindert, dass eine fremde Quellversion überschrieben wird. Ein Umzug des Checkouts kann außerdem eine nicht automatisierte Migration der Identitäten erfordern. Nutze Backend-Operationen, statt aktive Metadaten direkt zu bearbeiten. Halte Zugangsdaten und die Registerdateien der Installation privat.</p>
+<p>Die Verzeichnisse <code>.voice-review/contexts/</code> und <code>.voice-review/reviews/</code> aus <a href="/voice/de/guides/holistic-review/">holistic-review.md</a> beschreiben das <strong>geplante</strong> portable Git-Format, nicht den heutigen Speicher. Ein automatischer Export oder eine Migration in dieses Format ist nicht implementiert.</p>
+<h2 id="semantic-review-is-a-runner-task">Semantische Reviews als Runner-Aufgaben<a class="heading-anchor" href="#semantic-review-is-a-runner-task" aria-label="Link zu diesem Abschnitt">#</a></h2><p>Der implementierte Adapter nutzt <code>CodingAgentRunner</code> 0.7.0, kein direktes Modell-SDK. Nur die ausdrückliche Review-Aktion startet einen Lauf. Sie stellt die aktuelle Datei, zugeordnete Einheiten, Feedback und den begrenzten konfigurierten Komponentenkontext in einem eigenen Arbeitsverzeichnis bereit. Der Runner erhält nur Leserechte, einen frischen Kontext und keine Delegation. Befunde benötigen gültige Verweise auf Quellversion, Einheit, Zitat und UTF-16-Bereich sowie eine Begründung. Fehlgeschlagene, abgebrochene, unterbrochene und veraltete Läufe bleiben von abgeschlossenen Ergebnissen unterscheidbar. Fehlerhafte oder unvollständige Modellantworten bestehen die Validierung nicht.</p>
+<p>Quelländerungen werden weiterhin über eine ausdrückliche Vorschlagsaktion des Backends angewendet. Gewöhnliche Befunde eines semantischen Reviews sind Hinweise und erzeugen keine Vorschläge automatisch. Eine ausdrücklich gestartete Verbesserungsaufgabe kann einen validierten, zusammengefassten Vorschlag vorbereiten. Dieser durchläuft denselben von Menschen geprüften Diff-Ablauf wie ein manueller Vorschlag. Eine syntaktisch gültige JSON-Antwort beweist weder Wahrheit noch redaktionelle Qualität. Qualifizierung, vergleichende Voice-Benchmarks und die Zulassung über Token Economy bleiben gesonderte Integrationsarbeit. Siehe <a href="/voice/de/guides/runner-integration/">Runner-Integration</a> und <span class="repository-reference" title="Verweis im Quellrepository">Modellstrategie</span>.</p>
+<h2 id="explain-the-checks-and-preserve-review-evidence">Prüfungen erklären und Review-Belege aufbewahren<a class="heading-anchor" href="#explain-the-checks-and-preserve-review-evidence" aria-label="Link zu diesem Abschnitt">#</a></h2><p>Der lokale Prüfer und das Wiki laden denselben Katalog <code>knowledge/rules.json</code> mit vier Hinweisregeln, ihren Auslösern, Fragen, Beispielen und Grenzen. Das Wiki erklärt außerdem Quellzuordnung, Feedback, Modellwahl und mögliche Sprachwerkzeuge. LanguageTool, Vale, CSpell, Hunspell und textlint sind in dieser Preview keine integrierten Analysewerkzeuge. Die Seiten zu <span class="repository-reference" title="Verweis im Quellrepository">Sprachwerkzeugen</span> und <a href="/voice/de/guides/notices/">Drittanbieterhinweisen</a> erläutern die Trennung von Engine und Daten sowie das Verzeichnis mit 604 Einträgen aufgelöster npm-Metadaten.</p>
+<p>Der <span class="repository-reference" title="Verweis im Quellrepository">Review der Agent-Studio-Website</span> umfasst alle 27 Routen und 30 Inhaltsdateien. Seine 36 Befunde halten exakte Zitate, Dateihashes, Belege und Entscheidungen in einer zugehörigen JSON-Datei fest. Importiere sie erst nach erneuter Prüfung der aktuellen Quelle. Fragen zur Übereinstimmung mit dem Release sind nicht automatisch falsche Behauptungen; Ersatztexte werden nicht automatisch angewendet.</p>
+<p>Die ursprüngliche Dossier-Einleitung bleibt als Gegenbeispiel erhalten: Die lokale Regel-Engine meldet <strong>null Befunde</strong> für „Voice Lint concept revision“ und den Absatz „Research and analysis behind a sober public voice…“. Das bedeutet nur, dass keine implementierte feste Regel angeschlagen hat. Ein semantischer Review sollte die abstrakten internen Begriffe und die schwache Erklärung des Nutzens für Lesende aufgreifen.</p>
+</div><details class="source-details"><summary data-en="Git and source reference" data-de="Git- und Quellbezug">Git- und Quellbezug</summary><p>Quelle dieser Seite: <code>website/guides/de/workflow.md</code>. Inhaltshash und Git-Revision: <a href="/voice/build-info.json">Build-Nachweis</a>.</p><a href="/voice/sources/de/workflow.md" download="" data-en="Download the Markdown source" data-de="Markdown-Quelle herunterladen">Markdown-Quelle herunterladen</a><p>Weitere Verweise im Repository:</p><ul><li><code>docs/model-strategy.md</code></li><li><code>docs/language-tooling.md</code></li><li><code>docs/reviews/agent-studio-website-2026-09-06.md</code></li></ul></details><a class="next-guide" href="/voice/de/guides/library/"><span data-en="Next guide" data-de="Nächster Guide">Nächster Guide</span><strong>Die Review-Library einbinden →</strong></a></article><aside class="page-outline"><p data-en="On this page" data-de="Auf dieser Seite">Auf dieser Seite</p><nav aria-label="Auf dieser Seite"><a href="#start-your-first-review">Den ersten Review starten</a><a href="#angular-applications-browse-the-running-app">Angular-Anwendungen: die laufende Anwendung öffnen</a><a href="#json-content-and-the-voice-website">JSON-Inhalte und die Voice-Website</a><a href="#markdown-browse-the-project-folder">Markdown: den Projektordner durchsuchen</a><a href="#review-and-source-changes">Review und Quelländerungen</a><a href="#local-project-checks-after-apply">Lokale Projektprüfungen nach dem Anwenden</a><a href="#saved-tasks-and-decisions">Gespeicherte Aufgaben und Entscheidungen</a><a href="#semantic-review-is-a-runner-task">Semantische Reviews als Runner-Aufgaben</a><a href="#explain-the-checks-and-preserve-review-evidence">Prüfungen erklären und Review-Belege aufbewahren</a></nav></aside></div></main><footer class="site-footer"><a href="https://agent-orchestrator.dev/">Agent-Orchestrator-Ökosystem</a><p data-en="Git and folders · Explicit source changes" data-de="Git und Ordner · Bewusste Quelländerungen">Git und Ordner · Bewusste Quelländerungen</p><a href="/voice/build-info.json" data-en="Build record" data-de="Build-Nachweis">Build-Nachweis</a></footer><script src="/voice/site.js" defer=""></script></body></html>

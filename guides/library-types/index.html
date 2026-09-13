@@ -1,0 +1,127 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Types, IntelliSense and examples · Voice docs</title><meta name="description" content="TypeScript, checked JavaScript and the classic browser global, verified as package consumers."><link rel="canonical" href="https://agent-orchestrator.dev/voice/guides/library-types/"><link rel="stylesheet" href="/voice/site.css"><link rel="stylesheet" href="/voice/docs.css"><meta name="theme-color" content="#14271f"><link rel="alternate" hreflang="en" href="https://agent-orchestrator.dev/voice/guides/library-types/"><link rel="alternate" hreflang="de" href="https://agent-orchestrator.dev/voice/de/guides/library-types/"><link rel="alternate" hreflang="x-default" href="https://agent-orchestrator.dev/voice/guides/library-types/"><meta property="og:type" content="website"><meta property="og:site_name" content="Voice Lint"><meta property="og:title" content="Types, IntelliSense and examples · Voice docs"><meta property="og:description" content="TypeScript, checked JavaScript and the classic browser global, verified as package consumers."><meta property="og:url" content="https://agent-orchestrator.dev/voice/guides/library-types/"><meta property="og:locale" content="en_US"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Types, IntelliSense and examples · Voice docs","description":"TypeScript, checked JavaScript and the classic browser global, verified as package consumers.","url":"https://agent-orchestrator.dev/voice/guides/library-types/","inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Voice Lint","url":"https://agent-orchestrator.dev/voice/"}}</script></head><body class="guide-page"><a class="skip" href="#content" data-en="Skip to content" data-de="Zum Inhalt">Skip to content</a><header class="site-header"><a class="brand" href="/voice/" aria-label="Voice home">voice <i>/</i></a><nav class="site-nav" aria-label="Main"><div class="nav-tools" role="group" aria-label="Tools / Werkzeuge"><a href="/voice/studio/" data-en="Studio" data-de="Studio">Studio</a><a href="/voice/library/" data-en="Library" data-de="Library">Library</a></div><div class="nav-resources" role="group" aria-label="Knowledge / Wissen"><a href="/voice/research/" data-en="Research" data-de="Forschung">Research</a><a href="/voice/writing-patterns/" data-en="AI anti-patterns" data-de="KI-Negativmuster">AI anti-patterns</a><a href="/voice/docs/" aria-current="page" data-en="Docs" data-de="Doku">Docs</a></div></nav><div class="language" role="group" aria-label="Language / Sprache"><a data-locale="en" href="/voice/guides/library-types/" hreflang="en" lang="en" aria-label="English" aria-current="true">EN</a><a data-locale="de" href="/voice/de/guides/library-types/" hreflang="de" lang="de" aria-label="Deutsch">DE</a></div></header><main id="content"><div class="docs-breadcrumb"><a href="/voice/docs/" data-en="Docs" data-de="Doku">Docs</a><span aria-hidden="true">/</span><span>Reference</span></div><div class="docs-layout"><aside class="guide-sidebar"><details class="guide-menu" open=""><summary data-en="All guides" data-de="Alle Guides">All guides</summary><nav aria-label="Documentation"><div class="guide-group"><p>Start here</p><a href="/voice/guides/writing-tools/">Writing tools for agents</a><a href="/voice/guides/workflow/">The Studio workflow</a><a href="/voice/guides/library/">Mount the review library</a><a href="/voice/guides/agent-integration/">Use AI findings in your application</a></div><details class="guide-group guide-group-details" open=""><summary>Reference</summary><a href="/voice/guides/review-benchmarks/">Review benchmarks</a><a href="/voice/guides/writing-rules/">Writing rules and prompt composition</a><a href="/voice/guides/ai-text-signals/">Inspect AI-like writing patterns</a><a href="/voice/guides/session/">Pair once. Resume for seven days.</a><a href="/voice/guides/usability/">Decisions and source versions</a><a href="/voice/guides/library-types/" aria-current="page">Types, IntelliSense and examples</a><a href="/voice/guides/live-bridge/">The live-page bridge protocol</a><a href="/voice/guides/runner-integration/">Runner requests and source proposals</a><a href="/voice/guides/checks/">Local build and test checks</a><a href="/voice/guides/holistic-review/">Review source in a Git repository</a></details><details class="guide-group guide-group-details"><summary>Maintenance</summary><a href="/voice/guides/maintaining/">Product files, tools and evidence</a><a href="/voice/guides/commands/">Operator command catalogue</a><a href="/voice/guides/verification/">Dated verification evidence</a><a href="/voice/guides/notices/">Third-party notices</a></details></nav></details></aside><article class="guide-article" lang="en"><header class="guide-heading"><h1>Types, IntelliSense and examples</h1><p class="lead">TypeScript, checked JavaScript and the classic browser global, verified as package consumers.</p></header><details class="mobile-outline"><summary data-en="On this page" data-de="Auf dieser Seite">On this page</summary><nav aria-label="Page sections"><a href="#build-and-editor-setup">Build and editor setup</a><a href="#typescript-mount-update-dispose">TypeScript: mount, update, dispose</a><a href="#javascript-the-same-api-with-jsdoc">JavaScript: the same API with JSDoc</a><a href="#a-classic-script-without-a-bundler">A classic script without a bundler</a><a href="#coordinates-and-ai-integration">Coordinates and AI integration</a><a href="#what-verification-proves">What verification proves</a></nav></details><div class="guide-content"><p><code>@voice/review</code> renders findings supplied by your host application. Its ESM
+entry includes TypeScript declarations and JSDoc for completion, callback
+inference and hover help. JavaScript consumers can use <code>// @ts-check</code>; classic
+scripts can reference types for the <code>VoiceReview</code> global. Analysis and source
+editing belong to the host, outside this library's API.</p>
+<h2 id="build-and-editor-setup">Build and editor setup<a class="heading-anchor" href="#build-and-editor-setup" aria-label="Link to this section">#</a></h2><p>In this workspace:</p>
+<figure class="code-block"><figcaption><span>sh</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="sh code"><code>npm run build -w @voice/review
+npm run test:types -w @voice/review</code></pre></figure><p>Resolve imports by the package name <code>@voice/review</code>, not by a private <code>src/</code>
+path. The package's <code>exports</code> and <code>types</code> entries point at built declarations.
+Build the local package before consuming it in another project. The consumer
+test exercises <code>NodeNext</code> and <code>Bundler</code> module resolution.</p>
+<p>For JavaScript projects, <code>// @ts-check</code> enables checking in the current file.
+A project can instead set <code>allowJs</code>, <code>checkJs</code>, <code>strict</code>, and <code>noEmit</code> in its
+TypeScript configuration. Include the DOM library when replacing the default
+<code>lib</code> list. An editor using the TypeScript language service can show controller
+methods, callback parameters, literal options such as <code>encoding: 'utf16'</code>,
+method signatures, and the public JSDoc text.</p>
+<h2 id="typescript-mount-update-dispose">TypeScript: mount, update, dispose<a class="heading-anchor" href="#typescript-mount-update-dispose" aria-label="Link to this section">#</a></h2><p>This complete example uses an exact plain-text source string. The example host
+creates its own markup; the annotation library leaves that markup intact.
+For HTML, Markdown or framework content files, obtain units and source spans
+from a source adapter instead of deriving file offsets from rendered HTML.</p>
+<figure class="code-block"><figcaption><span>ts</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="ts code"><code><span class="syntax-keyword">import</span> {
+  mountVoiceReview, codePointOffsetToUtf16,
+  <span class="syntax-keyword">type</span> Finding, <span class="syntax-keyword">type</span> SourceSpan, <span class="syntax-keyword">type</span> TextUnit,
+} <span class="syntax-keyword">from</span> <span class="syntax-string">'@voice/review'</span>;
+
+<span class="syntax-keyword">export</span> <span class="syntax-keyword">function</span> showReview(root: HTMLElement): () =&gt; <span class="syntax-keyword">void</span> {
+  <span class="syntax-keyword">const</span> source = <span class="syntax-string">'🧭 Clear copy.'</span>;
+  <span class="syntax-keyword">const</span> sourceSpan: SourceSpan = {
+    start: <span class="syntax-number">0</span>, end: source.length, encoding: <span class="syntax-string">'utf16'</span>,
+  };
+  <span class="syntax-keyword">const</span> unit: TextUnit = {
+    id: <span class="syntax-string">'intro'</span>, text: source, sourceSpan,
+    kind: <span class="syntax-string">'paragraph'</span>, language: <span class="syntax-string">'en'</span>,
+  };
+  <span class="syntax-keyword">const</span> finding: Finding = {
+    id: <span class="syntax-string">'example-1'</span>, ruleId: <span class="syntax-string">'host.example'</span>, category: <span class="syntax-string">'wording'</span>, severity: <span class="syntax-string">'info'</span>,
+    message: <span class="syntax-string">'Example finding'</span>, explanation: <span class="syntax-string">'Supplied example data; no analysis is run.'</span>,
+    quote: <span class="syntax-string">'Clear'</span>, unitId: unit.id,
+    start: codePointOffsetToUtf16(source, <span class="syntax-number">2</span>),
+    end: codePointOffsetToUtf16(source, <span class="syntax-number">7</span>),
+    suggestion: <span class="syntax-keyword">null</span>, engine: <span class="syntax-string">'host/example'</span>,
+  };
+  <span class="syntax-keyword">const</span> paragraph = root.ownerDocument.createElement(<span class="syntax-string">'p'</span>);
+  paragraph.dataset.voiceUnit = unit.id;
+  paragraph.textContent = source;
+  root.replaceChildren(paragraph);
+
+  <span class="syntax-keyword">const</span> review = mountVoiceReview({
+    root, units: [unit], findings: [finding], feedback: [],
+    onSelect(selection) {
+      <span class="syntax-comment">// selection is inferred: unitId, quote, start and end.</span>
+      console.info(selection.quote);
+    },
+  });
+  review.update({ findings: [finding] });
+  console.info(review.getDiagnostics());
+  <span class="syntax-keyword">return</span> () =&gt; review.dispose();
+}</code></pre></figure><p>Invoke the returned cleanup when the host changes route, removes the view or
+replaces its iframe. Call <code>mountVoiceReview</code> after the target document has loaded.
+A new root needs a new mount; <code>update()</code> changes data and callbacks on the existing
+root. The checked example is <a href="/voice/sources/repository/packages/review/examples/typescript.ts">typescript.ts</a>.</p>
+<h2 id="javascript-the-same-api-with-jsdoc">JavaScript: the same API with JSDoc<a class="heading-anchor" href="#javascript-the-same-api-with-jsdoc" aria-label="Link to this section">#</a></h2><figure class="code-block"><figcaption><span>js</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="js code"><code><span class="syntax-comment">// @ts-check</span>
+<span class="syntax-keyword">import</span> { mountVoiceReview } <span class="syntax-keyword">from</span> <span class="syntax-string">'@voice/review'</span>;
+
+<span class="syntax-comment">/**
+ * @param {HTMLElement} root
+ * @param {readonly import('@voice/review').TextUnit[]} units
+ * @param {readonly import('@voice/review').Finding[]} findings
+ * @returns {() =&gt; void}
+ */</span>
+<span class="syntax-keyword">export</span> <span class="syntax-keyword">function</span> showReview(root, units, findings) {
+  <span class="syntax-keyword">const</span> review = mountVoiceReview({
+    root, units, findings, feedback: [],
+    onSelect(selection) { console.info(selection.quote); },
+  });
+  <span class="syntax-keyword">return</span> () =&gt; review.dispose();
+}</code></pre></figure><p>The callback and returned controller are inferred without converting this file
+to TypeScript. A complete source-span example is
+<a href="/voice/sources/repository/packages/review/examples/javascript.js">javascript.js</a>.</p>
+<h2 id="a-classic-script-without-a-bundler">A classic script without a bundler<a class="heading-anchor" href="#a-classic-script-without-a-bundler" aria-label="Link to this section">#</a></h2><p>Load the built runtime as a normal script, then load your host integration:</p>
+<figure class="code-block"><figcaption><span>html</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="html code"><code>&lt;script src="/library/voice-review.js"&gt;&lt;/script&gt;
+&lt;script src="/review-host.js"&gt;&lt;/script&gt;</code></pre></figure><p>At the top of <code>review-host.js</code>, when <code>@voice/review</code> is available to the editor:</p>
+<figure class="code-block"><figcaption><span>js</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="js code"><code><span class="syntax-comment">/// &lt;reference types="@voice/review/standalone" /&gt;</span>
+<span class="syntax-comment">// @ts-check</span>
+<span class="syntax-keyword">const</span> connection = VoiceReview.connectVoiceStudio({
+  studioOrigin: <span class="syntax-string">'http://127.0.0.1:5188'</span>,
+});
+window.addEventListener(<span class="syntax-string">'pagehide'</span>, () =&gt; connection.dispose(), { once: <span class="syntax-keyword">true</span> });</code></pre></figure><p>The triple-slash reference supplies declarations only. It does not download or
+execute the library. Do not import the standalone runtime as an ESM module to
+obtain a global: ESM consumers use named imports from <code>@voice/review</code>.
+The checked global example is <a href="/voice/sources/repository/packages/review/examples/standalone.js">standalone.js</a>.</p>
+<h2 id="coordinates-and-ai-integration">Coordinates and AI integration<a class="heading-anchor" href="#coordinates-and-ai-integration" aria-label="Link to this section">#</a></h2><p><code>SourceSpan.start/end</code> refer to the original source file. A finding's or
+selection's <code>start/end</code> refer to the text of its mapped unit. Both use zero-based,
+half-open <strong>UTF-16 code units</strong>. An emoji can occupy two code units. In the plain
+text example, <code>Clear</code> is at <code>[3, 8)</code> in UTF-16, although a code-point engine reports
+<code>[2, 7)</code>. Convert both endpoints with <code>codePointOffsetToUtf16</code> before sending such
+findings to this library. Matching coordinates alone do not establish a source
+file mapping: markup, entities and excluded content require an adapter.</p>
+<p>A host can pass validated AI findings into <code>mountVoiceReview</code> or <code>update</code> just as
+it passes local-rule findings. The host must validate the engine's schema,
+offset encoding, exact quote, unit identity and source version. It owns the goal,
+marketing context, model route, job execution, result provenance and review
+decisions. The bridge transports supplied review data to an explicitly integrated
+live page; it does not transmit backend credentials or start model work.</p>
+<p>Use <code>createReviewClient</code> only in the authorized host when feedback must persist
+through the Studio backend. It exposes typed <code>getDocument</code> and <code>saveFeedback</code>
+operations. Supply the current bearer through a host-owned in-memory getter;
+never embed it in the reviewed website, URLs, source control or reports.
+<code>FeedbackInput</code> carries <code>expectedVersion</code>, <code>expectedReviewRevision</code> and a
+<code>requestId</code>. Preserve the same request ID and exact payload when retrying an
+uncertain save. Source application remains a separate, guarded backend workflow.
+The overlay alone has no durable feedback store and no source-write operation.</p>
+<p>See <a href="/voice/guides/library/">the Library README</a> for persistence examples and
+<a href="/voice/guides/live-bridge/">the bridge contract</a> for origin/session checks.</p>
+<h2 id="what-verification-proves">What verification proves<a class="heading-anchor" href="#what-verification-proves" aria-label="Link to this section">#</a></h2><p><code>packages/review/test/types.test.mjs</code> creates an isolated consumer outside this
+workspace using only the package's declared distributable files. It compiles real
+TypeScript, <code>checkJs</code>, classic-global and deliberately invalid consumer fixtures
+with both NodeNext and Bundler resolution. Expected errors ensure that encoding,
+root, category and callback constraints have not silently degraded to <code>any</code>.</p>
+<p>The test also calls the actual TypeScript language service for controller and
+selection completions, classic-global completion, cleanup signatures and JSDoc
+hover text. This validates the metadata used by compatible editors. It does not
+drive the VS Code interface, prove the behavior of a particular editor extension,
+or verify rendering in VS Code's embedded browser. Existing Library runtime tests
+cover mounting, updates, teardown, anchoring and bridge behavior separately.</p>
+</div><details class="source-details"><summary data-en="Git and source reference" data-de="Git- und Quellbezug">Git and source reference</summary><p>Source for this page: <code>docs/library-types.md</code>. Content hash and Git revision: <a href="/voice/build-info.json">Build record</a>.</p><a href="/voice/sources/library-types.md" download="" data-en="Download the Markdown source" data-de="Markdown-Quelle herunterladen">Download the Markdown source</a></details><a class="next-guide" href="/voice/guides/live-bridge/"><span data-en="Next guide" data-de="Nächster Guide">Next guide</span><strong>The live-page bridge protocol →</strong></a></article><aside class="page-outline"><p data-en="On this page" data-de="Auf dieser Seite">On this page</p><nav aria-label="On this page"><a href="#build-and-editor-setup">Build and editor setup</a><a href="#typescript-mount-update-dispose">TypeScript: mount, update, dispose</a><a href="#javascript-the-same-api-with-jsdoc">JavaScript: the same API with JSDoc</a><a href="#a-classic-script-without-a-bundler">A classic script without a bundler</a><a href="#coordinates-and-ai-integration">Coordinates and AI integration</a><a href="#what-verification-proves">What verification proves</a></nav></aside></div></main><footer class="site-footer"><a href="https://agent-orchestrator.dev/">Agent Orchestrator ecosystem</a><p data-en="Git and folders · Explicit source changes" data-de="Git und Ordner · Bewusste Quelländerungen">Git and folders · Explicit source changes</p><a href="/voice/build-info.json" data-en="Build record" data-de="Build-Nachweis">Build record</a></footer><script src="/voice/site.js" defer=""></script></body></html>

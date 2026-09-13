@@ -1,0 +1,348 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>The Studio workflow · Voice docs</title><meta name="description" content="From a registered folder and running page to an explicit, version-checked source change."><link rel="canonical" href="https://agent-orchestrator.dev/voice/guides/workflow/"><link rel="stylesheet" href="/voice/site.css"><link rel="stylesheet" href="/voice/docs.css"><meta name="theme-color" content="#14271f"><link rel="alternate" hreflang="en" href="https://agent-orchestrator.dev/voice/guides/workflow/"><link rel="alternate" hreflang="de" href="https://agent-orchestrator.dev/voice/de/guides/workflow/"><link rel="alternate" hreflang="x-default" href="https://agent-orchestrator.dev/voice/guides/workflow/"><meta property="og:type" content="website"><meta property="og:site_name" content="Voice Lint"><meta property="og:title" content="The Studio workflow · Voice docs"><meta property="og:description" content="From a registered folder and running page to an explicit, version-checked source change."><meta property="og:url" content="https://agent-orchestrator.dev/voice/guides/workflow/"><meta property="og:locale" content="en_US"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"The Studio workflow · Voice docs","description":"From a registered folder and running page to an explicit, version-checked source change.","url":"https://agent-orchestrator.dev/voice/guides/workflow/","inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Voice Lint","url":"https://agent-orchestrator.dev/voice/"}}</script></head><body class="guide-page"><a class="skip" href="#content" data-en="Skip to content" data-de="Zum Inhalt">Skip to content</a><header class="site-header"><a class="brand" href="/voice/" aria-label="Voice home">voice <i>/</i></a><nav class="site-nav" aria-label="Main"><div class="nav-tools" role="group" aria-label="Tools / Werkzeuge"><a href="/voice/studio/" data-en="Studio" data-de="Studio">Studio</a><a href="/voice/library/" data-en="Library" data-de="Library">Library</a></div><div class="nav-resources" role="group" aria-label="Knowledge / Wissen"><a href="/voice/research/" data-en="Research" data-de="Forschung">Research</a><a href="/voice/writing-patterns/" data-en="AI anti-patterns" data-de="KI-Negativmuster">AI anti-patterns</a><a href="/voice/docs/" aria-current="page" data-en="Docs" data-de="Doku">Docs</a></div></nav><div class="language" role="group" aria-label="Language / Sprache"><a data-locale="en" href="/voice/guides/workflow/" hreflang="en" lang="en" aria-label="English" aria-current="true">EN</a><a data-locale="de" href="/voice/de/guides/workflow/" hreflang="de" lang="de" aria-label="Deutsch">DE</a></div></header><main id="content"><div class="docs-breadcrumb"><a href="/voice/docs/" data-en="Docs" data-de="Doku">Docs</a><span aria-hidden="true">/</span><span>Start here</span></div><div class="docs-layout"><aside class="guide-sidebar"><details class="guide-menu" open=""><summary data-en="All guides" data-de="Alle Guides">All guides</summary><nav aria-label="Documentation"><div class="guide-group"><p>Start here</p><a href="/voice/guides/writing-tools/">Writing tools for agents</a><a href="/voice/guides/workflow/" aria-current="page">The Studio workflow</a><a href="/voice/guides/library/">Mount the review library</a><a href="/voice/guides/agent-integration/">Use AI findings in your application</a></div><details class="guide-group guide-group-details"><summary>Reference</summary><a href="/voice/guides/review-benchmarks/">Review benchmarks</a><a href="/voice/guides/writing-rules/">Writing rules and prompt composition</a><a href="/voice/guides/ai-text-signals/">Inspect AI-like writing patterns</a><a href="/voice/guides/session/">Pair once. Resume for seven days.</a><a href="/voice/guides/usability/">Decisions and source versions</a><a href="/voice/guides/library-types/">Types, IntelliSense and examples</a><a href="/voice/guides/live-bridge/">The live-page bridge protocol</a><a href="/voice/guides/runner-integration/">Runner requests and source proposals</a><a href="/voice/guides/checks/">Local build and test checks</a><a href="/voice/guides/holistic-review/">Review source in a Git repository</a></details><details class="guide-group guide-group-details"><summary>Maintenance</summary><a href="/voice/guides/maintaining/">Product files, tools and evidence</a><a href="/voice/guides/commands/">Operator command catalogue</a><a href="/voice/guides/verification/">Dated verification evidence</a><a href="/voice/guides/notices/">Third-party notices</a></details></nav></details></aside><article class="guide-article" lang="en"><header class="guide-heading"><h1>The Studio workflow</h1><p class="lead">From a registered folder and running page to an explicit, version-checked source change.</p></header><details class="mobile-outline"><summary data-en="On this page" data-de="Auf dieser Seite">On this page</summary><nav aria-label="Page sections"><a href="#start-your-first-review">Start your first review</a><a href="#angular-applications-browse-the-running-app">Angular applications: browse the running app</a><a href="#json-content-and-the-voice-website">JSON content and the Voice website</a><a href="#markdown-browse-the-project-folder">Markdown: browse the project folder</a><a href="#review-and-source-changes">Review and source changes</a><a href="#local-project-checks-after-apply">Local project checks after apply</a><a href="#saved-tasks-and-decisions">Saved tasks and decisions</a><a href="#semantic-review-is-a-runner-task">Semantic review is a Runner task</a><a href="#explain-the-checks-and-preserve-review-evidence">Explain the checks and preserve review evidence</a></nav></details><div class="guide-content"><h2 id="start-your-first-review">Start your first review<a class="heading-anchor" href="#start-your-first-review" aria-label="Link to this section">#</a></h2><p>From the Voice Studio checkout, start the app:</p>
+<figure class="code-block"><figcaption><span>sh</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="sh code"><code>npm start
+# Open http://127.0.0.1:5188/</code></pre></figure><ol>
+<li>Enter the pairing code printed by the backend. Run <code>npm run pairing-code</code> in a second terminal to display it again.</li>
+<li>Open <strong>Projects and files</strong>, register your source folder and select a Markdown or HTML file.</li>
+<li>Select a mapped passage in the rendered view, or open a finding in the review panel.</li>
+<li>Choose <strong>Keep as written</strong>, inspect an existing suggestion, or add feedback. A keep decision records the passage and its source version.</li>
+<li>For a replacement, inspect the source diff and choose <strong>Apply</strong>. Check the resulting file and rendered page before committing.</li>
+</ol>
+<p>Generated alternatives and semantic tasks use the configured Runner and require an explicit start. Reading a file and saving a decision do not call a model.</p>
+<p>To review a running application, connect its development server as described below. For saved records, go to <a href="#saved-tasks-and-decisions">file storage and JSON examples</a>.</p>
+<p><strong>Remember this browser for 7 days</strong> keeps access on the same Studio address. <strong>Log out</strong> revokes it. See <a href="/voice/guides/session/">browser sessions</a> for expiry and the HTTP contract.</p>
+<h2 id="angular-applications-browse-the-running-app">Angular applications: browse the running app<a class="heading-anchor" href="#angular-applications-browse-the-running-app" aria-label="Link to this section">#</a></h2><p>Start the application's own development server. Register its project directory
+and open its local URL in Voice Studio. The iframe loads the original server
+response, including Angular routing, scripts, assets and browser state. There
+is no re-created page, injected reverse proxy or prerendered copy used as source.</p>
+<p>An explicitly enabled <code>@voice/review</code> bridge connects that local page to Studio.
+The parent verifies the exact window, local origin and session; review messages
+also carry a page URL and review ID. No Studio bearer token crosses that bridge.
+The parent only sends source units and review data to the local development
+origin configured for the registered project. Remote destinations are rejected.</p>
+<p><code>voice.config.json</code> describes the source relationship:</p>
+<figure class="code-block"><figcaption><span>json</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="json code"><code>{
+  <span class="syntax-string">"version"</span>: <span class="syntax-number">1</span>,
+  <span class="syntax-string">"liveUrl"</span>: <span class="syntax-string">"http://127.0.0.1:4184/?voice-studio=1"</span>,
+  <span class="syntax-string">"sourceFiles"</span>: [<span class="syntax-string">"src/app/content/*.ts"</span>],
+  <span class="syntax-string">"routes"</span>: {<span class="syntax-string">"/"</span>: <span class="syntax-string">"src/app/content/home.ts"</span>},
+  <span class="syntax-string">"sourceContexts"</span>: {
+    <span class="syntax-string">"src/app/content/home.ts"</span>: [
+      <span class="syntax-string">"src/app/page.component.ts"</span>,
+      <span class="syntax-string">"src/app/page.component.html"</span>,
+      <span class="syntax-string">"src/app/site-content.ts"</span>
+    ]
+  }
+}</code></pre></figure><p>The real Agent Studio website is onboarded this way: 27 routes reference their
+original content modules and shared Angular renderer. Select text on the real
+page; the review points to the content file, source line and related components.
+An accepted text proposal changes that original TypeScript string literal. The
+application's own rebuild and rendering show the result.</p>
+<p>The TypeScript adapter uses the TypeScript AST without evaluating site code. It
+extracts supported prose literals from explicitly included source files; imports,
+code, technical values and interpolated templates are excluded. Replacements
+preserve quote escaping, Unicode and the surrounding TypeScript structure.
+Syntactic validity is checked; the application's typecheck/build remains a
+separate verification step. Dynamic text or ambiguous DOM matches are not silently
+assigned to a different source. A configured route names a file, not a complete
+dependency graph; <code>sourceContexts</code> records the relevant known components explicitly.</p>
+<p>The site's browser policy still applies. A local app that forbids iframe embedding
+must allow its development Studio parent, or be opened in its own tab. The latter
+is ordinary browsing and does not imply a connected review panel. Production
+builds should not enable the developer bridge automatically.</p>
+<h2 id="json-content-and-the-voice-website">JSON content and the Voice website<a class="heading-anchor" href="#json-content-and-the-voice-website" aria-label="Link to this section">#</a></h2><p>Explicitly configured JSON files are supported source documents. The adapter reads
+named prose fields such as title, lead, method, limitations and API explanations.
+It preserves UTF-16 positions across escaped quotes and Unicode characters.
+Technical IDs, URLs and markup are excluded. Duplicate keys and invalid JSON are
+rejected. Proposals preserve JSON string escaping and the existing source-version
+checks; applying a proposal writes the original file.</p>
+<p>The Voice checkout includes its own <code>voice.config.json</code>. To register it:</p>
+<figure class="code-block"><figcaption><span>sh</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="sh code"><code>npm run website:preview
+# In a second terminal:
+npm start
+# With both services running:
+npm run onboard:website</code></pre></figure><p>The project opens the Studio product page. Its heading and introduction come from
+<code>website/content/studio.json</code>. The project also includes the original Markdown
+files for the 18 HTML guides and the English/German research JSON records.
+Use the connection badge to select a different research source file. A route
+selects one source file; only exact visible text matches receive annotations.
+JavaScript-generated page structure and text spanning multiple source files are
+not automatically assigned to a guessed source.</p>
+<p>The local website enables its HTML review bridge with <code>?voice-studio=1</code> on
+loopback. Ordinary public browsing exposes no analysis or prompt-composition
+controls. The bridge passes review selections and findings, without credentials
+or model execution. After a JSON source change, rebuild the static website with
+<code>npm run website:build</code> and reload it to inspect the result.</p>
+<h2 id="markdown-browse-the-project-folder">Markdown: browse the project folder<a class="heading-anchor" href="#markdown-browse-the-project-folder" aria-label="Link to this section">#</a></h2><p>Register a folder, navigate through its subfolders, and open a Markdown file.
+The source remains the file in that folder. Its rendered view supports mapped
+prose, links, basic emphasis and visible excluded code. File reports cover all
+supported units in the file; project reports aggregate the registered inventory.</p>
+<p>The example handbook has <code>guides/</code> and <code>checklists/</code> folders so folder navigation
+and relative Markdown links can be exercised. Markdown rendering is a supported
+subset, not a full CommonMark implementation. This generated document view is
+sandboxed without scripts; the opt-in live application above runs on its own
+explicitly configured development origin. Cross-markup replacements are
+rejected when the source adapter cannot preserve the structure safely.</p>
+<h2 id="review-and-source-changes">Review and source changes<a class="heading-anchor" href="#review-and-source-changes" aria-label="Link to this section">#</a></h2><ol>
+<li>Browse the application or folder in its normal context.</li>
+<li>Open local findings or select an unmarked mapped passage.</li>
+<li>Read the rule’s explanation. Keep the wording or compare a suggestion; feedback is optional.</li>
+<li>Optionally start a semantic review of the whole selected file.</li>
+<li>Explicitly generate alternatives, write an optional replacement, or save a task with an instruction and selected feedback.</li>
+<li>Start the saved task explicitly through the Coding-Agent-Runner.</li>
+<li>Read its outcome and inspect any complete source diff.</li>
+<li>Apply the proposal explicitly.</li>
+<li>Explicitly start the configured local project check, inspect its result, and verify the running application.</li>
+</ol>
+<p>Feedback, source tasks, proposals and semantic run history remain associated with the project.
+A stale source version cannot be overwritten. A source change can make an older
+note or semantic result stale; the UI labels that state instead of presenting it
+as a current finding. Before applying a proposal, the backend backs up the source and records the pending write in a transaction journal.</p>
+<h2 id="local-project-checks-after-apply">Local project checks after apply<a class="heading-anchor" href="#local-project-checks-after-apply" aria-label="Link to this section">#</a></h2><p>The project-check panel offers a separate explicit start for the configured
+build/test command. The Angular pilot uses its existing <code>npm run check</code>.
+It shows running/cancelling status, bounded logs, exit code and the final
+completed, failed or cancelled result. Results persist with the configured
+source fingerprint; changed source or check configuration makes them <code>stale</code>,
+with the original outcome retained. Applying a proposal never starts a check
+automatically or marks an earlier result current.</p>
+<p>Only private host configuration outside the target repository chooses the fixed
+command and inputs; HTTP requests and <code>voice.config.json</code> cannot provide programs
+or arguments. Missing configured dependencies block start. This executes trusted
+project code with the host user's permissions, without a model or a sandbox
+guarantee. See <a href="/voice/guides/checks/">local project checks</a> for setup, source
+scope and process limits. A passing build still needs a review of the rendered
+page and its wording.</p>
+<h2 id="saved-tasks-and-decisions">Saved tasks and decisions<a class="heading-anchor" href="#saved-tasks-and-decisions" aria-label="Link to this section">#</a></h2><p>Saving a task records its instruction, selected feedback, source version, feedback
+revision and the configured component-context fingerprint. Saving does not call a
+model. The explicit start is idempotent; retries of the same request do not create
+a second Runner launch. A new attempt uses a new task after the source and
+feedback have been reviewed.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Documentation table"><table>
+<thead>
+<tr>
+<th>Outcome</th>
+<th>What it means</th>
+<th>Next step</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>queued</code></td>
+<td>Saved, with no model execution</td>
+<td>Inspect the instruction/context and start explicitly</td>
+</tr>
+<tr>
+<td><code>running</code> / <code>cancelling</code></td>
+<td>A Runner attempt is active or stopping</td>
+<td>Observe or cancel; no source is written</td>
+</tr>
+<tr>
+<td><code>ready</code></td>
+<td>A validated, combined source proposal is available</td>
+<td>Inspect the complete diff and apply explicitly</td>
+</tr>
+<tr>
+<td><code>completed</code>, <code>agent_no_changes</code></td>
+<td>The agent explicitly reported <code>already_satisfied</code>, with a reason and no open findings</td>
+<td>Review the reason; no text was changed</td>
+</tr>
+<tr>
+<td><code>needs_review</code></td>
+<td>Required facts or supported source operations are missing</td>
+<td>Read the reason, provide evidence or prepare a broader task</td>
+</tr>
+<tr>
+<td><code>failed</code> / <code>cancelled</code> / <code>interrupted</code> / <code>stale</code></td>
+<td>The attempt cannot provide a current successful proposal</td>
+<td>Inspect the recorded outcome; no automatic restart</td>
+</tr>
+<tr>
+<td><code>applied</code></td>
+<td>The separately approved proposal was written</td>
+<td>Verify the real source and rendered result</td>
+</tr>
+</tbody></table>
+</div><p>A task proposal can combine 1–50 non-overlapping supported prose replacements in
+<strong>one original file</strong>. Every replacement refers to that original source version;
+the backend validates exact quotes, Unicode and source mapping, then applies the
+set to one source snapshot. It rejects overlap, unsafe markup boundaries and
+unsupported structural changes instead of applying a partial set. A related
+Angular component remains context, not an additional write target.</p>
+<p>Source, feedback revision and component-context hashes are rechecked around
+launch and before proposal creation/apply. A changed context requires renewed
+review. A separate manual resolution needs a written reason and current source
+and feedback state; it is visibly distinguished from an applied fix. Even a
+validated <code>already_satisfied</code> statement is the model’s judgment, not independent
+proof that the editorial task was solved.</p>
+<h3 id="files-beside-the-source">Files beside the source<a class="heading-anchor" href="#files-beside-the-source" aria-label="Link to this section">#</a></h3><p>Today's tasks and decisions live under the <strong>registered source project's</strong> hidden
+<code>.voice-lint/</code> folder. That project can be a Git checkout or an ordinary folder;
+the registered root can also be a subfolder of a larger repository.</p>
+<figure class="code-block"><figcaption><span>text</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="text code"><code>&lt;registered source project&gt;/
+  guide.md
+  voice.config.json                         # optional route/source configuration
+  .voice-lint/
+    reviews/&lt;document-id&gt;.voice-meta.json    # feedback, decisions, proposals
+    tasks/&lt;document-id&gt;/&lt;task-id&gt;.json       # task, prepared prompt, fingerprints
+    semantic-runs/&lt;run-id&gt;/
+      request.claim                         # duplicate-start protection
+      input.json                            # staged source and related context
+      run.json                              # state, findings/alternatives, usage
+      output.txt                            # collected model output
+    backups/&lt;document-id&gt;/&lt;proposal-id&gt;.md   # original source before apply
+    transactions/&lt;document-id&gt;-&lt;proposal-id&gt;.json</code></pre></figure><p>The backup extension follows the source file: <code>.md</code>, <code>.html</code>, <code>.ts</code>, etc.
+Keep decisions are items in the sidecar's <code>decisions</code> array; proposals are in
+<code>proposals</code>. They do not get individual decision/proposal files. A task also
+retains its linked proposal in <code>task.proposal</code>.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Documentation table"><table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Persistent change</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Open a document</td>
+<td>May create the reviews directory. Existing metadata can be rewritten for source reanchoring or interrupted-write recovery; an untouched new document needs no sidecar file yet.</td>
+</tr>
+<tr>
+<td>Save feedback / Keep as written</td>
+<td>Create/update the review sidecar and its revision. No source edit or model call.</td>
+</tr>
+<tr>
+<td>Save a task</td>
+<td>Create its JSON with <code>queued</code>, prepared prompt and current source/review/context fingerprints. No model call.</td>
+</tr>
+<tr>
+<td>Explicitly start</td>
+<td>Update the task with <code>runId</code>; after admission checks, create the run claim, input and running record. A failure before admission can leave a failed task without a run folder.</td>
+</tr>
+<tr>
+<td>Finish or cancel</td>
+<td>Persist run outcome and collected output. A successful task can prepare a sidecar proposal and retain it in its task record. Source remains unchanged.</td>
+</tr>
+<tr>
+<td>Explicitly apply</td>
+<td>Write the original-source backup and pending transaction journal, apply the checked source change, update metadata, then mark the journal completed.</td>
+</tr>
+</tbody></table>
+</div><h3 id="stored-json-and-the-reference-chain">Stored JSON and the reference chain<a class="heading-anchor" href="#stored-json-and-the-reference-chain" aria-label="Link to this section">#</a></h3><p>The linked files show <strong>synthetic examples of current storage</strong>, not real user
+records, API requests or the planned holistic schema. The fictional source is
+<code>guide.md</code> with exactly <code>Clear copy.\n</code>:</p>
+<ul>
+<li><a href="/voice/sources/examples/stored-source-task.example.json" data-json-viewer="" aria-haspopup="dialog">Complete task JSON</a>: a <code>ready</code>
+task and proposal changing <code>copy</code> to <code>instructions</code>. Its prepared prompt is
+an explicitly labeled placeholder; no model generated this example.</li>
+<li><a href="/voice/sources/examples/stored-selection-decision.example.json" data-json-viewer="" aria-haspopup="dialog">Complete review-sidecar JSON</a>:
+the earlier sidecar state after keeping <code>Clear</code>, before a proposal exists.</li>
+</ul>
+<p>The stored task is a wrapper around the API's <code>ImprovementTask</code>. This excerpt
+shows its links; the download includes all fields:</p>
+<figure class="code-block"><figcaption><span>json</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="json code"><code>{
+  <span class="syntax-string">"task"</span>: {
+    <span class="syntax-string">"status"</span>: <span class="syntax-string">"ready"</span>,
+    <span class="syntax-string">"documentId"</span>: <span class="syntax-string">"doc-dc0dbe13416a77d1"</span>,
+    <span class="syntax-string">"id"</span>: <span class="syntax-string">"4354b61ec302dd4963c5264d0e313b25"</span>,
+    <span class="syntax-string">"runId"</span>: <span class="syntax-string">"644e8e50d6185aee1c92635408fe1af8"</span>,
+    <span class="syntax-string">"proposalId"</span>: <span class="syntax-string">"1edf21d420d5a71fa53e5a7395988f91"</span>
+  }
+}</code></pre></figure><p>Follow <code>documentId</code> to the review sidecar and its <code>documentPath</code> to the source
+file. Follow <code>runId</code> to <code>semantic-runs/&lt;run-id&gt;/run.json</code>; that task-generated
+run carries <code>taskId</code> back. <code>proposalId</code> selects the sidecar proposal, whose
+<code>taskId</code>/<code>runId</code> must match. The proposal retains <code>sourceBefore</code>,
+<code>sourceAfter</code>, exact edit quotes and mapped source spans. The saved diff is not
+the current Git diff.</p>
+<p>The wrapper also stores <code>prompt</code>, <code>creationFingerprint</code>,
+<code>contextFingerprint</code>, <code>startRequestId</code> and <code>startFingerprint</code>.
+The start fields are null before start; fingerprints reject changed input under
+the same request ID and bind the task to its source, review and component context.
+These are storage fields, not extra task API inputs. JSON property names are
+camelCase, including null fields, as emitted by the current backend serializer.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Documentation table"><table>
+<thead>
+<tr>
+<th>Identifier or version</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>project-&lt;12 hex&gt;</code></td>
+<td>Hash-derived from the absolute registration path; moving the checkout can change it. Built-in examples use named IDs.</td>
+</tr>
+<tr>
+<td><code>doc-&lt;16 hex&gt;</code></td>
+<td>SHA-256 prefix of the project-relative path with forward slashes. A rename changes it; a text edit does not.</td>
+</tr>
+<tr>
+<td>Task/run/proposal/decision IDs</td>
+<td>32-character identifiers derived from request/owner identity; manual proposals use random GUIDs. None is a Git commit.</td>
+</tr>
+<tr>
+<td><code>sourceVersion</code>, proposal <code>expectedVersion</code></td>
+<td>SHA-256 of decoded source text encoded as UTF-8, not a Git SHA or necessarily the original byte hash including BOM.</td>
+</tr>
+<tr>
+<td>Sidecar <code>revision</code> / task <code>reviewRevision</code></td>
+<td>Document review-state counter; task <code>revision</code> is a separate task-state counter.</td>
+</tr>
+<tr>
+<td><code>unitsFingerprint</code>, <code>contextFingerprint</code></td>
+<td>Backend-owned hashes of serialized source mapping/context, not user settings.</td>
+</tr>
+</tbody></table>
+</div><p>Keep entries retain their quote, unit-local UTF-16 range and original source
+version. Source/mapping changes mark them stale. Sidecars and task/run files are
+mutable operational records with revision checks, not an append-only decision
+ledger. The legacy <code>improvementRequests</code> array is separate from today's task store.</p>
+<h3 id="private-storage-and-git">Private storage and Git<a class="heading-anchor" href="#private-storage-and-git" aria-label="Link to this section">#</a></h3><p>Studio's installation keeps the local project registry in
+<code>.voice-studio/projects.json</code> and a credential-file pointer in
+<code>.voice-studio/session-location.json</code>. Credentials, browser trust and CLI
+scratch work are separate from the source-side records:</p>
+<figure class="code-block"><figcaption><span>text</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="text code"><code>&lt;user LocalApplicationData&gt;/VoiceStudio/sessions/&lt;installation-hash&gt;/
+  session.json                            # private credentials
+  trusted-browsers.json                    # hashed browser trust
+  checks.json                             # host-owned check configuration
+  runner/workspaces/&lt;run-id&gt;/
+    review-context.json                   # CLI staging copy
+    .git/                                 # scratch init, no source commit</code></pre></figure><p><strong>Studio does not auto-commit, push or synchronize these records, and does not add
+<code>.voice-lint/</code> to each project's ignore rules.</strong> Inspect what Git would include:
+source-side tasks and runs can contain full source, prompts and model output;
+transaction journals contain a local absolute backup path. Preserve source and
+relevant metadata/backups together when retaining work. A hash cannot restore
+content, source Git history cannot recover ignored metadata, and a proposal
+backup covers one file only. The journal detects interrupted writes and refuses
+to overwrite an unrelated source version. Moving a checkout can also require an
+identity migration that is not automated. Use backend operations rather than
+editing active metadata; keep credentials and installation registry files private.</p>
+<p>The <code>.voice-review/contexts/</code> and <code>.voice-review/reviews/</code> layout in
+<a href="/voice/guides/holistic-review/">holistic-review.md</a> is the <strong>planned</strong> portable Git format,
+not today's storage. Automatic export/migration to it is not implemented.</p>
+<h2 id="semantic-review-is-a-runner-task">Semantic review is a Runner task<a class="heading-anchor" href="#semantic-review-is-a-runner-task" aria-label="Link to this section">#</a></h2><p>The implemented adapter uses <code>CodingAgentRunner</code> 0.7.0, not a direct model SDK.
+Only the explicit review action starts a run. It stages the current file, mapped
+units, feedback and bounded configured component context in a separate workspace.
+The Runner is given read-only permission, clean context and no delegation.
+Findings need valid source-version, unit, quote and UTF-16 span references plus
+reasoning. Failed, cancelled, interrupted and stale runs are distinct from
+completed results. Malformed or incomplete model replies fail validation.</p>
+<p>Applying source changes remains an explicit backend proposal action. Ordinary
+semantic-review findings are advisory; they do not create proposals automatically.
+An explicitly started improvement task may prepare a validated combined proposal,
+which enters the same human-reviewed diff workflow as a manual suggestion. A syntactically valid JSON
+reply is not a proof of truth or editorial quality. Qualification, comparative
+Voice benchmarks and Token Economy admission remain separate integration work.
+See <a href="/voice/guides/runner-integration/">Runner integration</a> and <span class="repository-reference" title="Reference in the source repository">model strategy</span>.</p>
+<h2 id="explain-the-checks-and-preserve-review-evidence">Explain the checks and preserve review evidence<a class="heading-anchor" href="#explain-the-checks-and-preserve-review-evidence" aria-label="Link to this section">#</a></h2><p>The local checker and wiki load one <code>knowledge/rules.json</code> catalogue with four
+advisory rules, their triggers, questions, examples and limitations. The wiki also
+explains source mapping, feedback, model choice and language-tool candidates.
+LanguageTool, Vale, CSpell, Hunspell and textlint are not integrated analyzers in
+this preview. See <span class="repository-reference" title="Reference in the source repository">language tooling</span> and
+<a href="/voice/guides/notices/">third-party notices</a> for engine/data separation and the
+604-entry resolved npm metadata inventory.</p>
+<p>The <span class="repository-reference" title="Reference in the source repository">Agent Studio website review</span> covers
+all 27 routes and 30 content files. Its 36 findings retain exact quotes, file
+hashes, evidence and dispositions in a companion JSON file. Import only after
+rechecking the current source; release-alignment questions are not automatically
+false claims, and replacement text is not automatically applied.</p>
+<p>The original dossier introduction is a retained counterexample: the local rule
+engine reports <strong>zero findings</strong> for “Voice Lint concept revision” and its
+“Research and analysis behind a sober public voice…” paragraph. That result only
+means no implemented fixed rule matched. A semantic review should address its
+abstract internal terminology and weak explanation of the reader's benefit.</p>
+</div><details class="source-details"><summary data-en="Git and source reference" data-de="Git- und Quellbezug">Git and source reference</summary><p>Source for this page: <code>docs/workflow.md</code>. Content hash and Git revision: <a href="/voice/build-info.json">Build record</a>.</p><a href="/voice/sources/workflow.md" download="" data-en="Download the Markdown source" data-de="Markdown-Quelle herunterladen">Download the Markdown source</a><p>Additional references in the repository:</p><ul><li><code>docs/model-strategy.md</code></li><li><code>docs/language-tooling.md</code></li><li><code>docs/reviews/agent-studio-website-2026-09-06.md</code></li></ul></details><a class="next-guide" href="/voice/guides/library/"><span data-en="Next guide" data-de="Nächster Guide">Next guide</span><strong>Mount the review library →</strong></a></article><aside class="page-outline"><p data-en="On this page" data-de="Auf dieser Seite">On this page</p><nav aria-label="On this page"><a href="#start-your-first-review">Start your first review</a><a href="#angular-applications-browse-the-running-app">Angular applications: browse the running app</a><a href="#json-content-and-the-voice-website">JSON content and the Voice website</a><a href="#markdown-browse-the-project-folder">Markdown: browse the project folder</a><a href="#review-and-source-changes">Review and source changes</a><a href="#local-project-checks-after-apply">Local project checks after apply</a><a href="#saved-tasks-and-decisions">Saved tasks and decisions</a><a href="#semantic-review-is-a-runner-task">Semantic review is a Runner task</a><a href="#explain-the-checks-and-preserve-review-evidence">Explain the checks and preserve review evidence</a></nav></aside></div></main><footer class="site-footer"><a href="https://agent-orchestrator.dev/">Agent Orchestrator ecosystem</a><p data-en="Git and folders · Explicit source changes" data-de="Git und Ordner · Bewusste Quelländerungen">Git and folders · Explicit source changes</p><a href="/voice/build-info.json" data-en="Build record" data-de="Build-Nachweis">Build record</a></footer><script src="/voice/site.js" defer=""></script></body></html>

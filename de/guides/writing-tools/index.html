@@ -1,0 +1,122 @@
+<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Schreibwerkzeuge für Agenten · Voice docs</title><meta name="description" content="Vier LLM-Tools für Regelwissen, Review-Prompts, lokale Textsignale und vom Host bereitgestellte Modellnachweise registrieren."><link rel="canonical" href="https://agent-orchestrator.dev/voice/de/guides/writing-tools/"><link rel="stylesheet" href="/voice/site.css"><link rel="stylesheet" href="/voice/docs.css"><meta name="theme-color" content="#14271f"><link rel="alternate" hreflang="en" href="https://agent-orchestrator.dev/voice/guides/writing-tools/"><link rel="alternate" hreflang="de" href="https://agent-orchestrator.dev/voice/de/guides/writing-tools/"><link rel="alternate" hreflang="x-default" href="https://agent-orchestrator.dev/voice/guides/writing-tools/"><meta property="og:type" content="website"><meta property="og:site_name" content="Voice Lint"><meta property="og:title" content="Schreibwerkzeuge für Agenten · Voice docs"><meta property="og:description" content="Vier LLM-Tools für Regelwissen, Review-Prompts, lokale Textsignale und vom Host bereitgestellte Modellnachweise registrieren."><meta property="og:url" content="https://agent-orchestrator.dev/voice/de/guides/writing-tools/"><meta property="og:locale" content="de_DE"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Schreibwerkzeuge für Agenten · Voice docs","description":"Vier LLM-Tools für Regelwissen, Review-Prompts, lokale Textsignale und vom Host bereitgestellte Modellnachweise registrieren.","url":"https://agent-orchestrator.dev/voice/de/guides/writing-tools/","inLanguage":"de","isPartOf":{"@type":"WebSite","name":"Voice Lint","url":"https://agent-orchestrator.dev/voice/"}}</script></head><body class="guide-page"><a class="skip" href="#content" data-en="Skip to content" data-de="Zum Inhalt">Zum Inhalt</a><header class="site-header"><a class="brand" href="/voice/de/" aria-label="Voice-Startseite">voice <i>/</i></a><nav class="site-nav" aria-label="Hauptnavigation"><div class="nav-tools" role="group" aria-label="Werkzeuge"><a href="/voice/de/studio/" data-en="Studio" data-de="Studio">Studio</a><a href="/voice/de/library/" data-en="Library" data-de="Library">Library</a></div><div class="nav-resources" role="group" aria-label="Wissen"><a href="/voice/de/research/" data-en="Research" data-de="Forschung">Forschung</a><a href="/voice/de/writing-patterns/" data-en="AI anti-patterns" data-de="KI-Negativmuster">KI-Negativmuster</a><a href="/voice/de/docs/" aria-current="page" data-en="Docs" data-de="Doku">Doku</a></div></nav><div class="language" role="group" aria-label="Sprache"><a data-locale="en" href="/voice/guides/writing-tools/" hreflang="en" lang="en" aria-label="English">EN</a><a data-locale="de" href="/voice/de/guides/writing-tools/" hreflang="de" lang="de" aria-label="Deutsch" aria-current="true">DE</a></div></header><main id="content"><div class="docs-breadcrumb"><a href="/voice/de/docs/" data-en="Docs" data-de="Doku">Doku</a><span aria-hidden="true">/</span><span>Einstieg</span></div><div class="docs-layout"><aside class="guide-sidebar"><details class="guide-menu" open=""><summary data-en="All guides" data-de="Alle Guides">Alle Guides</summary><nav aria-label="Dokumentation"><div class="guide-group"><p>Einstieg</p><a href="/voice/de/guides/writing-tools/" aria-current="page">Schreibwerkzeuge für Agenten</a><a href="/voice/de/guides/workflow/">Der Ablauf in Studio</a><a href="/voice/de/guides/library/">Die Review-Library einbinden</a><a href="/voice/de/guides/agent-integration/">KI-Befunde in der eigenen Anwendung anzeigen</a></div><details class="guide-group guide-group-details"><summary>Referenz</summary><a href="/voice/de/guides/review-benchmarks/">Benchmarks für Textreviews</a><a href="/voice/de/guides/writing-rules/">Schreibregeln und Prompts zusammenstellen</a><a href="/voice/de/guides/ai-text-signals/">KI-typische Schreibmuster prüfen</a><a href="/voice/de/guides/session/">Einmal koppeln, sieben Tage angemeldet bleiben</a><a href="/voice/de/guides/usability/">Entscheidungen und Quellversionen</a><a href="/voice/de/guides/library-types/">Typen, IntelliSense und Beispiele</a><a href="/voice/de/guides/live-bridge/">Das Protokoll der Live-Bridge</a><a href="/voice/de/guides/runner-integration/">Runner-Anfragen und Quelltextvorschläge</a><a href="/voice/de/guides/checks/">Lokale Build- und Testprüfungen</a><a href="/voice/de/guides/holistic-review/">Quelltext in einem Git-Repository prüfen</a></details><details class="guide-group guide-group-details"><summary>Wartung</summary><a href="/voice/de/guides/maintaining/">Produktdateien, Werkzeuge und Nachweise</a><a href="/voice/de/guides/commands/">Befehlskatalog für den Betrieb</a><a href="/voice/de/guides/verification/">Datierte Prüfnachweise</a><a href="/voice/de/guides/notices/">Drittanbieterhinweise</a></details></nav></details></aside><article class="guide-article" lang="de"><header class="guide-heading"><h1>Schreibwerkzeuge für Agenten</h1><p class="lead">Vier LLM-Tools für Regelwissen, Review-Prompts, lokale Textsignale und vom Host bereitgestellte Modellnachweise registrieren.</p></header><details class="mobile-outline"><summary data-en="On this page" data-de="Auf dieser Seite">Auf dieser Seite</summary><nav aria-label="Seitenabschnitte"><a href="#register-and-dispatch-tools">Tools registrieren und Aufrufe ausführen</a><a href="#tool-inputs-and-results">Eingaben und Ergebnisse der Tools</a><a href="#read-model-quality-evidence">Nachweise zur Modellqualität lesen</a><a href="#review-results-before-using-them">Ergebnisse vor der Verwendung prüfen</a></nav></details><div class="guide-content"><p><code>@voice/writing-rules/tools</code> stellt einem Agenten vier ausschließlich lesende Tools bereit. Die einbindende Anwendung registriert deren JSON-Schemas beim Modellanbieter und führt die zurückgegebenen Tool-Aufrufe aus. Der Adapter ruft Regelwissen ab, stellt Prüfanweisungen zusammen, sucht nach festgelegten Formulierungen und liest Qualitätsnachweise, die die Anwendung bereitstellt.</p>
+<p><code>@voice/writing-rules</code> liefert Analyse und Prüfanweisungen. <code>@voice/review</code> ermöglicht Textauswahl und die Darstellung von Befunden in HTML. Ein Agent kann die Tools ohne Browser verwenden. Eine Website kann Befunde aus jeder kompatiblen Prüfkomponente darstellen.</p>
+<h2 id="register-and-dispatch-tools">Tools registrieren und Aufrufe ausführen<a class="heading-anchor" href="#register-and-dispatch-tools" aria-label="Link zu diesem Abschnitt">#</a></h2><figure class="code-block"><figcaption><span>ts</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Kopieren</button></figcaption><pre tabindex="0" aria-label="ts code"><code><span class="syntax-keyword">import</span> {
+  writingReviewTools,
+  createWritingToolDispatcher,
+  <span class="syntax-keyword">type</span> WritingToolCall,
+} <span class="syntax-keyword">from</span> <span class="syntax-string">'@voice/writing-rules/tools'</span>;
+
+<span class="syntax-keyword">const</span> dispatcher = createWritingToolDispatcher({
+  reviewContext: {
+    audience: <span class="syntax-string">'Developers reading the setup guide'</span>,
+    goal: <span class="syntax-string">'Open a project folder and complete the first review'</span>,
+  },
+});
+
+<span class="syntax-comment">// Adapt each { name, description, inputSchema } descriptor to the provider's</span>
+<span class="syntax-comment">// tool format. The host owns registration, model execution and conversation.</span>
+<span class="syntax-keyword">const</span> definitions = writingReviewTools;
+
+<span class="syntax-comment">// Example of an already decoded model tool call; no model is called here.</span>
+<span class="syntax-keyword">const</span> call: WritingToolCall = {
+  name: <span class="syntax-string">'find_writing_signals'</span>,
+  arguments: {
+    text: <span class="syntax-string">'A powerful review panel.'</span>,
+    language: <span class="syntax-string">'en'</span>,
+    ruleIds: [<span class="syntax-string">'word-choice'</span>],
+  },
+};
+<span class="syntax-keyword">const</span> result = <span class="syntax-keyword">await</span> dispatcher.dispatch(call);
+<span class="syntax-comment">// The host can return JSON.stringify(result) as the provider's tool result.</span></code></pre></figure><p>Die Beschreibungen sind anbieterunabhängige JSON-Schema-Objekte, keine Request-Objekte eines Anbieter-SDKs. Der Dispatcher nimmt bereits dekodierte Argumente als Objekt entgegen. Er liefert <code>{ ok: true, tool, data }</code> oder <code>{ ok: false, tool, error: { code, message } }</code>. Unbekannte Tools, zusätzliche Felder, nicht unterstützte Sprachen und ungültige Auswahlen führen zu strukturierten Fehlern. Der angeforderte Prüfumfang wird nicht stillschweigend verändert.</p>
+<p>Die Anwendung legt Zielgruppe und Ziel beim Erstellen des Dispatchers fest. Ein Tool-Aufruf kann diese Werte weder ersetzen noch einen Callback registrieren, einen Endpunkt konfigurieren oder Quelltext ausführen. Rohe Dokumente bleiben nicht vertrauenswürdiges Prüfmaterial. Das Paket benötigt weder Netzwerk- oder Dateisystemzugriff noch Zugangsdaten, Anbieter-SDKs oder eine Modellausführung.</p>
+<h2 id="tool-inputs-and-results">Eingaben und Ergebnisse der Tools<a class="heading-anchor" href="#tool-inputs-and-results" aria-label="Link zu diesem Abschnitt">#</a></h2><div class="table-scroll" tabindex="0" role="region" aria-label="Dokumentationstabelle"><table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Eingaben</th>
+<th>Ergebnis</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>get_writing_rules</code></td>
+<td>Optional: <code>profile</code>, <code>ruleIds</code>, <code>language</code>, <code>detail</code></td>
+<td>Standardmäßig eine kurze Regelliste. <code>detail: "full"</code> liefert vollständige Regeln, übersetzte Prompts und Beispiele, Ausnahmen und die Quellenbelege aus dem Katalog.</td>
+</tr>
+<tr>
+<td><code>compose_writing_review_prompt</code></td>
+<td>Optional: <code>profile</code>, <code>ruleIds</code>, <code>language</code>, <code>maxFindings</code></td>
+<td>Kanonischer Prompt-Text, ausgewählte Regel-IDs und Katalogversion. Zielgruppe und Ziel müssen von der Anwendung vorgegeben sein. Standardmäßig werden die sechs Regeln für öffentliche Dokumentation verwendet.</td>
+</tr>
+<tr>
+<td><code>find_writing_signals</code></td>
+<td>Erforderlich: <code>text</code>; optional: <code>profile</code>, <code>ruleIds</code>, <code>language</code>, <code>maxSignals</code></td>
+<td>Trefferkandidaten der veröffentlichten regulären Ausdrücke mit zitierten UTF-16-Bereichen, geprüften und nicht geprüften Regeln sowie Angabe einer Kürzung.</td>
+</tr>
+<tr>
+<td><code>get_model_comparison_evidence</code></td>
+<td>Erforderlich: <code>language</code>, <code>profile</code>, <code>role: "reviewer"</code>, <code>cohortId</code></td>
+<td>Von der Anwendung bereitgestellte Nachweise für genau diesen Prüfumfang oder <code>evidence-missing</code>.</td>
+</tr>
+</tbody></table>
+</div><p>Unterstützte Sprachen sind <code>en</code> und <code>de</code>. Ohne Sprachangabe verwenden die ersten drei Tools Englisch. Verfügbare Profile sind <code>public-docs</code>, <code>technical-reference</code>, <code>product-copy</code> und <code>agent-report</code>. Explizit angegebene Regel-IDs müssen zum ausgewählten Profil gehören. Leere ID-Arrays und doppelte IDs werden abgelehnt.</p>
+<p><code>maxFindings</code> erlaubt Werte von 1 bis 20; der Standardwert ist fünf. Das Feld fordert ein Antwortformat an, begrenzt aber nicht die Modellausführung. <code>maxSignals</code> erlaubt 1 bis 500 und verwendet standardmäßig 50. Eingabetext darf höchstens 250.000 UTF-16-Codeeinheiten umfassen. Bei Zeichen außerhalb der Basic Multilingual Plane können die Zeichenlänge nach JSON Schema und die UTF-16-Länge in JavaScript voneinander abweichen. Die Laufzeitprüfung setzt das UTF-16-Limit durch.</p>
+<figure class="code-block"><figcaption><span>ts</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Kopieren</button></figcaption><pre tabindex="0" aria-label="ts code"><code><span class="syntax-keyword">const</span> knowledge = <span class="syntax-keyword">await</span> dispatcher.dispatch({
+  name: <span class="syntax-string">'get_writing_rules'</span>,
+  arguments: { ruleIds: [<span class="syntax-string">'reader-goal'</span>, <span class="syntax-string">'word-choice'</span>], detail: <span class="syntax-string">'full'</span> },
+});
+
+<span class="syntax-keyword">const</span> instructions = <span class="syntax-keyword">await</span> dispatcher.dispatch({
+  name: <span class="syntax-string">'compose_writing_review_prompt'</span>,
+  arguments: { profile: <span class="syntax-string">'public-docs'</span>, language: <span class="syntax-string">'en'</span>, maxFindings: <span class="syntax-number">3</span> },
+});</code></pre></figure><p>Vollständiges Regelwissen enthält die zweisprachigen Katalogeinträge. <code>language</code> bestimmt die Sprache der zusammengefassten Titel sowie die Prompt- und Scanner-Sprache. Der Composer nimmt die ausgewählten Anweisungen und Beispiele mit ihren Anwendungsbedingungen auf. Er hängt weder Forschungsartikel noch sämtliche Metadatenfelder des Katalogs an. Ein neuer Artikel auf der Website aktualisiert das Regelwissen des Pakets nicht automatisch.</p>
+<h2 id="read-model-quality-evidence">Nachweise zur Modellqualität lesen<a class="heading-anchor" href="#read-model-quality-evidence" aria-label="Link zu diesem Abschnitt">#</a></h2><p>Die Anwendung stellt verfügbare Modell-IDs, erlaubte Kohorten-IDs und einen ausschließlich lesenden Callback für Nachweise bereit. Diese Werte stammen aus der Anwendungskonfiguration und ihrem Modellkatalog. Der Tool-Aufruf übergibt nur den gewünschten Prüfumfang.</p>
+<figure class="code-block"><figcaption><span>ts</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Kopieren</button></figcaption><pre tabindex="0" aria-label="ts code"><code><span class="syntax-keyword">import</span> {
+  createWritingToolDispatcher,
+  <span class="syntax-keyword">type</span> ModelComparisonEvidence,
+} <span class="syntax-keyword">from</span> <span class="syntax-string">'@voice/writing-rules/tools'</span>;
+
+<span class="syntax-keyword">const</span> evidenceTools = createWritingToolDispatcher({
+  modelComparisonContext: {
+    availableModelIds: [<span class="syntax-string">'model-id-resolved-by-the-host'</span>],
+    cohortIds: [<span class="syntax-string">'public-docs-held-out-v1'</span>],
+  },
+  getModelComparisonEvidence: <span class="syntax-keyword">async</span> (query, context) =&gt; {
+    <span class="syntax-comment">// A host can read retained, independently reviewed benchmark results here.</span>
+    <span class="syntax-comment">// This example deliberately has no measured comparison to return.</span>
+    <span class="syntax-keyword">const</span> result: ModelComparisonEvidence = {
+      status: <span class="syntax-string">'evidence-missing'</span>,
+      query,
+      bestValue: <span class="syntax-keyword">null</span>,
+      highestDetection: <span class="syntax-keyword">null</span>,
+      sources: [],
+      explanation: <span class="syntax-string">'No independently reviewed comparison is available for this scope.'</span>,
+      limitations: [
+        <span class="syntax-string">'The authored pilot and researched token prices do not qualify a model.'</span>,
+      ],
+    };
+    <span class="syntax-keyword">return</span> result;
+  },
+});
+
+<span class="syntax-keyword">const</span> evidence = <span class="syntax-keyword">await</span> evidenceTools.dispatch({
+  name: <span class="syntax-string">'get_model_comparison_evidence'</span>,
+  arguments: {
+    language: <span class="syntax-string">'en'</span>,
+    profile: <span class="syntax-string">'public-docs'</span>,
+    role: <span class="syntax-string">'reviewer'</span>,
+    cohortId: <span class="syntax-string">'public-docs-held-out-v1'</span>,
+  },
+});</code></pre></figure><p>Der Callback darf gespeicherte Nachweise lesen. Er darf weder eine Modellausführung starten noch eine Route ändern oder Zustand schreiben. Die Library selbst führt keine solchen Aufrufe aus; beliebiger Callback-Code der Anwendung lässt sich durch sie jedoch nicht abschirmen. Abfrage und Kontext werden als unveränderliche Kopien festgehalten. Spätere Änderungen an den Eingabe-Arrays der Anwendung verändern den Dispatcher nicht.</p>
+<p>Ein verfügbarer Vergleich enthält <code>bestValue</code>, <code>highestDetection</code> oder beides. Jede Auswahl nennt die Modell-ID der Anwendung, Quellen-IDs, die Kennzeichnung unabhängiger Beurteilung, die Anzahl geplanter, beurteilter und akzeptierter vollständiger Reviews, Erkennungszahlen, die Anzahl falscher Änderungsvorschläge, Kosten sämtlicher Versuche und Einschränkungen. Quelldatensätze enthalten einen Speicherort und SHA-256. Speicherorte werden als Daten zurückgegeben; der Adapter ruft sie nicht ab.</p>
+<ul>
+<li><code>bestValue</code> setzt unabhängig beurteilte Reviews, mindestens ein akzeptiertes vollständiges Review und bekannte Kosten einschließlich fehlgeschlagener und wiederholter Versuche voraus.</li>
+<li><code>highestDetection</code> verlangt unabhängige Urteile zu einzelnen Problemen: Anzahlen erkannter und erwarteter Probleme sowie falscher Änderungsvorschläge. Übereinstimmung mit wenigen Testfall-Labels reicht dafür nicht aus.</li>
+<li>Unbekannte Messwerte bleiben <code>null</code>. Ein Vergleich kann das Preis-Leistungs-Verhältnis belegen, während Nachweise zur Erkennungsleistung fehlen.</li>
+</ul>
+<p>Die Anwendung erklärt ihre Qualitätskriterien und die Grenzen des Vergleichs. Eine Auswahl muss auf übereinstimmendem Prüfumfang, unterstützten Modelleinstellungen und reproduzierbaren Berichten beruhen. Der Adapter prüft Struktur, Quellenverweise, verfügbare IDs, Anzahlen sowie die genaue Übereinstimmung von Sprache, Profil, Rolle und Kohorte. Er prüft nicht den Inhalt der Berichte und berechnet kein optimales Modell. Eine Anwendung kann bestehende Token-Economy-Verträge zur Modellauflösung und für Kostennachweise verwenden. Dieses Paket stellt keinen Ersatz für das Routing bereit.</p>
+<p>Fehlen Callback oder Kontext, lautet das Ergebnis <code>evidence-missing</code> mit <code>null</code> für die Modellauswahl. Ein fehlgeschlagener Callback liefert <code>host-evidence-failed</code>; eine fehlerhafte oder nicht passende Antwort liefert <code>invalid-host-evidence</code>. In keinem dieser Fälle wird ein anderes Modell oder eine andere Sprache eingesetzt.</p>
+<h2 id="review-results-before-using-them">Ergebnisse vor der Verwendung prüfen<a class="heading-anchor" href="#review-results-before-using-them" aria-label="Link zu diesem Abschnitt">#</a></h2><p>Der statische Scanner erkennt Muster für acht Regeln anhand von sechzehn EN/DE-Regex-Einträgen. Er schließt Code, Zitate oder Verneinungen nicht aus und beurteilt weder Bedeutung noch Faktenbelege, Seitenstruktur oder Urheberschaft. Jeder Treffer muss geprüft werden.</p>
+<p>Das Prompt-Tool bereitet Anweisungen vor. Die Anwendung entscheidet über deren Übermittlung und validiert jedes zurückgegebene Urteil. Sie ordnet auch Quelltextbereiche zu, erhält Entscheidungen der Autorinnen und Autoren und übergibt Befunde bei Bedarf an <code>@voice/review</code> zur Darstellung in HTML. Die Ausführung eines Tools allein verändert kein Dokument.</p>
+<p>Die lokalen Tests für den Adaptervertrag lassen sich so ausführen:</p>
+<figure class="code-block"><figcaption><span>sh</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Kopieren</button></figcaption><pre tabindex="0" aria-label="sh code"><code>npm --prefix packages/writing-rules test</code></pre></figure><p>Diese Tests führen synthetische Tool-Aufrufe aus und prüfen die tatsächlichen Katalog-, Prompt- und Regex-Ergebnisse. Nachweis-Testdaten decken fehlende oder ungültige Daten und die Begrenzung auf Lesezugriffe ab. Sie messen weder Modellqualität noch Preise oder Ausführungsdauer.</p>
+</div><details class="source-details"><summary data-en="Git and source reference" data-de="Git- und Quellbezug">Git- und Quellbezug</summary><p>Quelle dieser Seite: <code>website/guides/de/writing-tools.md</code>. Inhaltshash und Git-Revision: <a href="/voice/build-info.json">Build-Nachweis</a>.</p><a href="/voice/sources/de/writing-tools.md" download="" data-en="Download the Markdown source" data-de="Markdown-Quelle herunterladen">Markdown-Quelle herunterladen</a></details></article><aside class="page-outline"><p data-en="On this page" data-de="Auf dieser Seite">Auf dieser Seite</p><nav aria-label="Auf dieser Seite"><a href="#register-and-dispatch-tools">Tools registrieren und Aufrufe ausführen</a><a href="#tool-inputs-and-results">Eingaben und Ergebnisse der Tools</a><a href="#read-model-quality-evidence">Nachweise zur Modellqualität lesen</a><a href="#review-results-before-using-them">Ergebnisse vor der Verwendung prüfen</a></nav></aside></div></main><footer class="site-footer"><a href="https://agent-orchestrator.dev/">Agent-Orchestrator-Ökosystem</a><p data-en="Git and folders · Explicit source changes" data-de="Git und Ordner · Bewusste Quelländerungen">Git und Ordner · Bewusste Quelländerungen</p><a href="/voice/build-info.json" data-en="Build record" data-de="Build-Nachweis">Build-Nachweis</a></footer><script src="/voice/site.js" defer=""></script></body></html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pair once. Resume for seven days. · Voice docs</title><meta name="description" content="Local pairing, browser trust, expiry and logout, with the exact HTTP contract."><link rel="canonical" href="https://agent-orchestrator.dev/voice/guides/session/"><link rel="stylesheet" href="/voice/site.css"><link rel="stylesheet" href="/voice/docs.css"><meta name="theme-color" content="#14271f"><link rel="alternate" hreflang="en" href="https://agent-orchestrator.dev/voice/guides/session/"><link rel="alternate" hreflang="de" href="https://agent-orchestrator.dev/voice/de/guides/session/"><link rel="alternate" hreflang="x-default" href="https://agent-orchestrator.dev/voice/guides/session/"><meta property="og:type" content="website"><meta property="og:site_name" content="Voice Lint"><meta property="og:title" content="Pair once. Resume for seven days. · Voice docs"><meta property="og:description" content="Local pairing, browser trust, expiry and logout, with the exact HTTP contract."><meta property="og:url" content="https://agent-orchestrator.dev/voice/guides/session/"><meta property="og:locale" content="en_US"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Pair once. Resume for seven days. · Voice docs","description":"Local pairing, browser trust, expiry and logout, with the exact HTTP contract.","url":"https://agent-orchestrator.dev/voice/guides/session/","inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Voice Lint","url":"https://agent-orchestrator.dev/voice/"}}</script></head><body class="guide-page"><a class="skip" href="#content" data-en="Skip to content" data-de="Zum Inhalt">Skip to content</a><header class="site-header"><a class="brand" href="/voice/" aria-label="Voice home">voice <i>/</i></a><nav class="site-nav" aria-label="Main"><div class="nav-tools" role="group" aria-label="Tools / Werkzeuge"><a href="/voice/studio/" data-en="Studio" data-de="Studio">Studio</a><a href="/voice/library/" data-en="Library" data-de="Library">Library</a></div><div class="nav-resources" role="group" aria-label="Knowledge / Wissen"><a href="/voice/research/" data-en="Research" data-de="Forschung">Research</a><a href="/voice/writing-patterns/" data-en="AI anti-patterns" data-de="KI-Negativmuster">AI anti-patterns</a><a href="/voice/docs/" aria-current="page" data-en="Docs" data-de="Doku">Docs</a></div></nav><div class="language" role="group" aria-label="Language / Sprache"><a data-locale="en" href="/voice/guides/session/" hreflang="en" lang="en" aria-label="English" aria-current="true">EN</a><a data-locale="de" href="/voice/de/guides/session/" hreflang="de" lang="de" aria-label="Deutsch">DE</a></div></header><main id="content"><div class="docs-breadcrumb"><a href="/voice/docs/" data-en="Docs" data-de="Doku">Docs</a><span aria-hidden="true">/</span><span>Reference</span></div><div class="docs-layout"><aside class="guide-sidebar"><details class="guide-menu" open=""><summary data-en="All guides" data-de="Alle Guides">All guides</summary><nav aria-label="Documentation"><div class="guide-group"><p>Start here</p><a href="/voice/guides/writing-tools/">Writing tools for agents</a><a href="/voice/guides/workflow/">The Studio workflow</a><a href="/voice/guides/library/">Mount the review library</a><a href="/voice/guides/agent-integration/">Use AI findings in your application</a></div><details class="guide-group guide-group-details" open=""><summary>Reference</summary><a href="/voice/guides/review-benchmarks/">Review benchmarks</a><a href="/voice/guides/writing-rules/">Writing rules and prompt composition</a><a href="/voice/guides/ai-text-signals/">Inspect AI-like writing patterns</a><a href="/voice/guides/session/" aria-current="page">Pair once. Resume for seven days.</a><a href="/voice/guides/usability/">Decisions and source versions</a><a href="/voice/guides/library-types/">Types, IntelliSense and examples</a><a href="/voice/guides/live-bridge/">The live-page bridge protocol</a><a href="/voice/guides/runner-integration/">Runner requests and source proposals</a><a href="/voice/guides/checks/">Local build and test checks</a><a href="/voice/guides/holistic-review/">Review source in a Git repository</a></details><details class="guide-group guide-group-details"><summary>Maintenance</summary><a href="/voice/guides/maintaining/">Product files, tools and evidence</a><a href="/voice/guides/commands/">Operator command catalogue</a><a href="/voice/guides/verification/">Dated verification evidence</a><a href="/voice/guides/notices/">Third-party notices</a></details></nav></details></aside><article class="guide-article" lang="en"><header class="guide-heading"><h1>Pair once. Resume for seven days.</h1><p class="lead">Local pairing, browser trust, expiry and logout, with the exact HTTP contract.</p></header><details class="mobile-outline"><summary data-en="On this page" data-de="Auf dieser Seite">On this page</summary><nav aria-label="Page sections"><a href="#what-is-remembered">What is remembered</a><a href="#address-and-browser-scope">Address and browser scope</a><a href="#move-the-application-directory">Move the application directory</a><a href="#http-contract">HTTP contract</a><a href="#verification-and-scope">Verification and scope</a></nav></details><div class="guide-content"><p>Open the local Studio app at <code>http://127.0.0.1:5188/</code> and enter the current
+pairing code. <strong>Remember this browser for 7 days</strong> is selected by default.
+After pairing, reloads, new tabs and reopening that browser can resume the session.
+Use <strong>Log out</strong> to revoke this browser's saved access.</p>
+<figure class="code-block"><figcaption><span>sh</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="sh code"><code>npm run pairing-code</code></pre></figure><p>Run the command in the Voice Studio workspace if the startup code has scrolled
+out of the terminal. It prints only the installation's current pairing code.
+It does not print the API bearer token.</p>
+<h2 id="what-is-remembered">What is remembered<a class="heading-anchor" href="#what-is-remembered" aria-label="Link to this section">#</a></h2><p>The browser receives an opaque, HttpOnly, SameSite=Strict, host-only cookie
+restricted to <code>/api/session</code>. The local backend stores only the credential's hash,
+its exact origin and its creation and expiry timestamps in the private
+<code>trusted-browsers.json</code> file. This registry is outside the reviewed repository.
+The bearer token used for ordinary API requests remains in browser memory.
+The cookie by itself cannot authorize project API operations.</p>
+<p>The lifetime is seven days from pairing. Reloading does not extend that deadline.
+The saved trust survives a backend restart; resume obtains a valid in-memory
+bearer again. The loopback HTTP cookie is not marked Secure because this local
+installation serves HTTP. This is a local app session design, not a hosted login
+service.</p>
+<h2 id="address-and-browser-scope">Address and browser scope<a class="heading-anchor" href="#address-and-browser-scope" aria-label="Link to this section">#</a></h2><p>Keep using the same browser profile and app address. <code>localhost</code> and <code>127.0.0.1</code>
+are distinct hosts; the port is part of the exact origin binding too. A different
+profile, private browsing session, cleared site data or expired credential needs
+pairing again. Leaving the checkbox unchecked creates a temporary in-memory
+session: a page reload requires the code again.</p>
+<h2 id="move-the-application-directory">Move the application directory<a class="heading-anchor" href="#move-the-application-directory" aria-label="Link to this section">#</a></h2><p>Set <code>VOICE_STUDIO_SESSION_ROOT</code> in the host's startup environment to keep an
+existing private session directory when <code>VOICE_STUDIO_HOME</code> changes. Read its
+current location from <code>.voice-studio/session-location.json</code> in the old application
+directory. Use the directory containing <code>session.json</code>, not the file itself.</p>
+<p>The override must be an absolute local directory outside the application
+repository. Relative paths, filesystem roots, network/device paths on Windows,
+symlinks and junctions are rejected. Set it in a private launcher or service
+configuration; repository configuration and HTTP requests cannot select it.
+Without the variable, Studio keeps deriving its default private directory from
+the application path under the user's local application-data directory.</p>
+<p>Stop the previous Studio process before starting the moved application with the
+same private directory. The existing directory permissions and exclusive
+instance lock still apply. Keep the directory and app origin unchanged: the
+browser cookie name includes the private directory's identity. Copying
+<code>trusted-browsers.json</code> into another directory does not preserve that identity.
+A resumed browser keeps its original expiry and receives a new in-memory
+bearer. Startup writes a new <code>session-location.json</code> pointer in the new
+application directory.</p>
+<p>Move the separate project registry, <code>.voice-studio/projects.json</code>, while Studio
+is stopped. Preserve project IDs and update the roots of moved source projects
+before the first start. Their <code>.voice-lint/</code> directories contain the saved
+reviews, tasks and proposals and must stay with those sources. External source
+projects keep their current paths. Private check profiles in the retained
+session directory's <code>checks.json</code> use absolute <code>projectPath</code> values; update only
+the paths of projects that moved before restarting.</p>
+<h2 id="http-contract">HTTP contract<a class="heading-anchor" href="#http-contract" aria-label="Link to this section">#</a></h2><div class="table-scroll" tabindex="0" role="region" aria-label="Documentation table"><table>
+<thead>
+<tr>
+<th>Request</th>
+<th>Input and outcome</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>POST /api/session/pair</code></td>
+<td><code>{ code, remember }</code>; returns <code>{ token, remembered, expiresAt }</code> and sets browser trust when requested</td>
+</tr>
+<tr>
+<td><code>POST /api/session/resume</code></td>
+<td>Saved session cookie; returns a valid bearer and the original expiry, or HTTP 200 <code>{ paired: false }</code> for absent/expired/revoked trust</td>
+</tr>
+<tr>
+<td><code>POST /api/session/logout</code></td>
+<td>Revokes this browser's credential and associated active bearer; expires its cookie</td>
+</tr>
+</tbody></table>
+</div><p>Resume, logout and pairing with <code>remember: true</code> require the exact local
+<code>Origin</code> and <code>X-Voice-Studio-Session: 1</code>. Temporary CLI pairing with
+<code>remember: false</code> also works without those browser headers. A page on an unrelated origin cannot resume or revoke
+the session just by sending the cookie. Normal project APIs require a bearer.
+The existing private CLI installation token continues to work for local tools;
+it is never stored in a browser cookie or published in evidence.</p>
+<p>The UI resumes when it starts. After a token becomes invalid, a read may resume
+and retry once. Writes and model starts are <strong>never automatically replayed</strong>.
+A definitive authentication failure returns the UI to pairing. Session-generation
+guards prevent a late response from an older request from clearing a newer login.</p>
+<h2 id="verification-and-scope">Verification and scope<a class="heading-anchor" href="#verification-and-scope" aria-label="Link to this section">#</a></h2><p>The offline backend suite covers pairing, cookie restrictions, origin binding,
+absolute expiry, restart persistence, revocation and a changed application home
+with the same explicit private session directory. UI state tests exercise
+resume, unauthorized-response handling and late-response races.</p>
+<figure class="code-block"><figcaption><span>sh</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="sh code"><code>npm run test:session
+npm run test:session-ui
+npm run test:browser-session</code></pre></figure><p>The real Chrome scenario uses an isolated browser profile and verifies a full
+close/reopen, reload, a new tab, logout, origin rejection and temporary mode. It
+does not write project source, create a proposal or start a model. This proves
+the tested local Chrome workflow; it is not cross-browser or hosted-service
+qualification.</p>
+</div><details class="source-details"><summary data-en="Git and source reference" data-de="Git- und Quellbezug">Git and source reference</summary><p>Source for this page: <code>docs/browser-session.md</code>. Content hash and Git revision: <a href="/voice/build-info.json">Build record</a>.</p><a href="/voice/sources/session.md" download="" data-en="Download the Markdown source" data-de="Markdown-Quelle herunterladen">Download the Markdown source</a></details><a class="next-guide" href="/voice/guides/workflow/"><span data-en="Next guide" data-de="Nächster Guide">Next guide</span><strong>The Studio workflow →</strong></a></article><aside class="page-outline"><p data-en="On this page" data-de="Auf dieser Seite">On this page</p><nav aria-label="On this page"><a href="#what-is-remembered">What is remembered</a><a href="#address-and-browser-scope">Address and browser scope</a><a href="#move-the-application-directory">Move the application directory</a><a href="#http-contract">HTTP contract</a><a href="#verification-and-scope">Verification and scope</a></nav></aside></div></main><footer class="site-footer"><a href="https://agent-orchestrator.dev/">Agent Orchestrator ecosystem</a><p data-en="Git and folders · Explicit source changes" data-de="Git und Ordner · Bewusste Quelländerungen">Git and folders · Explicit source changes</p><a href="/voice/build-info.json" data-en="Build record" data-de="Build-Nachweis">Build record</a></footer><script src="/voice/site.js" defer=""></script></body></html>

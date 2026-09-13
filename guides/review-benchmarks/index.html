@@ -1,0 +1,232 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Review benchmarks · Voice docs</title><meta name="description" content="Evaluate retained responses, independent human judgments and all-attempt costs with frozen inputs and reproducible reports."><link rel="canonical" href="https://agent-orchestrator.dev/voice/guides/review-benchmarks/"><link rel="stylesheet" href="/voice/site.css"><link rel="stylesheet" href="/voice/docs.css"><meta name="theme-color" content="#14271f"><link rel="alternate" hreflang="en" href="https://agent-orchestrator.dev/voice/guides/review-benchmarks/"><link rel="alternate" hreflang="de" href="https://agent-orchestrator.dev/voice/de/guides/review-benchmarks/"><link rel="alternate" hreflang="x-default" href="https://agent-orchestrator.dev/voice/guides/review-benchmarks/"><meta property="og:type" content="website"><meta property="og:site_name" content="Voice Lint"><meta property="og:title" content="Review benchmarks · Voice docs"><meta property="og:description" content="Evaluate retained responses, independent human judgments and all-attempt costs with frozen inputs and reproducible reports."><meta property="og:url" content="https://agent-orchestrator.dev/voice/guides/review-benchmarks/"><meta property="og:locale" content="en_US"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Review benchmarks · Voice docs","description":"Evaluate retained responses, independent human judgments and all-attempt costs with frozen inputs and reproducible reports.","url":"https://agent-orchestrator.dev/voice/guides/review-benchmarks/","inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Voice Lint","url":"https://agent-orchestrator.dev/voice/"}}</script></head><body class="guide-page"><a class="skip" href="#content" data-en="Skip to content" data-de="Zum Inhalt">Skip to content</a><header class="site-header"><a class="brand" href="/voice/" aria-label="Voice home">voice <i>/</i></a><nav class="site-nav" aria-label="Main"><div class="nav-tools" role="group" aria-label="Tools / Werkzeuge"><a href="/voice/studio/" data-en="Studio" data-de="Studio">Studio</a><a href="/voice/library/" data-en="Library" data-de="Library">Library</a></div><div class="nav-resources" role="group" aria-label="Knowledge / Wissen"><a href="/voice/research/" data-en="Research" data-de="Forschung">Research</a><a href="/voice/writing-patterns/" data-en="AI anti-patterns" data-de="KI-Negativmuster">AI anti-patterns</a><a href="/voice/docs/" aria-current="page" data-en="Docs" data-de="Doku">Docs</a></div></nav><div class="language" role="group" aria-label="Language / Sprache"><a data-locale="en" href="/voice/guides/review-benchmarks/" hreflang="en" lang="en" aria-label="English" aria-current="true">EN</a><a data-locale="de" href="/voice/de/guides/review-benchmarks/" hreflang="de" lang="de" aria-label="Deutsch">DE</a></div></header><main id="content"><div class="docs-breadcrumb"><a href="/voice/docs/" data-en="Docs" data-de="Doku">Docs</a><span aria-hidden="true">/</span><span>Reference</span></div><div class="docs-layout"><aside class="guide-sidebar"><details class="guide-menu" open=""><summary data-en="All guides" data-de="Alle Guides">All guides</summary><nav aria-label="Documentation"><div class="guide-group"><p>Start here</p><a href="/voice/guides/writing-tools/">Writing tools for agents</a><a href="/voice/guides/workflow/">The Studio workflow</a><a href="/voice/guides/library/">Mount the review library</a><a href="/voice/guides/agent-integration/">Use AI findings in your application</a></div><details class="guide-group guide-group-details" open=""><summary>Reference</summary><a href="/voice/guides/review-benchmarks/" aria-current="page">Review benchmarks</a><a href="/voice/guides/writing-rules/">Writing rules and prompt composition</a><a href="/voice/guides/ai-text-signals/">Inspect AI-like writing patterns</a><a href="/voice/guides/session/">Pair once. Resume for seven days.</a><a href="/voice/guides/usability/">Decisions and source versions</a><a href="/voice/guides/library-types/">Types, IntelliSense and examples</a><a href="/voice/guides/live-bridge/">The live-page bridge protocol</a><a href="/voice/guides/runner-integration/">Runner requests and source proposals</a><a href="/voice/guides/checks/">Local build and test checks</a><a href="/voice/guides/holistic-review/">Review source in a Git repository</a></details><details class="guide-group guide-group-details"><summary>Maintenance</summary><a href="/voice/guides/maintaining/">Product files, tools and evidence</a><a href="/voice/guides/commands/">Operator command catalogue</a><a href="/voice/guides/verification/">Dated verification evidence</a><a href="/voice/guides/notices/">Third-party notices</a></details></nav></details></aside><article class="guide-article" lang="en"><header class="guide-heading"><h1>Review benchmarks</h1><p class="lead">Evaluate retained responses, independent human judgments and all-attempt costs with frozen inputs and reproducible reports.</p></header><details class="mobile-outline"><summary data-en="On this page" data-de="Auf dieser Seite">On this page</summary><nav aria-label="Page sections"><a href="#prepare-and-freeze-the-inputs">Prepare and freeze the inputs</a><a href="#record-the-comparison-before-generating-answers">Record the comparison before generating answers</a><a href="#save-every-attempt">Save every attempt</a><a href="#judge-the-complete-response-set">Judge the complete response set</a><a href="#evaluate-and-replay">Evaluate and replay</a><a href="#read-quality-and-cost-separately">Read quality and cost separately</a></nav></details><div class="guide-content"><p>Compare models and prompt strategies using independently reviewed results. Report
+whether the review preserves facts and intent, makes justified decisions and
+misses relevant issues. Cost is a separate measurement: a result can be evaluated
+when its provider usage or invoice cost is unavailable.</p>
+<p>The offline evaluator accepts recorded model responses and human judgments. It
+does not call a model, launch an agent or select a production model. The included
+30 EN/DE cases are authored development examples. They help test the evaluation
+method; they are not a representative or held-out quality benchmark.</p>
+<h2 id="prepare-and-freeze-the-inputs">Prepare and freeze the inputs<a class="heading-anchor" href="#prepare-and-freeze-the-inputs" aria-label="Link to this section">#</a></h2><p>Run these commands from the Voice Studio project root:</p>
+<figure class="code-block"><figcaption><span>sh</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="sh code"><code>npm run build:writing-rules
+node benchmarks/writing-review/prepare-model-comparison.mjs
+node benchmarks/writing-review/verify-model-comparison.mjs
+node benchmarks/writing-review/evaluate-model-quality.mjs \
+  --manifest test-results/writing-review/model-experiment.json \
+  --init \
+  --output test-results/writing-review/quality-run.json</code></pre></figure><p>The last command creates an inert run template. It records the <strong>exact manifest
+file hash</strong>, evaluator hash, catalogue version and original fixture, Library,
+research and preparer hashes. Its condition, attempt and review arrays start
+empty. Creating the template sends no requests.</p>
+<figure class="code-block"><figcaption><span>text</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="text code"><code>benchmarks/writing-review/           maintained method and code
+├── fixtures.json                    authored cases and reviewer-only labels
+├── prepare-model-comparison.mjs     canonical requests and experiment manifest
+├── evaluate-model-quality.mjs       response validation and offline evaluation
+├── verify-model-quality.mjs         synthetic contract tests
+└── quality-evaluation.md            evaluation method
+
+test-results/writing-review/         generated records; ignored by Git
+├── model-experiment.json            frozen prompts, sources and planned options
+├── quality-run.json                 selected conditions, attempts and judgments
+└── quality-report.json              deterministic evaluation of those inputs</code></pre></figure><p>Keep a copy of the manifest, run file and source revision with any published
+result. Do not rerun preparation over a manifest that already identifies a model
+run. A changed rule, source, model setting or evaluator requires a new recorded
+experiment or an explicitly separate re-evaluation. The evaluator rejects a
+manifest whose exact bytes differ, even if only its formatting changed.</p>
+<h2 id="record-the-comparison-before-generating-answers">Record the comparison before generating answers<a class="heading-anchor" href="#record-the-comparison-before-generating-answers" aria-label="Link to this section">#</a></h2><p>Each condition selects one frozen coverage cohort and prompt strategy, exact
+source IDs and repetition numbers. Conditions also record requested and returned
+model IDs, provider parameters and execution settings. Resolve the model through
+the host; the researched candidate names are not a routing catalogue.</p>
+<p>The condition contract is:</p>
+<figure class="code-block"><figcaption><span>json</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="json code"><code>{
+  <span class="syntax-string">"conditionId"</span>: <span class="syntax-string">"profile-bundle-cold"</span>,
+  <span class="syntax-string">"candidateId"</span>: <span class="syntax-string">"openai-luna"</span>,
+  <span class="syntax-string">"cohortId"</span>: <span class="syntax-string">"public-docs-six"</span>,
+  <span class="syntax-string">"strategyId"</span>: <span class="syntax-string">"bundled"</span>,
+  <span class="syntax-string">"sourceIds"</span>: [<span class="syntax-string">"source-001"</span>, <span class="syntax-string">"source-002"</span>],
+  <span class="syntax-string">"repetitions"</span>: [<span class="syntax-number">1</span>, <span class="syntax-number">2</span>],
+  <span class="syntax-string">"provider"</span>: <span class="syntax-string">"recorded-provider-name"</span>,
+  <span class="syntax-string">"requestedModelId"</span>: <span class="syntax-string">"recorded-requested-model-id"</span>,
+  <span class="syntax-string">"effectiveModelId"</span>: <span class="syntax-string">"recorded-returned-model-version"</span>,
+  <span class="syntax-string">"parameters"</span>: {<span class="syntax-string">"max_output_tokens"</span>: <span class="syntax-number">1000</span>},
+  <span class="syntax-string">"parametersSha256"</span>: <span class="syntax-string">"SHA-256 of JSON.stringify(parameters)"</span>,
+  <span class="syntax-string">"executionSettings"</span>: {
+    <span class="syntax-string">"adapterVersion"</span>: <span class="syntax-string">"recorded-adapter-version"</span>,
+    <span class="syntax-string">"runtimeVersion"</span>: <span class="syntax-string">"recorded-runtime-version"</span>,
+    <span class="syntax-string">"reasoning"</span>: <span class="syntax-keyword">null</span>,
+    <span class="syntax-string">"maxOutputTokens"</span>: <span class="syntax-number">1000</span>,
+    <span class="syntax-string">"concurrency"</span>: <span class="syntax-number">1</span>,
+    <span class="syntax-string">"retryPolicy"</span>: {<span class="syntax-string">"maximumAttempts"</span>: <span class="syntax-number">2</span>},
+    <span class="syntax-string">"cacheMode"</span>: <span class="syntax-string">"cold"</span>,
+    <span class="syntax-string">"ordering"</span>: <span class="syntax-string">"counterbalanced"</span>,
+    <span class="syntax-string">"orderSeed"</span>: <span class="syntax-string">"recorded-seed"</span>,
+    <span class="syntax-string">"providerBatch"</span>: <span class="syntax-keyword">false</span>
+  }
+}</code></pre></figure><p>This is a field example for the template's <code>conditions</code> array. Replace descriptive
+values with actual recorded settings and hashes before evaluation. Obtain hashes
+with the exported <code>sha256</code> function from <code>prepare-model-comparison.mjs</code>. Copy
+source IDs, candidate IDs, strategies and coverage from the frozen manifest.
+<code>reasoning: null</code> records no supplied reasoning setting; it does not mean that
+the model used zero reasoning tokens.</p>
+<p>Keep the same source selection and repetitions across compared models and prompt
+strategies. Six-rule and twenty-rule coverage remain separate. English and German
+results remain separate. Randomize or counterbalance generation order and record
+the procedure. Treat cold cache, warm cache, provider Batch and changed parameters
+as separate conditions. A different model on retry requires a separately declared
+condition; this evaluator does not combine undeclared escalation routes.</p>
+<h2 id="save-every-attempt">Save every attempt<a class="heading-anchor" href="#save-every-attempt" aria-label="Link to this section">#</a></h2><p>An attempt belongs to a planned review, identified as
+<code>conditionId/sourceId/r&lt;repetition&gt;</code>, and one frozen request. Keep failures and
+retries alongside successful responses. Each attempt has one globally unique ID.</p>
+<figure class="code-block"><figcaption><span>json</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="json code"><code>{
+  <span class="syntax-string">"attemptId"</span>: <span class="syntax-string">"attempt-001"</span>,
+  <span class="syntax-string">"reviewRunId"</span>: <span class="syntax-string">"profile-bundle-cold/source-001/r1"</span>,
+  <span class="syntax-string">"requestId"</span>: <span class="syntax-string">"source-001/public-docs-six/bundled/all"</span>,
+  <span class="syntax-string">"sequence"</span>: <span class="syntax-number">1</span>,
+  <span class="syntax-string">"retryOf"</span>: <span class="syntax-keyword">null</span>,
+  <span class="syntax-string">"requestedModelId"</span>: <span class="syntax-string">"recorded-requested-model-id"</span>,
+  <span class="syntax-string">"effectiveModelId"</span>: <span class="syntax-string">"recorded-returned-model-version"</span>,
+  <span class="syntax-string">"parametersSha256"</span>: <span class="syntax-string">"copy the condition parameter hash"</span>,
+  <span class="syntax-string">"payloadSha256"</span>: <span class="syntax-string">"copy the frozen request payload hash"</span>,
+  <span class="syntax-string">"canonicalPromptSha256"</span>: <span class="syntax-string">"copy the frozen canonical prompt hash"</span>,
+  <span class="syntax-string">"sourceSha256"</span>: <span class="syntax-string">"copy the frozen source hash"</span>,
+  <span class="syntax-string">"status"</span>: <span class="syntax-string">"response"</span>,
+  <span class="syntax-string">"response"</span>: <span class="syntax-string">"the exact raw JSON response text"</span>,
+  <span class="syntax-string">"error"</span>: <span class="syntax-keyword">null</span>,
+  <span class="syntax-string">"actualCostUsd"</span>: <span class="syntax-keyword">null</span>,
+  <span class="syntax-string">"usage"</span>: <span class="syntax-keyword">null</span>,
+  <span class="syntax-string">"latencyMs"</span>: <span class="syntax-keyword">null</span>
+}</code></pre></figure><p>The attempt example shows the full field contract; descriptive strings stand in
+for recorded values. <code>response</code> accepts raw JSON text or a parsed JSON object.
+Preserve the raw text when available, including invalid JSON. The evaluator calls
+<code>validateModelResponse</code> on each supplied response. Invalid JSON, missing rules,
+stale sources, inaccurate quoted spans and unsupported result shapes count as
+failed responses; they do not disappear from the report.</p>
+<p>Other attempt statuses are <code>error</code>, <code>cancelled</code> and <code>not-completed</code>. Their
+<code>response</code> is <code>null</code>. An attempt that received no model response can also have a
+null effective model ID. A retry references its predecessor with <code>retryOf</code> and
+increments <code>sequence</code>; changing source, prompt, parameters or model inside that
+condition is rejected.</p>
+<p>When usage is available, <code>usage</code> contains all five nullable count fields:
+<code>inputTokens</code>, <code>outputTokens</code>, <code>cacheReadTokens</code>, <code>cacheWriteTokens</code> and
+<code>reasoningTokens</code>. Missing usage stays null. Enter actual cost from the host's
+recorded accounting; the evaluator does not turn research price estimates into
+invoices. No local cost or token estimate fills an unknown value.</p>
+<h2 id="judge-the-complete-response-set">Judge the complete response set<a class="heading-anchor" href="#judge-the-complete-response-set" aria-label="Link to this section">#</a></h2><p>Select exactly which final attempt supplies each request's answer <strong>before human
+grading</strong>. An accepted complete review needs a valid answer for every request in
+its selected rule scope. Keep unselected attempts in the run so their cost and
+failure rates remain visible.</p>
+<p>Create a <code>reviews</code> entry with <code>reviewRunId</code>, <code>finalAttemptIds</code>, <code>humanJudgments</code>
+and <code>adjudication</code>. Use <code>responseSetSha256(finalAttemptIds, attempts)</code>, exported by
+the evaluator, to bind each human judgment to those exact selected responses. A
+later change to a response or selection invalidates its earlier judgments.</p>
+<p>A human judgment has this shape:</p>
+<figure class="code-block"><figcaption><span>json</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="json code"><code>{
+  <span class="syntax-string">"reviewerId"</span>: <span class="syntax-string">"editor-01"</span>,
+  <span class="syntax-string">"method"</span>: <span class="syntax-string">"independent-human-review"</span>,
+  <span class="syntax-string">"responseSetSha256"</span>: <span class="syntax-string">"hash returned by responseSetSha256"</span>,
+  <span class="syntax-string">"alternativeScope"</span>: <span class="syntax-string">"all-produced-alternatives"</span>,
+  <span class="syntax-string">"factsPreserved"</span>: <span class="syntax-keyword">null</span>,
+  <span class="syntax-string">"intentPreserved"</span>: <span class="syntax-keyword">null</span>,
+  <span class="syntax-string">"harmfulChange"</span>: <span class="syntax-keyword">null</span>,
+  <span class="syntax-string">"ruleJudgments"</span>: [
+    {
+      <span class="syntax-string">"ruleId"</span>: <span class="syntax-string">"reader-goal"</span>,
+      <span class="syntax-string">"decisionJustified"</span>: <span class="syntax-keyword">null</span>,
+      <span class="syntax-string">"missedIssueCount"</span>: <span class="syntax-keyword">null</span>,
+      <span class="syntax-string">"rationale"</span>: <span class="syntax-keyword">null</span>
+    }
+  ],
+  <span class="syntax-string">"rationale"</span>: <span class="syntax-keyword">null</span>
+}</code></pre></figure><p>The rule entry is abbreviated: include exactly one judgment for <strong>every selected
+rule</strong>, using the frozen review's <code>ruleIds</code>. Null means unassessed. Reviewers
+replace null values only after checking the original source, supplied context,
+decisions and <strong>all one to three proposed alternatives</strong>. An unsafe alternative
+still counts when another alternative is usable. Assessed rules and completed
+reviews require written rationales.</p>
+<p>Review these questions independently of the authored diagnostic labels and model
+name:</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Documentation table"><table>
+<thead>
+<tr>
+<th>Judgment</th>
+<th>What the reviewer assesses</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Facts preserved</td>
+<td>Do every proposed alternative and the stated reasons preserve supported facts without adding unsupported claims?</td>
+</tr>
+<tr>
+<td>Intent preserved</td>
+<td>Does the review preserve the source's purpose, audience and intended meaning?</td>
+</tr>
+<tr>
+<td>Decision justified</td>
+<td>Is keeping, changing or requesting evidence warranted for this rule and context?</td>
+</tr>
+<tr>
+<td>Missed issues</td>
+<td>How many relevant issues under this selected rule did the answer leave unaddressed?</td>
+</tr>
+<tr>
+<td>Harmful change</td>
+<td>Could any proposed alternative damage factual accuracy, intent or the reader's ability to act?</td>
+</tr>
+</tbody></table>
+</div><p>A justified <code>keep</code> can be an accepted complete review. A justified
+<code>needs-evidence</code> can have accepted editorial quality while the review remains
+incomplete. For example, a model should request missing current paths instead of
+inventing them while replacing an internal cleanup story.</p>
+<p>Preserve each reviewer's record. Differing resolved judgments remain visible as
+disagreement. Until resolved they cannot accept a review. A separate adjudicator
+can supply the same judgment contract in <code>adjudication</code>; the original judgments
+and disagreement count remain in the result. A single complete human review is
+supported by the contract; it does not establish independent reviewer agreement.</p>
+<p>The evaluator derives acceptance from complete, resolved human judgments:
+preserved facts and intent, justified decisions, no missed issue in the selected
+scope and no harmful alternative. Matching a fixture label cannot supply a
+missing human judgment. The report exposes these dimensions separately and
+produces no overall writing-quality score.</p>
+<h2 id="evaluate-and-replay">Evaluate and replay<a class="heading-anchor" href="#evaluate-and-replay" aria-label="Link to this section">#</a></h2><p>After recording responses and judgments:</p>
+<figure class="code-block"><figcaption><span>sh</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden="">Copy</button></figcaption><pre tabindex="0" aria-label="sh code"><code>node benchmarks/writing-review/evaluate-model-quality.mjs \
+  --manifest test-results/writing-review/model-experiment.json \
+  --run test-results/writing-review/quality-run.json \
+  --output test-results/writing-review/quality-report.json
+
+node --test benchmarks/writing-review/verify-model-quality.mjs</code></pre></figure><p>The evaluator never rebuilds the manifest. It checks the manifest byte hash,
+original provenance, evaluator version and code hash, response-validator revision,
+prompt and source hashes, exact model identities and condition parameter hashes.
+It refuses to overwrite input files or an existing report. For a replay, choose
+a new output filename and use the same input files and recorded code revision.
+The resulting report is identical for those fixed inputs; it contains no current
+timestamp.</p>
+<p>Replaying evaluation is different from generating new model responses. A new
+model run can vary even with the same request and settings. Record it as a new
+run or repetition, retain its outputs and compare the distribution of results.
+Reusing one old answer under another repetition is not independent evidence.</p>
+<p>The test suite uses explicitly labelled synthetic responses and reviewer records
+to verify the evaluator. Passing those tests establishes contract behavior,
+including failure handling; it measures no model's editorial quality.</p>
+<h2 id="read-quality-and-cost-separately">Read quality and cost separately<a class="heading-anchor" href="#read-quality-and-cost-separately" aria-label="Link to this section">#</a></h2><p>Each condition and language report retains the planned denominator, including
+missing, invalid, incomplete, unassessed, disputed and rejected reviews. It reports
+accepted editorial reviews separately from accepted <strong>complete</strong> reviews, plus
+fact and intent preservation, harmful changes and rule-level human judgments.</p>
+<p>The diagnostic section compares predictions with sparse authored fixture labels:
+an exact selected rule ID, exact quote and unambiguous UTF-16 span must match.
+There is no overlap or fuzzy matching. A broader but useful quote can fail that
+diagnostic while receiving a positive human assessment. Unlabelled rules are not
+automatically correct keep decisions. Out-of-scope labels do not enter recall.
+The report includes matched, predicted and expected counts alongside diagnostic
+precision and recall; an empty denominator produces null.</p>
+<p>Cost per accepted complete review divides the cost of <strong>all supplied attempts</strong>
+by the accepted complete-review count. Errors, invalid responses, unselected
+attempts and retries count once each. Any unknown attempt cost makes total cost
+and that ratio unknown; zero accepted complete reviews also produces a null
+ratio. Known partial cost remains visible. Quality can still be compared when
+cost is unknown.</p>
+<p>Compare only matching source sets, repetitions, coverage and declared execution
+conditions. Do not choose a production model from the sparse fixture diagnostics.
+Use held-out product documents, independently reviewed issue labels and repeated
+conditions to establish what a model detects and preserves in actual use. The
+current evaluator reports evidence; the host supplies any explicit model-selection
+policy.</p>
+</div><details class="source-details"><summary data-en="Git and source reference" data-de="Git- und Quellbezug">Git and source reference</summary><p>Source for this page: <code>benchmarks/writing-review/quality-evaluation.md</code>. Content hash and Git revision: <a href="/voice/build-info.json">Build record</a>.</p><a href="/voice/sources/review-benchmarks.md" download="" data-en="Download the Markdown source" data-de="Markdown-Quelle herunterladen">Download the Markdown source</a></details></article><aside class="page-outline"><p data-en="On this page" data-de="Auf dieser Seite">On this page</p><nav aria-label="On this page"><a href="#prepare-and-freeze-the-inputs">Prepare and freeze the inputs</a><a href="#record-the-comparison-before-generating-answers">Record the comparison before generating answers</a><a href="#save-every-attempt">Save every attempt</a><a href="#judge-the-complete-response-set">Judge the complete response set</a><a href="#evaluate-and-replay">Evaluate and replay</a><a href="#read-quality-and-cost-separately">Read quality and cost separately</a></nav></aside></div></main><footer class="site-footer"><a href="https://agent-orchestrator.dev/">Agent Orchestrator ecosystem</a><p data-en="Git and folders · Explicit source changes" data-de="Git und Ordner · Bewusste Quelländerungen">Git and folders · Explicit source changes</p><a href="/voice/build-info.json" data-en="Build record" data-de="Build-Nachweis">Build record</a></footer><script src="/voice/site.js" defer=""></script></body></html>
