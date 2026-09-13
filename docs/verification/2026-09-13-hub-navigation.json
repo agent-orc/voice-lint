@@ -1,0 +1,120 @@
+{
+  "checkedAt": "2026-09-13T08:09:30.849Z",
+  "url": "https://agent-orchestrator.dev/",
+  "sourceRepository": "https://github.com/agent-orc/website",
+  "sourceCommit": "d5d7144d7cf020dc9533b3071bb1e1d71f99d759",
+  "deployCommit": "4ebba40f52a96a624d860aa5b961e8e462300dac",
+  "htmlSha256": "3a95341e61db9e2a22ffb31bd51ed35f12801c162660441d2e01b396f24c9276",
+  "cards": [
+    "studio",
+    "quality-studio",
+    "voice",
+    "runner",
+    "token-economy",
+    "chat"
+  ],
+  "removed": [
+    "benchmark card",
+    "project introduction",
+    "three work-model links",
+    "separate Voice header link"
+  ],
+  "mode": "live",
+  "views": [
+    {
+      "width": 1440,
+      "language": "en",
+      "roles": [
+        "App",
+        "App",
+        "App + libraries (TypeScript)",
+        "Library (.NET)",
+        "Library (.NET)",
+        "Library (Angular)"
+      ],
+      "appsFirst": true,
+      "noOverflow": true
+    },
+    {
+      "width": 1440,
+      "language": "de",
+      "roles": [
+        "App",
+        "App",
+        "App + Bibliotheken (TypeScript)",
+        "Bibliothek (.NET)",
+        "Bibliothek (.NET)",
+        "Bibliothek (Angular)"
+      ],
+      "appsFirst": true,
+      "noOverflow": true
+    },
+    {
+      "width": 390,
+      "language": "en",
+      "roles": [
+        "App",
+        "App",
+        "App + libraries (TypeScript)",
+        "Library (.NET)",
+        "Library (.NET)",
+        "Library (Angular)"
+      ],
+      "appsFirst": true,
+      "noOverflow": true
+    },
+    {
+      "width": 390,
+      "language": "de",
+      "roles": [
+        "App",
+        "App",
+        "App + Bibliotheken (TypeScript)",
+        "Bibliothek (.NET)",
+        "Bibliothek (.NET)",
+        "Bibliothek (Angular)"
+      ],
+      "appsFirst": true,
+      "noOverflow": true
+    },
+    {
+      "width": 320,
+      "language": "en",
+      "roles": [
+        "App",
+        "App",
+        "App + libraries (TypeScript)",
+        "Library (.NET)",
+        "Library (.NET)",
+        "Library (Angular)"
+      ],
+      "appsFirst": true,
+      "noOverflow": true
+    },
+    {
+      "width": 320,
+      "language": "de",
+      "roles": [
+        "App",
+        "App",
+        "App + Bibliotheken (TypeScript)",
+        "Bibliothek (.NET)",
+        "Bibliothek (.NET)",
+        "Bibliothek (Angular)"
+      ],
+      "appsFirst": true,
+      "noOverflow": true
+    }
+  ],
+  "noJavaScript": true,
+  "errors": [],
+  "voiceArtifactUnchanged": "a074139716dc6d7273146428e391f33514f23642",
+  "checks": [
+    "Public HTML equals committed site/index.html",
+    "Apps precede libraries in DOM and responsive layout",
+    "Stack labels in English and German",
+    "No page or card horizontal overflow",
+    "Voice card reaches the matching English/German page",
+    "Six cards and correct stack labels without JavaScript"
+  ]
+}

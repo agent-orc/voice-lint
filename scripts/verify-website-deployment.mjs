@@ -53,7 +53,7 @@ const home=await request('https://agent-orchestrator.dev/');assert.equal(home.st
 const html=await home.text();
 const hub=new JSDOM(html).window.document;
 assert.equal(hub.querySelector('#voice h3')?.textContent.trim(),'Voice Lint');
-assert([...hub.querySelectorAll('.statusbar a')].some(link=>link.textContent.trim()==='Voice Lint'&&link.getAttribute('href')==='/voice/'),'Visible header link must identify Voice Lint.');
+assert.equal(hub.querySelector('#voice')?.getAttribute('href'),'/voice/','The Voice Lint project card must link to its website.');
 assert.match(home.headers.get('cache-control')??'',/no-cache/,'Hub HTML must revalidate.');
 assert(/href=["']\/voice\/["']/.test(html),'Ecosystem homepage must link to Voice.');
 const output=path.join(root,'test-results/voice-deployment');await fs.mkdir(output,{recursive:true});
