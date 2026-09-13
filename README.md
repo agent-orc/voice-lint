@@ -113,8 +113,10 @@ npm run website:preview
 
 The [Voice website](https://agent-orchestrator.dev/voice/) presents Studio, both
 libraries, AI writing research and HTML guides. It exposes no text-analysis form, prompt-generation playground, LLM tools
-or model endpoint. Product and Research content support English and German;
-technical guide bodies remain English.
+or model endpoint. English pages are served under `/voice/`; German pages under
+`/voice/de/`. All eighteen guides have complete German prose. Code examples,
+API identifiers and source quotations retain their original form. Language links
+and page content work without JavaScript.
 
 The static build targets the ecosystem's `/voice/` path. The
 [website and deployment guide](website/README.md) describes its output and
@@ -150,6 +152,7 @@ private runtime state and dated evidence.
 ## Build and verify
 
 ```sh
+npm ci
 npm run build
 npm run test:library
 npm run test:writing-rules
@@ -157,6 +160,14 @@ npm run test:library-types
 npm run test:backend
 npm run test:writing-review-quality
 ```
+
+A fresh HTTPS clone of source `33063b5` passed dependency installation, the full
+product build, the static website build and strict artifact validation on
+13 September 2026 with Node.js 24.18.0 and .NET SDK 10.0.301. Dependencies were
+restored through npm and NuGet; no local project dependencies, private session
+files or sibling checkouts were copied into the clone. The
+[repository audit](docs/reviews/voice-repository-2026-09-13.md) records the exact
+revision and scope. Later source changes need their own build verification.
 
 The current browser layout suite has **120 checks** for full/compact/focus modes,
 desktop/mobile panes, touch, keyboard controls, persistence and accessible header

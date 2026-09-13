@@ -1,0 +1,38 @@
+{
+  "live-bridge": {
+    "title": "Das Protokoll der Live-Bridge",
+    "description": "Explizite Entwicklungsintegration, exakte Origins, Quelltextzuordnung und postMessage-Nachrichten der Version 1."
+  },
+  "runner-integration": {
+    "title": "Runner-Anfragen und Quelltextvorschläge",
+    "description": "Modellaufrufe ausdrücklich starten, Kontext bereitstellen, Ausgaben validieren und Dateiänderungen gesondert übernehmen."
+  },
+  "checks": {
+    "title": "Lokale Build- und Testprüfungen",
+    "description": "Befehle auf dem Host konfigurieren, Quelltext-Fingerprints erfassen und Prozessergebnisse auf Aktualität prüfen."
+  },
+  "agent-integration": {
+    "title": "KI-Befunde in der eigenen Anwendung anzeigen",
+    "description": "Modellausgaben validieren, Quelltextbereiche zuordnen und Befunde an die Review-UI übergeben."
+  },
+  "holistic-review": {
+    "title": "Quelltext in einem Git-Repository prüfen",
+    "description": "Einen Checkout registrieren, den aktuellen Quelltext prüfen und Review-Daten im Projekt speichern."
+  },
+  "maintaining": {
+    "title": "Produktdateien, Werkzeuge und Nachweise",
+    "description": "Dateiablage, wiederverwendbare Befehle und die Aufbewahrung historischer Prüfergebnisse."
+  },
+  "commands": {
+    "title": "Befehlskatalog für den Betrieb",
+    "description": "Unterstützte Befehle mit Voraussetzungen, Nebenwirkungen und Ausgabeorten."
+  },
+  "verification": {
+    "title": "Datierte Prüfnachweise",
+    "description": "Lokale Prüfergebnisse für Preview 0.3 vom 12. September mit Umfang, Einschränkungen und Inhaltshashes."
+  },
+  "notices": {
+    "title": "Drittanbieterhinweise",
+    "description": "Lizenzangaben zu Abhängigkeiten, Engines und Daten aus dem gepflegten Quelltextbestand."
+  }
+}

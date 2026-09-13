@@ -22,7 +22,17 @@ try{
  const context=await browser.newContext({locale:'de-DE',permissions:['clipboard-read','clipboard-write']});
  const page=await context.newPage();page.setDefaultTimeout(12000);page.on('pageerror',error=>errors.push(error.message));page.on('request',request=>requests.push({method:request.method(),url:request.url()}));
  const current=()=>page.locator('article:not([hidden])');
- async function language(locale){await page.getByRole('button',{name:locale.toUpperCase(),exact:true}).click();assert.equal(await page.locator('html').getAttribute('lang'),locale);}
+ async function language(locale){
+  const link=page.locator('a[data-locale="'+locale+'"]');
+  const target=await link.evaluate(element=>element.href);
+  const destination=new URL(target);
+  if(page.url()!==target)await Promise.all([page.waitForURL(url=>url.origin===destination.origin&&url.pathname===destination.pathname&&url.search===destination.search,{waitUntil:'domcontentloaded'}),link.click()]);
+  await page.waitForFunction(language=>document.documentElement.lang===language,locale);
+  assert.equal(await page.locator('html').getAttribute('lang'),locale);
+  const hash=new URL(page.url()).hash;
+  if(hash)assert.ok(await page.evaluate(id=>Boolean(document.getElementById(id)),decodeURIComponent(hash.slice(1))),'A language switch must preserve a valid section target: '+hash);
+  assert.equal(await page.locator('article').count(),1,'A language URL must contain one localized article');
+ }
  async function recordLinks(){for(const href of await page.locator('a[href]').evaluateAll(items=>items.map(item=>item.href)))if(href.startsWith(base))links.add(href);}
  await page.goto(new URL('writing-patterns/',base).href,{waitUntil:'domcontentloaded'});
  assert.equal(await page.locator('html').getAttribute('lang'),'en');
@@ -68,7 +78,7 @@ try{
  const search=current().locator('[data-pattern-search]');await search.fill('no-matching-writing-rule-unique');assert(await page.locator(hash).getAttribute('hidden')!==null);
  await current().locator('.pattern-profiles details > summary').click();await current().locator(`.pattern-profile-list a[href="${hash}"]`).first().click();
  await page.locator(hash+':not([hidden])[open]').waitFor();assert.equal(await search.inputValue(),'');checks.push('Clicking the same rule hash again clears an excluding filter and reopens the requested rule.');
- const deHash='#de-'+chosen.id;await page.goto(new URL('writing-patterns/'+deHash,base).href,{waitUntil:'domcontentloaded'});await page.locator(deHash+'[open]').waitFor();assert.equal(await page.locator('html').getAttribute('lang'),'de');checks.push('A German deep link selects German even when the prior preference was English.');
+ const deHash='#de-'+chosen.id;await page.goto(new URL('de/writing-patterns/'+deHash,base).href,{waitUntil:'domcontentloaded'});await page.locator(deHash+'[open]').waitFor();assert.equal(await page.locator('html').getAttribute('lang'),'de');checks.push('A German URL deep link opens the German rule with one localized article.');
  await language('en');if(await current().locator('.pattern-rule').first().getAttribute('open')===null)await current().locator('.pattern-rule').first().locator('summary').first().click();
  const firstRule=current().locator('.pattern-rule').first();await firstRule.locator('.copy-code').click();assert.equal((await page.evaluate(()=>navigator.clipboard.readText())).replaceAll('\r\n','\n'),await firstRule.locator('code').textContent());checks.push('Individual rule prompt copy preserves its full text.');
 
@@ -88,7 +98,17 @@ try{
  for(const href of links){const response=await context.request.get(href);assert.equal(response.status(),200,'Broken local link: '+new URL(href).pathname);if(new URL(href).hash&&(response.headers()['content-type']||'').includes('text/html')){const found=await response.text(),id=decodeURIComponent(new URL(href).hash.slice(1));assert(found.includes(`id="${id}"`),'Broken local section: '+new URL(href).pathname+new URL(href).hash);}}
  checks.push(`${links.size} local writing, docs, Git, Studio and verification links/section targets resolve.`);
 
- const noJs=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}});const fallback=await noJs.newPage();await fallback.goto(new URL('writing-patterns/',base).href);assert.equal(await fallback.locator('article:not([hidden]) [data-pattern-rule]').count(),catalogue.rules.length);await fallback.locator('article:not([hidden]) [data-pattern-rule] summary').first().click();assert(await fallback.locator('article:not([hidden]) [data-pattern-rule] code').first().isVisible());await noJs.close();checks.push(catalogue.rules.length+' anti-patterns and their counter-prompts remain readable on mobile without JavaScript.');
+ const noJs=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}});const fallback=await noJs.newPage();
+ for(const locale of ['en','de']){
+  await fallback.goto(new URL((locale==='de'?'de/':'')+'writing-patterns/',base).href);
+  assert.equal(await fallback.locator('html').getAttribute('lang'),locale);
+  assert.equal(await fallback.locator('article').count(),1);
+  assert.equal(await fallback.locator('article [data-pattern-rule]').count(),catalogue.rules.length);
+  await fallback.locator('article [data-pattern-rule] summary').first().click();
+  assert(await fallback.locator('article [data-pattern-rule] code').first().isVisible());
+  assert.equal(await fallback.locator('article [data-pattern-rule] code').first().textContent(),catalogue.rules[0].prompt[locale]);
+ }
+ await noJs.close();checks.push(catalogue.rules.length+' anti-patterns and their counter-prompts remain readable in EN/DE URLs on mobile without JavaScript.');
  for(const asset of ['writing-playground.js','writing-rules/index.js','writing-rules/tools.js']){
   const response=await context.request.get(new URL(asset,base).href);assert.equal(response.status(),404,'Executable writing capability must not be publicly served: '+asset);
  }

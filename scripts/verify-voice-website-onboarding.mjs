@@ -22,7 +22,7 @@ try{
  await page.getByRole('button',{name:'Open local Studio',exact:true}).click();
  const frame=page.frameLocator('iframe.live-frame');
  await expect(frame.locator('article:not([hidden]) h1[data-voice-unit]')).toHaveText(copy.en.title,{timeout:20000});
- await frame.getByRole('button',{name:'DE',exact:true}).click();
+ await frame.locator('a[data-locale="de"]').click();
  const heading=frame.locator('article:not([hidden]) h1[data-voice-unit]');await expect(heading).toHaveText(copy.de.title);
  await heading.evaluate(element=>{const selection=window.getSelection(),range=document.createRange();range.selectNodeContents(element);selection.removeAllRanges();selection.addRange(range);element.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));});
  await expect(page.locator('#voice-review-panel blockquote').filter({hasText:copy.de.title})).toBeVisible();
@@ -30,11 +30,11 @@ try{
  assert(await page.locator('.browser-connection-badge').isVisible());
  // Ordinary website links retain the explicit local bridge opt-in.
  const guide=frame.locator('article:not([hidden]) a[href*="guides/workflow/"]').first();await guide.click();
- await expect(frame.locator('.guide-content p[data-voice-unit]').filter({hasText:'From the Voice Studio checkout, start the app:'})).toHaveText('From the Voice Studio checkout, start the app:',{timeout:20000});
+ await expect(frame.locator('.guide-content p[data-voice-unit]').filter({hasText:'Starte die Anwendung im ausgecheckten Voice-Studio-Repository:'})).toHaveText('Starte die Anwendung im ausgecheckten Voice-Studio-Repository:',{timeout:20000});
  const frameUrl=await frame.locator('html').evaluate(()=>location.href);assert(new URL(frameUrl).searchParams.get('voice-studio')==='1');
  assert.deepEqual(writes,[]);assert.deepEqual(errors,[]);
  const output=path.join(root,'test-results/voice-onboarding');await fs.mkdir(output,{recursive:true});
  await page.screenshot({path:path.join(output,'mapped-guide.png')});
- await fs.writeFile(path.join(output,'verification.json'),JSON.stringify({capturedAt:new Date().toISOString(),projectId:project.id,sourceDocuments:27,checks:['Original EN/DE JSON heading maps to visible HTML','German umlauts and exact selected quote reach Studio','Local navigation retains the HTML bridge','Explicit original Markdown route maps to the actual HTML guide','No source/model writes or browser exceptions'],errors,writes},null,2)+'\n');
+ await fs.writeFile(path.join(output,'verification.json'),JSON.stringify({capturedAt:new Date().toISOString(),projectId:project.id,sourceDocuments:45,checks:['Original EN/DE JSON heading maps to visible HTML','German umlauts and exact selected quote reach Studio','Local navigation retains the HTML bridge','Explicit original Markdown route maps to the actual HTML guide','No source/model writes or browser exceptions'],errors,writes},null,2)+'\n');
  console.log('PASS Voice onboarding: original EN/DE JSON, exact German selection, mapped Markdown route, retained local bridge, no source or model writes.');
 }catch(error){console.error(JSON.stringify({frames:page.frames().map(frame=>frame.url()),errors,writes,body:(await page.locator('body').innerText()).slice(-4000)},null,2));throw error;}finally{await browser.close();}

@@ -174,3 +174,41 @@ The owner approved the central-repository exception. Integration commit eeee6eff
 The website is live at https://agent-orchestrator.dev/voice/. Clean source 7360a67e255656d4a3d38f04afa2e7db377409ec produced static artifact 12fabf4ec02d504ce7502d2c8b7eb40e1fe19d71; strict validation passed 99 files, 24 content routes plus the redirect and 87 input hashes. HTTPS verification at 2026-09-12T21:57:43.793Z compared all 99 file hashes and content types, checked 24 HTML routes, the 308 redirect, private/unknown-route 404s and the ecosystem link. Five sibling sites and the unrelated hosted application retained byte-identical public HTML. The existing Caddy configuration was backed up before its validated replacement and reload.
 
 The [retained public deployment record](../verification/2026-09-12-public-deployment/README.md) identifies this release and its scope. Earlier pending/404 observations above remain historical. No Studio backend or model capability was deployed.
+
+## Fresh-clone audit and remote retirement — 13 September 2026
+
+A fresh HTTPS clone of canonical source
+[33063b5141123d9c17108e74c369b9b408db5aa3](https://github.com/agent-orc/voice-lint/commit/33063b5141123d9c17108e74c369b9b408db5aa3)
+passed `npm ci`, `npm run build`, `npm run website:build` and strict
+`npm run website:verify-artifact` on Node.js 24.18.0 and .NET SDK 10.0.301.
+The check completed at 2026-09-13T06:56:21.338Z with clean Git status. It used
+normal npm/NuGet dependency installation and restore, without copying installed
+project dependencies, generated product files, private state or sibling source
+checkouts from the active installation. This is revision-specific evidence;
+later language and SEO changes require their own clean committed build.
+
+The remaining remote Devspace copy was retired after the owner asked for the old
+repository to be cleaned up. A separate clone of
+RobertMischke/agent-taskboard-devspace, without submodule initialization, produced
+normal commit
+[53188edb930d1fd8c81e32e9a83573cfd55cdc80](https://github.com/RobertMischke/agent-taskboard-devspace/commit/53188edb930d1fd8c81e32e9a83573cfd55cdc80).
+It advances main from 2b235abbe7de435acf84b38ac7dc589d365b07f0, removes exactly
+299 tracked files under voice-studio/ and adds only VOICE-MOVED.md with the
+canonical source and build-instruction links. All 227 other tree entries and
+modes were checked unchanged. The pushed remote SHA was verified at
+2026-09-13T07:07:46.432Z. No history was rewritten and no Voice implementation
+was added to the old repository.
+
+The active local Devspace remains deliberately at its recorded 2b235ab baseline.
+Its unrelated working-tree edits, index, sibling projects, backup ref and private
+runtime archive were not touched by this remote operation. The earlier sparse
+exclusion still leaves no active voice-studio directory there. Updating that
+busy checkout is separate from retiring the remote copy. The isolated retirement
+clone is private maintenance evidence, not a second active product root.
+
+The compact private reports are .local/clean-clone-report.json and
+.local/old-repository-retirement-report.json in the canonical checkout. The
+[13 September repository audit](../reviews/voice-repository-2026-09-13.md)
+records their revision, command scope and limitations. Earlier statements above
+that the old remote was unchanged describe the 12 September local handoff; the
+13 September retirement supersedes that remote state while preserving history.

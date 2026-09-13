@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "language": "de",
+  "normalization": "utf8-lf",
+  "sources": {
+    "writing-tools": {
+      "source": "packages/writing-rules/TOOLS.md",
+      "sha256": "515c5a20ac329d0e466b100d05e556d13ef9cef0d74a68e36e53b8e574f8a001"
+    },
+    "review-benchmarks": {
+      "source": "benchmarks/writing-review/quality-evaluation.md",
+      "sha256": "6792a0f36ceb72fd5415f4da55ac21b5aa8644f8941d3060f6242d02cdfafdfc"
+    },
+    "writing-rules": {
+      "source": "docs/writing-rules.md",
+      "sha256": "404dff807cc9e3998b15725211e8c566455b0c3f14b315b0b4dcb32fd744bfd0"
+    },
+    "ai-text-signals": {
+      "source": "docs/ai-text-signals.md",
+      "sha256": "d00c3798b48e2fac608bead5276e1ad6f1fab8c1a9c9c67306655d3d73894e86"
+    },
+    "workflow": {
+      "source": "docs/workflow.md",
+      "sha256": "91330b29d9c403d964d31b933d195b0b277103204597539b1c8c91dfb52f4150"
+    },
+    "session": {
+      "source": "docs/browser-session.md",
+      "sha256": "6dcc3f592c43158371f83744a45b0527a223ca412b0c764f88e29f11160cea2f"
+    },
+    "usability": {
+      "source": "docs/usability.md",
+      "sha256": "5c0c6e25461a5d1b710398c40a67b9ca8791519868263700196dbf56a43b0e50"
+    },
+    "library": {
+      "source": "packages/review/README.md",
+      "sha256": "a7fc37e9397b6b54e87bd349c24fe77f31496a6a20fe787b5baf6323b2662920"
+    },
+    "library-types": {
+      "source": "docs/library-types.md",
+      "sha256": "ff1dc61665c68bf465a857510787ceee31a65331150eaae09b816ae94795f3c3"
+    },
+    "live-bridge": {
+      "source": "packages/review/LIVE-BRIDGE.md",
+      "sha256": "e183a733a6aac8b125be519a8df62c313b23074ce2ef6a529bb0d012280f3504"
+    },
+    "runner-integration": {
+      "source": "docs/runner-integration.md",
+      "sha256": "002e3ac07d481e9fb9bc334e6be04fe379020d4d72dc974cc669279441b94c9e"
+    },
+    "checks": {
+      "source": "backend/CHECKS.md",
+      "sha256": "20026de19f95d3b17ae740e628c1de9bb43b01c2253d62f7f30270cd93739a0b"
+    },
+    "agent-integration": {
+      "source": "docs/agent-integration.md",
+      "sha256": "2d8192df8a5e41f97b0eafd1125834b3079bff1969c519942837f175d4cdb6b5"
+    },
+    "holistic-review": {
+      "source": "docs/holistic-review.md",
+      "sha256": "77deca55d978eaf1f4f8b2cec7de17311d4bcb69f5622a4a7344871d6e9ee067"
+    },
+    "maintaining": {
+      "source": "docs/maintaining.md",
+      "sha256": "64a9fa9f5b749b8f422a9c7cc0e7ac749513904cfc9caf828cb88e09134b4d30"
+    },
+    "commands": {
+      "source": "scripts/README.md",
+      "sha256": "d53dacad8d2036c9d281df4017aec23eb3976ac82c7e4a5b9b7f984ddabcabe3"
+    },
+    "verification": {
+      "source": "docs/verification.md",
+      "sha256": "02b74873b8156ea33f326aaffba61ffd4c4a8439a6130330cc571397c28ffe35"
+    },
+    "notices": {
+      "source": "THIRD_PARTY_NOTICES.md",
+      "sha256": "dee0cfcfa39d21cff747714a838755a08f02df23572495678cf14fcbcf762b0c"
+    }
+  }
+}

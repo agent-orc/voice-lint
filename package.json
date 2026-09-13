@@ -64,7 +64,8 @@
     "test:loading-overlay": "node scripts/verify-loading-overlay.mjs",
     "test:website-onboarding": "node scripts/verify-voice-website-onboarding.mjs",
     "website:verify-artifact": "node scripts/verify-website-artifact.mjs",
-    "website:verify-deployment": "node scripts/verify-website-deployment.mjs"
+    "website:verify-deployment": "node scripts/verify-website-deployment.mjs",
+    "test:website-seo": "node website/verify-seo.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1",

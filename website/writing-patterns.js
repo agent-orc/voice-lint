@@ -13,6 +13,11 @@ for(const article of document.querySelectorAll('[data-language]')){
 }
 function openRuleHash(){
   let id;try{id=decodeURIComponent(location.hash.slice(1))}catch{return}
+  if(document.documentElement.lang==='en'&&id.startsWith('de-')) {
+    const target=document.querySelector('a[data-locale="de"]');
+    if(target){const url=new URL(target.href);url.hash=id;location.replace(url.href);return;}
+  }
+  if(id)id=document.documentElement.lang+'-'+id.replace(/^(en|de)-/,'');
   const rule=document.getElementById(id);if(!rule?.matches('[data-pattern-rule]'))return;
   const article=rule.closest('[data-language]');
   if(article?.hidden)document.querySelector(`[data-locale="${article.dataset.language}"]`)?.click();

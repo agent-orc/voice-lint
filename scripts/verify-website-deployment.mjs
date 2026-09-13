@@ -1,3 +1,4 @@
+import {JSDOM} from 'jsdom';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -45,11 +46,15 @@ for(const route of info.routes){
 }
 const bare=await request('https://agent-orchestrator.dev/voice');assert.equal(bare.status,308);
 assert.equal(new URL(bare.headers.get('location'),'https://agent-orchestrator.dev').href,base);
-for(const route of ['not-a-voice-route/','api/session','writing-playground.js','writing-playground.mjs','voice-writing-rules.js']){
+for(const route of ['not-a-voice-route/','api/session','writing-playground.js','writing-playground.mjs','voice-writing-rules.js','de/not-a-voice-route/','de/api/session','de/voice-writing-rules.js']){
  assert.equal((await request(new URL(route,base))).status,404,route+' must not be served');
 }
 const home=await request('https://agent-orchestrator.dev/');assert.equal(home.status,200);
 const html=await home.text();
+const hub=new JSDOM(html).window.document;
+assert.equal(hub.querySelector('#voice h3')?.textContent.trim(),'Voice Lint');
+assert([...hub.querySelectorAll('.statusbar a')].some(link=>link.textContent.trim()==='Voice Lint'&&link.getAttribute('href')==='/voice/'),'Visible header link must identify Voice Lint.');
+assert.match(home.headers.get('cache-control')??'',/no-cache/,'Hub HTML must revalidate.');
 assert(/href=["']\/voice\/["']/.test(html),'Ecosystem homepage must link to Voice.');
 const output=path.join(root,'test-results/voice-deployment');await fs.mkdir(output,{recursive:true});
 await fs.writeFile(path.join(output,'verification.json'),JSON.stringify({verifiedAt:new Date().toISOString(),base,sourceCommit:info.git.commit,buildTime:info.builtAt,files:checked.sort((a,b)=>a.path.localeCompare(b.path)),routes:info.routes.length,bareRedirect:308,unknownAndPrivateRoutes:404,ecosystemLink:true},null,2)+'\n');

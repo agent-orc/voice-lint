@@ -216,7 +216,7 @@
   <h1>Voice Studio: review text in context</h1>
   <p class="lede">Voice Studio opens your running website or a folder of Markdown files. Select passages, save feedback, and inspect proposed changes before applying them to the source. This dossier documents the workflow, source mapping, and semantic review.</p>
   <div class="meta">
-    <span><b>Status:</b> 2026-09-12: public website live; source 7360a67, static artifact 12fabf4; Studio remains local preview</span>
+    <span><b>Status:</b> 2026-09-13: standalone clone builds; old repository retired; bilingual website verified locally, publication in progress</span>
     <span><b>Trigger:</b> Quality Studio website copy of 2026-09-01, status section</span>
     <span><b>Scope:</b> voice-lint (VL), public copy of WEB, AOW and QSW, runner prompts in AGT</span>
     <span><b>Decisions:</b> <a href="#programme">§11</a></span>
@@ -235,6 +235,14 @@
 </section>
 
 <!-- voice-studio:current:start -->
+<section class="box" id="voice-release-audit-2026-09-13" aria-labelledby="voice-release-audit-heading">
+<h4 id="voice-release-audit-heading">13 September 2026: repository, bilingual content and SEO review</h4>
+<p><b>Fresh clone:</b> a new HTTPS clone of <code>agent-orc/voice-lint</code> at <code>33063b5</code> passed <code>npm ci</code>, the complete product build (both libraries, Angular frontend and .NET backend), the website build and strict artifact verification. No existing project dependencies or private runtime files were copied. Node 24.18.0 and .NET SDK 10.0.301 were used.</p>
+<p><b>Old repository retired:</b> normal Devspace commit <code>53188edb930d1fd8c81e32e9a83573cfd55cdc80</code> removes exactly 299 old <code>voice-studio/</code> files and adds <code>VOICE-MOVED.md</code>. The other 227 tree entries and existing history are unchanged. The active dirty Devspace checkout was left untouched; its earlier local backups remain.</p>
+<p><b>Copy review:</b> six public pages were checked in English and German using the library's local signals plus contextual editorial review. The scanner covers 8 of 20 rules; it did not detect the unsupported evaluation in <q>berechtigten Ausnahmen</q>. Catalogue 0.2.2 adds contextual criteria to the existing claims-evidence prompts, with EN/DE regressions and 33 passing package tests. These checks do not establish AI authorship or measured model effectiveness.</p>
+<p><b>Prepared website changes:</b> 24 English and 24 German content URLs, full translations of all 18 guides, localized metadata and navigation, reciprocal language links and a sitemap. Heading hierarchy, original code examples and reviewed source hashes guard translation updates. The local Studio project maps the German guide URLs to their actual Markdown sources. Local checks passed 96 browser views, 282 links/assets/fragments, 48 SEO routes, 1,086 internal anchors, 22 writing-pattern checks, 16 research checks and original-source onboarding with 45 documents. JSON dialogs passed 12 focused browser checks. Public deployment verification of this new release is pending.</p>
+<p><b>Evidence:</b> <code>docs/reviews/voice-repository-2026-09-13.md</code>, <code>docs/reviews/voice-public-copy-2026-09-13.md</code> and <code>docs/reviews/voice-seo-2026-09-13.md</code>. The records below retain their original dated scope.</p>
+</section>
 <section class="box" id="voice-repository-migration" aria-labelledby="voice-repository-migration-heading">
 <h4 id="voice-repository-migration-heading">12 September 2026: standalone Voice repository</h4>
 <p><b>Canonical source:</b> <a href="https://github.com/agent-orc/voice-lint">agent-orc/voice-lint</a> contains Studio, <code>@voice/writing-rules</code>, <code>@voice/review</code>, the website, benchmarks, concept and this dossier at its repository root. All future Voice product commits belong to its <code>main</code> branch. The local checkout is <code>C:/Projects/voice-lint</code>; Voice is no longer maintained as a Devspace subdirectory.</p>

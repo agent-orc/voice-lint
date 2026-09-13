@@ -104,7 +104,18 @@ try{
  page.on('request',request=>requests.push({method:request.method(),url:request.url()}));
  const researchUrl=new URL('research/',base).href;
  const content=()=>page.locator('.research-content[lang="'+activeLocale+'"]');
- async function language(locale){activeLocale=locale;await page.getByRole('button',{name:locale.toUpperCase(),exact:true}).click();assert.equal(await page.locator('html').getAttribute('lang'),locale);}
+ async function language(locale){
+  const link=page.locator('a[data-locale="'+locale+'"]');
+  const target=await link.evaluate(element=>element.href);
+  const destination=new URL(target);
+  if(page.url()!==target)await Promise.all([page.waitForURL(url=>url.origin===destination.origin&&url.pathname===destination.pathname&&url.search===destination.search,{waitUntil:'domcontentloaded'}),link.click()]);
+  await page.waitForFunction(language=>document.documentElement.lang===language,locale);
+  assert.equal(await page.locator('html').getAttribute('lang'),locale);
+  const hash=new URL(page.url()).hash;
+  if(hash)assert.ok(await page.evaluate(id=>Boolean(document.getElementById(id)),decodeURIComponent(hash.slice(1))),'A language switch must preserve a valid section target: '+hash);
+  assert.equal(await page.locator('article').count(),1,'A language URL must contain one localized article');
+  activeLocale=locale;
+ }
  async function fits(label){assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),label+' must not cause horizontal page overflow');}
  await page.goto(researchUrl,{waitUntil:'domcontentloaded'});
  assert.equal(await page.locator('html').getAttribute('lang'),'en','Public research defaults to English even in a German browser');
@@ -181,17 +192,24 @@ try{
  checks.push(localLinks.size+' local research navigation, source downloads and rule section targets resolve.');
 
  const noJs=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}});
- const fallback=await noJs.newPage();await fallback.goto(researchUrl,{waitUntil:'domcontentloaded'});
- assert.equal(await fallback.locator('.research-content[lang="en"] details.research-entry:has(.research-api)').count(),records.length);
- for(const record of records){
-  const detail=fallback.locator('details.research-entry[id="'+record.id+'"]');await detail.locator(':scope > summary').click();
-  assert((normalize(await detail.innerText())).includes(normalize(record.observation??record.question??record.finding??record.voiceFit.replace(/^Assessment: /,''))));
-  await visibleApi(detail,record);
-  await detail.locator(':scope > summary').click();
+ const fallback=await noJs.newPage();
+ for(const locale of ['en','de']){
+  const localized=locale==='en'?records:Object.entries(deDatasets).flatMap(([dataset,items])=>items.map(item=>({...item,dataset})));
+  const idPrefix=locale==='de'?'de-':'';
+  await fallback.goto(new URL((locale==='de'?'de/':'')+'research/',base).href,{waitUntil:'domcontentloaded'});
+  assert.equal(await fallback.locator('html').getAttribute('lang'),locale);
+  assert.equal(await fallback.locator('article').count(),1);
+  assert.equal(await fallback.locator('.research-content[lang="'+locale+'"] details.research-entry:has(.research-api)').count(),records.length);
+  for(const record of localized){
+   const detail=fallback.locator('details.research-entry[id="'+idPrefix+record.id+'"]');await detail.locator(':scope > summary').click();
+   assert((normalize(await detail.innerText())).includes(normalize(record.observation??record.question??record.finding??record.voiceFit.replace(/^Assessment: /,''))));
+   await visibleApi(detail,record);
+   await detail.locator(':scope > summary').click();
+  }
+  assert(await fallback.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+  const fallbackJson=fallback.locator('#'+idPrefix+'sources a[href$="libraries.json"]').first();const fallbackUrl=await fallbackJson.evaluate(element=>element.href);const raw=await noJs.request.get(fallbackUrl);assert.equal(raw.status(),200);assert.deepEqual(await raw.json(),locale==='en'?datasets.libraries:deDatasets.libraries);
  }
- assert(await fallback.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
- const fallbackJson=fallback.locator('#sources a[href$="libraries.json"]').first();const fallbackUrl=await fallbackJson.evaluate(element=>element.href);const raw=await noJs.request.get(fallbackUrl);assert.equal(raw.status(),200);assert.deepEqual(await raw.json(),datasets.libraries);
- await noJs.close();checks.push('Without JavaScript, every research source and its API connection remain readable on mobile; JSON links resolve to the raw public records.');
+ await noJs.close();checks.push('Without JavaScript, every research source and its API connection remain readable on mobile at EN/DE URLs; JSON links resolve to the localized raw public records.');
 
  assert.deepEqual(errors,[],'Research interactions must not throw browser exceptions');
  assert(requests.every(request=>request.method==='GET'),'Research browsing must not issue mutation or model requests');

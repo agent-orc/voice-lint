@@ -1,0 +1,38 @@
+{
+  "writing-tools": {
+    "title": "Schreibwerkzeuge für Agenten",
+    "description": "Vier LLM-Tools für Regelwissen, Review-Prompts, lokale Textsignale und vom Host bereitgestellte Modellnachweise registrieren."
+  },
+  "review-benchmarks": {
+    "title": "Benchmarks für Textreviews",
+    "description": "Gespeicherte Antworten, unabhängige menschliche Bewertungen und die Kosten aller Versuche mit festgeschriebenen Eingaben und reproduzierbaren Berichten auswerten."
+  },
+  "writing-rules": {
+    "title": "Schreibregeln und Prompts zusammenstellen",
+    "description": "Ein Review-Profil auswählen, Regelbeispiele prüfen und einen Prompt für die konkrete Aufgabe zusammenstellen."
+  },
+  "ai-text-signals": {
+    "title": "KI-typische Schreibmuster prüfen",
+    "description": "Lokale Stilhinweise nutzen und verstehen, was sie über die Urheberschaft eines Textes aussagen können."
+  },
+  "workflow": {
+    "title": "Der Ablauf in Studio",
+    "description": "Vom registrierten Ordner und der laufenden Seite zur ausdrücklich angewendeten Quelländerung mit Versionsprüfung."
+  },
+  "session": {
+    "title": "Einmal koppeln, sieben Tage angemeldet bleiben",
+    "description": "Lokale Kopplung, gespeicherter Browserzugang, Ablauf und Abmeldung mit dem genauen HTTP-Vertrag."
+  },
+  "usability": {
+    "title": "Entscheidungen und Quellversionen",
+    "description": "Eine Passage beibehalten, Änderungsvorschläge prüfen und gespeicherte Ergebnisse vom aktuellen Quellstand unterscheiden."
+  },
+  "library": {
+    "title": "Die Review-Library einbinden",
+    "description": "Quelleinheiten, Befunde und die native Textauswahl mit der eigenen Anwendung verbinden."
+  },
+  "library-types": {
+    "title": "Typen, IntelliSense und Beispiele",
+    "description": "TypeScript, geprüftes JavaScript und das klassische Browser-Global verwenden – anhand tatsächlicher Paketimporte geprüft."
+  }
+}

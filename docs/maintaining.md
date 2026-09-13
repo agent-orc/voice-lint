@@ -50,7 +50,7 @@ whose manifest hashes match.
 ## Maintain reusable commands
 
 Build and operator commands belong in `scripts/`; benchmark runners and their
-fixtures belong in `benchmarks/`. Document explicit inputs, side effects,
-output locations and failure behavior. Document it in the command catalogue.
+fixtures belong in `benchmarks/`. Document each command's inputs, side effects, output locations and failure behavior
+in the command catalogue.
 Keep one-off patch and investigation scripts in ignored local maintenance storage;
 product code and supported commands must not import that storage.

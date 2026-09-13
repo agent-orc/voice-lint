@@ -1,5 +1,6 @@
 // Tests the actual renderer and viewer assets in an isolated loopback fixture.
 // No product build, running Studio, project mutation or model call is involved.
+import {localizeDocument} from './localization.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -30,13 +31,19 @@ assert(expectedRecords.length>0&&expectedRecords.every(href=>/\.json$/.test(href
 const expectedRecordPaths=expectedRecords.map(href=>{const source=path.posix.normalize(path.posix.join(path.posix.dirname(guide.source),href)),target=sourceTargets.get(source);assert(target,'Missing fixture mapping for a listed evidence record');JSON.parse(records.get('/voice/'+target));return '/voice/'+target;});
 const rendered=renderGuide(guide,markdown,sourceTargets);
 const fixtureLinks='<nav aria-label="Viewer test fixtures">'+['dangerous','invalid','missing','slow','large'].map(name=>`<a href="/voice/test-${name}.json">Fixture ${name}</a>`).join(' ')+'</nav>';
-const html=rendered.replace('</main>',fixtureLinks+'</main>');
+const fixtureRoutes=guides.map(item=>'guides/'+item.slug+'/');
+const html=localizeDocument(rendered.replace('</main>',fixtureLinks+'</main>'),'guides/verification/','en',fixtureRoutes);
+const translatedSource='website/guides/de/verification.md';
+const translated=await fs.readFile(path.join(root,translatedSource),'utf8');
+const germanRendered=renderGuide({...guide,source:translatedSource,linkSource:guide.source},translated,sourceTargets,{locale:'de'});
+const germanHtml=localizeDocument(germanRendered.replace('</main>',fixtureLinks+'</main>'),'guides/verification/','de',fixtureRoutes);
 const assets=new Map();for(const file of ['site.js','site.css','docs.css','json-viewer.js','json-viewer.css'])assets.set('/voice/'+file,await fs.readFile(path.join(root,'website',file)));
 let invalidAttempts=0;const slow=[],methods=[],errors=[],checks=[];
 const dangerous={text:'</code><img src=x onerror="window.__JSON_EXECUTED=true"><script>window.__JSON_EXECUTED=true</script>',nested:{list:[1,true,null]},long:'x'.repeat(900)};
 const server=http.createServer((request,response)=>{
  const pathname=new URL(request.url,'http://fixture').pathname;methods.push(request.method);
  if(pathname==='/voice/guides/verification/'){response.writeHead(200,{'Content-Type':'text/html'}).end(html);return;}
+ if(pathname==='/voice/de/guides/verification/'){response.writeHead(200,{'Content-Type':'text/html'}).end(germanHtml);return;}
  if(assets.has(pathname)){response.writeHead(200,{'Content-Type':pathname.endsWith('.css')?'text/css':'text/javascript'}).end(assets.get(pathname));return;}
  if(records.has(pathname)){response.writeHead(200,{'Content-Type':'application/json'}).end(records.get(pathname));return;}
  if(pathname==='/voice/test-dangerous.json'){response.writeHead(200,{'Content-Type':'application/json'}).end(JSON.stringify(dangerous));return;}
@@ -67,7 +74,7 @@ try{
  await page.getByRole('link',{name:'Fixture large',exact:true}).click();await dialog.getByText('This record is too large to display (limit: 2 MB).',{exact:true}).waitFor();checks.push('Oversize responses are bounded before JSON parsing.');await page.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});
  await page.getByRole('link',{name:'Fixture slow',exact:true}).click();await dialog.getByText('Loading JSON record…',{exact:true}).waitFor();assert.equal(await dialog.getAttribute('aria-busy'),'true');await page.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});
  await baseline.click();await dialog.locator('pre:not([hidden])').waitFor();for(const response of slow.splice(0))if(!response.destroyed)response.end('{"stale":true}');assert(!(await dialog.locator('code').textContent()).includes('"stale": true'));checks.push('Loading state is announced; closing aborts a pending record and late data cannot replace the next record.');await page.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});
- await page.getByRole('button',{name:'DE',exact:true}).click();await page.getByRole('link',{name:'Fixture missing',exact:true}).click();await dialog.getByText('Der JSON-Beleg konnte nicht geladen werden. Bitte erneut versuchen.',{exact:true}).waitFor();await dialog.getByRole('button',{name:'JSON-Beleg schließen',exact:true}).click();checks.push('Missing records and dialog controls support German interface language.');
+ await page.locator('a[data-locale="de"]').click();await page.waitForURL(origin+'/voice/de/guides/verification/');await page.getByRole('link',{name:'Fixture missing',exact:true}).click();await dialog.getByText('Der JSON-Beleg konnte nicht geladen werden. Bitte erneut versuchen.',{exact:true}).waitFor();await dialog.getByRole('button',{name:'JSON-Beleg schließen',exact:true}).click();checks.push('Missing records and dialog controls support German interface language.');
  const noJs=await browser.newContext({javaScriptEnabled:false});const fallback=await noJs.newPage();await fallback.goto(url);await fallback.locator('a[href$="baseline-checks.json"]').click();assert(fallback.url().endsWith('/baseline-checks.json'));await noJs.close();checks.push('Without JavaScript each record remains a normal JSON link.');
  assert.deepEqual(errors,[]);assert(methods.every(method=>method==='GET'));checks.push('No browser exceptions; fixture requests are read-only GETs.');
  const output=path.join(root,'test-results/voice-website');await fs.mkdir(output,{recursive:true});await fs.writeFile(path.join(output,'json-viewer.json'),JSON.stringify({capturedAt:new Date().toISOString(),scope:'Actual documentation renderer and viewer modules in an isolated loopback fixture; no running Studio, product build, project writes or model calls.',checks},null,2)+'\n');

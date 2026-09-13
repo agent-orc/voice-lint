@@ -16,6 +16,11 @@ const browser=await chromium.launch({channel:'chrome',headless:true});
 try{
  const context=await browser.newContext({locale:'de-DE',permissions:['clipboard-read','clipboard-write']});
  const page=await context.newPage();page.setDefaultTimeout(10000);page.on('pageerror',e=>errors.push(e.message));
+ async function changeLanguage(value){
+  const link=page.locator('a[data-locale="'+value+'"]'),target=await link.getAttribute('href');
+  await link.click();await page.waitForURL(url=>url.pathname===target);
+  await page.waitForFunction(expected=>document.documentElement.lang===expected,value);
+ }
  async function links(){
   for(const href of await page.locator('a[href],img[src],link[rel=stylesheet],script[src]').evaluateAll(els=>els.map(el=>el.href||el.src))){
    if(!href.startsWith(base)||verifiedLinks.has(href))continue;
@@ -34,18 +39,18 @@ try{
   const entries=[{group:tools,slugs:['studio','library'],labels:['Studio','Library']},{group:resources,slugs:['research','writing-patterns','docs'],labels:language==='de'?['Forschung','KI-Negativmuster','Doku']:['Research','AI anti-patterns','Docs']}];
   for(const {group,slugs,labels} of entries){
    const items=await group.locator('a').all();assert.equal(items.length,slugs.length);
-   for(let i=0;i<items.length;i++){assert(await items[i].isVisible());assert.equal(await items[i].innerText(),labels[i]);assert.equal(await items[i].evaluate(link=>link.href),base+slugs[i]+'/');await items[i].focus();assert(await items[i].evaluate(link=>document.activeElement===link),'Header links must be keyboard focusable');}
+   for(let i=0;i<items.length;i++){assert(await items[i].isVisible());assert.equal(await items[i].innerText(),labels[i]);assert.equal(await items[i].evaluate(link=>link.href),base+(language==='de'?'de/':'')+slugs[i]+'/');await items[i].focus();assert(await items[i].evaluate(link=>document.activeElement===link),'Header links must be keyboard focusable');}
   }
   const current=nav.locator('[aria-current="page"]'),expected=route.guide?'docs':route.slug;
-  assert.equal(await current.count(),expected?1:0,'Header current-page state must match route');if(expected)assert.equal(await current.evaluate(link=>link.href),base+expected+'/');
+  assert.equal(await current.count(),expected?1:0,'Header current-page state must match route');if(expected)assert.equal(await current.evaluate(link=>link.href),base+(language==='de'?'de/':'')+expected+'/');
   assert.equal(await nav.locator('a[href*="project-reviews"]').count(),0,'Obsolete page must not remain in navigation');
  }
  async function homeGitAndNavigation(language){
   const home=page.locator('article:not([hidden])'),git=home.locator('.home-git');assert(await git.isVisible());assert((await git.innerText()).includes('Git'));assert.equal(await git.locator('code').first().textContent(),'.voice-lint/');
   const tree=git.locator('a[href*="guides/workflow/"]');assert.equal(await tree.count(),1);assert.equal(new URL(await tree.evaluate(link=>link.href)).hash,'#saved-tasks-and-decisions');
-  await tree.click();await page.locator('#saved-tasks-and-decisions').waitFor();assert((await page.locator('.guide-content').innerText()).includes('.voice-lint/'),'File-tree destination must explain saved project records');await page.goto(base,{waitUntil:'domcontentloaded'});
+  await tree.click();await page.locator('#saved-tasks-and-decisions').waitFor();assert((await page.locator('.guide-content').innerText()).includes('.voice-lint/'),'File-tree destination must explain saved project records');await page.goto(base+(language==='de'?'de/':''),{waitUntil:'domcontentloaded'});
   for(const group of ['.nav-tools','.nav-resources']){
-   const link=page.locator('.site-nav '+group+' a').first(),target=await link.evaluate(element=>element.href);await link.focus();await link.press('Enter');await page.waitForURL(target);assert.equal(await page.locator('.site-nav [aria-current="page"]').evaluate(element=>element.href),target);assert.equal(await page.locator('html').getAttribute('lang'),language);await page.goto(base,{waitUntil:'domcontentloaded'});
+   const link=page.locator('.site-nav '+group+' a').first(),target=await link.evaluate(element=>element.href);await link.focus();await link.press('Enter');await page.waitForURL(target);assert.equal(await page.locator('.site-nav [aria-current="page"]').evaluate(element=>element.href),target);assert.equal(await page.locator('html').getAttribute('lang'),language);await page.goto(base+(language==='de'?'de/':''),{waitUntil:'domcontentloaded'});
   }
  }
  for(const size of [{width:1440,height:1000},{width:390,height:844}]){
@@ -55,13 +60,13 @@ try{
    assert((response.headers()['content-type']||'').startsWith('text/html'));
    if(!checked.length)assert.equal(await page.locator('html').getAttribute('lang'),'en');
    for(const language of ['en','de']){
-    await page.getByRole('button',{name:language.toUpperCase(),exact:true}).click();
+    await changeLanguage(language);
     assert.equal(await page.locator('html').getAttribute('lang'),language);
     assert.equal(await page.locator('article:not([hidden]) h1').count(),1);
     await navigation(route,language);if(route.slug==='')await homeGitAndNavigation(language);
     assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`${route.slug} ${language} ${size.width}: horizontal page overflow`);
     assert.equal(await page.locator('article:not([hidden]) a[href$=".md"]:not([download])').evaluateAll(els=>els.filter(el=>new URL(el.href).origin===location.origin).length),0,route.slug+': primary internal guide links must be HTML');
-    if(route.guide){assert.equal(await page.locator('.guide-article').getAttribute('lang'),'en');assert(await page.locator('.guide-content h2').count()>0);}
+    if(route.guide){assert.equal(await page.locator('.guide-article').getAttribute('lang'),language);assert(await page.locator('.guide-content h2').count()>0);}
     checked.push({route:route.slug||'home',language,width:size.width});
    }
    await links();
@@ -74,24 +79,24 @@ try{
    if(['','studio','docs','writing-patterns','library','guides/workflow','guides/library-types','guides/agent-integration'].includes(route.slug))await page.screenshot({path:path.join(output,`${route.slug.replaceAll('/','-')||'home'}-${size.width}.png`),fullPage:true});
   }
  }
- await page.goto(base+'library/',{waitUntil:'domcontentloaded'});await page.getByRole('button',{name:'EN',exact:true}).click();
+ await page.goto(base+'library/',{waitUntil:'domcontentloaded'});await changeLanguage('en');
  const demo=page.locator('article:not([hidden]) .demo');await demo.locator('[data-voice-unit]').waitFor();await demo.scrollIntoViewIfNeeded();await page.locator('[data-voice-overlay] > *').first().waitFor();
  await demo.getByRole('checkbox',{name:'Show marks'}).uncheck();await demo.getByText('Marks hidden.',{exact:true}).waitFor();
  await demo.getByRole('checkbox',{name:'Show marks'}).check();await demo.getByText('Marks visible.',{exact:true}).waitFor();
  await demo.locator('[data-voice-unit]').evaluate(el=>{const range=document.createRange();range.setStart(el.firstChild,4);range.setEnd(el.firstChild,12);const selection=getSelection();selection.removeAllRanges();selection.addRange(range);document.dispatchEvent(new Event('selectionchange'));el.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));});
  await page.waitForFunction(()=>document.querySelector('article:not([hidden]) .demo-output')?.textContent?.includes('"quote"'));
  assert((await demo.locator('output').textContent()).includes('powerful'));
- const original=await demo.locator('[data-voice-unit]').textContent();await page.getByRole('button',{name:'DE',exact:true}).click();assert.equal(await page.locator('article:not([hidden]) [data-voice-unit]').textContent(),original);
+ const original=await demo.locator('[data-voice-unit]').textContent();await changeLanguage('de');assert.equal(await page.locator('article:not([hidden]) [data-voice-unit]').textContent(),original);
  await page.reload({waitUntil:'domcontentloaded'});assert.equal(await page.locator('html').getAttribute('lang'),'de');
- await page.goto(base+'guides/library-types/');const code=page.locator('.code-block').first();await code.getByRole('button',{name:'Kopieren',exact:true}).click();assert.equal((await page.evaluate(()=>navigator.clipboard.readText())).replaceAll('\r\n','\n'),await code.locator('code').textContent(),'Copy preserves code text (native Windows newlines normalized)');
+ await page.goto(base+'de/guides/library-types/');const code=page.locator('.code-block').first();await code.getByRole('button',{name:'Kopieren',exact:true}).click();assert.equal((await page.evaluate(()=>navigator.clipboard.readText())).replaceAll('\r\n','\n'),await code.locator('code').textContent(),'Copy preserves code text (native Windows newlines normalized)');
  assert.equal((await context.request.get(base+'sources/site.mjs')).status(),404,'Obsolete publication input must be absent');
  const png=await context.request.get(base+'assets/studio-review.png');assert.equal(png.headers()['content-type'],'image/png');
- const info=await(await context.request.get(base+'build-info.json')).json();assert(info.git.commit);assert(info.inputs['docs/agent-integration.md']);assert(info.inputs['website/assets/studio-review.png']);assert.equal(info.routes.length,pages.length+guides.length);
- const sitemapResponse=await context.request.get(base+'sitemap.xml');assert.equal(sitemapResponse.status(),200);const sitemap=new JSDOM(await sitemapResponse.text(),{contentType:'application/xml'}).window.document;const sitemapUrls=[...sitemap.querySelectorAll('loc')].map(node=>node.textContent);assert.equal(sitemapUrls.length,24);assert(!sitemapUrls.some(url=>url.includes('/project-reviews/')),'Redirect alias must not be indexed');
+ const info=await(await context.request.get(base+'build-info.json')).json();assert(info.git.commit);assert(info.inputs['docs/agent-integration.md']);assert(info.inputs['website/assets/studio-review.png']);assert.equal(info.routes.length,2*(pages.length+guides.length));
+ const sitemapResponse=await context.request.get(base+'sitemap.xml');assert.equal(sitemapResponse.status(),200);const sitemap=new JSDOM(await sitemapResponse.text(),{contentType:'application/xml'}).window.document;const sitemapUrls=[...sitemap.querySelectorAll('loc')].map(node=>node.textContent);assert.equal(sitemapUrls.length,48);assert(!sitemapUrls.some(url=>url.includes('/project-reviews/')),'Redirect alias must not be indexed');
  const aliasResponse=await context.request.get(base+'project-reviews/');assert.equal(aliasResponse.status(),200);const aliasDoc=new JSDOM(await aliasResponse.text()).window.document;assert.equal(aliasDoc.querySelector('meta[name="robots"]')?.content,'noindex');assert(aliasDoc.querySelector('meta[http-equiv="refresh"]'),'Existing bookmarks must use a native browser redirect');
  await page.goto(base+'project-reviews/',{waitUntil:'domcontentloaded'});await page.waitForURL(base);assert(await page.locator('article:not([hidden]) .home-git').isVisible(),'Legacy URL must really land on homepage Git content');
- const noJs=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}});const fallback=await noJs.newPage();await fallback.goto(base+'project-reviews/');await fallback.waitForURL(base);assert.equal(await fallback.locator('.site-nav .nav-tools a').count(),2);assert.equal(await fallback.locator('.site-nav .nav-resources a').count(),3);assert.equal(await fallback.locator('article:not([hidden]) h1').textContent(),'Review the words.Keep the intent.');await fallback.goto(base+'guides/library-types/');assert(await fallback.locator('.guide-content pre').count()>0);assert(await fallback.getByRole('link',{name:'Mount the review library',exact:true}).isVisible());await noJs.close();
+ const noJs=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}});const fallback=await noJs.newPage();await fallback.goto(base+'project-reviews/');await fallback.waitForURL(base);assert.equal(await fallback.locator('.site-nav .nav-tools a').count(),2);assert.equal(await fallback.locator('.site-nav .nav-resources a').count(),3);assert.equal(await fallback.locator('article:not([hidden]) h1').textContent(),'Review the words.Keep the intent.');await fallback.goto(base+'guides/library-types/');assert(await fallback.locator('.guide-content pre').count()>0);assert(await fallback.getByRole('link',{name:'Mount the review library',exact:true}).isVisible());await fallback.locator('a[data-locale="de"]').click();await fallback.waitForURL(base+'de/guides/library-types/');assert.equal(await fallback.locator('html').getAttribute('lang'),'de');assert.equal(await fallback.locator('.guide-article').getAttribute('lang'),'de');assert(!(await fallback.locator('.guide-heading').innerText()).includes('Guide in English'));await noJs.close();
  assert.deepEqual(errors,[]);
- await fs.writeFile(path.join(output,'verification.json'),JSON.stringify({capturedAt:new Date().toISOString(),base,publicVerification,views:checked,localLinks:verifiedLinks.size,errors,libraryDemo:'actual bundle, marks toggle, native selection, language switch',guideFeatures:'HTML, local routes and fragments, source download, exact code copy, responsive navigation',homepage:'real UI screenshot, equal-width typed code panels and Git records linked to the file tree',header:'Two tool links and three resource links, keyboard navigation, localized labels and current-page state at both viewport sizes',legacyRoute:'project-reviews redirects to homepage with and without JavaScript and is absent from the 24-route sitemap',noJavaScript:'English content, grouped navigation, legacy redirect and all guide navigation available',build:{builtAt:info.builtAt,inputs:info.inputs},git:info.git},null,2)+'\n');
- console.log(`PASS ${checked.length} route/language/viewport views, ${verifiedLinks.size} local links/assets/fragments, HTML guides, exact copy, real library selection/marks, saved language and no-JS content. No browser errors or model calls.`);
+ await fs.writeFile(path.join(output,'verification.json'),JSON.stringify({capturedAt:new Date().toISOString(),base,publicVerification,views:checked,localLinks:verifiedLinks.size,errors,libraryDemo:'actual bundle, marks toggle, native selection, language switch',guideFeatures:'HTML, local routes and fragments, source download, exact code copy, responsive navigation',homepage:'real UI screenshot, equal-width typed code panels and Git records linked to the file tree',header:'Two tool links and three resource links, keyboard navigation, localized labels and current-page state at both viewport sizes',legacyRoute:'project-reviews redirects to homepage with and without JavaScript and is absent from the 48-route sitemap',noJavaScript:'English and German static content, working language links, grouped navigation and legacy redirect',build:{builtAt:info.builtAt,inputs:info.inputs},git:info.git},null,2)+'\n');
+ console.log(`PASS ${checked.length} route/language/viewport views, ${verifiedLinks.size} local links/assets/fragments, HTML guides, exact copy, real library selection/marks, language URLs and no-JS content. No browser errors or model calls.`);
 }finally{await browser.close()}

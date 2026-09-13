@@ -8,6 +8,7 @@ import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {JSDOM} from 'jsdom';
 import {pages} from '../website/site.mjs';
+import {locales,localizedRoute} from '../website/localization.mjs';
 import {guides,downloads} from '../website/guides.mjs';
 import {studioImages} from '../website/studio-tour.mjs';
 
@@ -79,12 +80,13 @@ try{
   }
   expectCopy(evidenceRoot+'/manifest.json','sources/verification/manifest.json');
 
-  const routes=[...guides.map(guide=>`guides/${guide.slug}/`),...pages.map(page=>page.slug?page.slug+'/':'')];
+  const routes=[...guides.map(guide=>`guides/${guide.slug}/`),...pages.map(page=>page.slug?page.slug+'/':'')].flatMap(route=>locales.map(locale=>localizedRoute(route,locale)));
   check(new Set(routes).size===routes.length,'Public route catalogue contains duplicates.');
-  for(const guide of guides){expectCopy(guide.source,`sources/${guide.slug}.md`);expectFile(`guides/${guide.slug}/index.html`);}
+  for(const guide of guides){expectCopy(guide.source,`sources/${guide.slug}.md`);expectCopy(`website/guides/de/${guide.slug}.md`,`sources/de/${guide.slug}.md`);}
+  for(const route of routes)expectFile(route+'index.html');
   for(const page of pages)expectFile((page.slug?page.slug+'/':'')+'index.html');
-  for(const name of ['project-reviews/index.html','build-info.json','sitemap.xml'])expectFile(name);
-  for(const source of ['website/site.mjs','website/content/studio.json','website/research.mjs','website/review-economics.mjs','website/library-analysis.mjs','website/tooling-library.mjs','website/writing-patterns.mjs','website/studio-tour.mjs','website/docs-index.mjs','website/build.mjs','website/guides.mjs','website/render-guide.mjs','website/template.mjs','package-lock.json'])expectInput(source);
+  for(const name of ['project-reviews/index.html','de/project-reviews/index.html','build-info.json','sitemap.xml'])expectFile(name);
+  for(const source of ['website/site.mjs','website/content/studio.json','website/research.mjs','website/review-economics.mjs','website/library-analysis.mjs','website/tooling-library.mjs','website/writing-patterns.mjs','website/studio-tour.mjs','website/docs-index.mjs','website/build.mjs','website/guides.mjs','website/render-guide.mjs','website/template.mjs','website/localization.mjs','website/metadata-de.json','website/guides/de/catalogue-a.json','website/guides/de/catalogue-b.json','website/guides/de/source-revisions.json','package-lock.json'])expectInput(source);
 
   const files=[];
   async function walk(directory,prefix=''){
@@ -178,31 +180,31 @@ try{
       }else check(script.getAttribute('type')==='application/ld+json','Inline executable script in public HTML: '+file);
     }
     const canonical=document.querySelector('link[rel="canonical"]')?.getAttribute('href');
-    const route=file==='project-reviews/index.html'?'':file.slice(0,-'index.html'.length);
+    const route=file.endsWith('project-reviews/index.html')?file.replace('project-reviews/index.html',''):file.slice(0,-'index.html'.length);
     check(canonical===target.href+route,'Canonical URL differs from its route: '+file);
     for(const element of document.querySelectorAll('[href],[src]')){
       const raw=element.getAttribute('href')??element.getAttribute('src');
       if(!raw||raw.startsWith('#')||raw.startsWith('data:'))continue;
       let url;try{url=new URL(raw,pageUrl);}catch{failures.push('Invalid public link in '+file);continue;}
       check(!['file:','javascript:'].includes(url.protocol),'Non-public link scheme in '+file);
-      if(['localhost','127.0.0.1','[::1]'].includes(url.hostname))check(file==='studio/index.html'&&url.href==='http://127.0.0.1:5188/','Unexpected development-server link in '+file);
+      if(['localhost','127.0.0.1','[::1]'].includes(url.hostname))check(['studio/index.html','de/studio/index.html'].includes(file)&&url.href==='http://127.0.0.1:5188/','Unexpected development-server link in '+file);
       if(url.origin!==target.origin||!url.pathname.startsWith(target.pathname))continue;
       const relative=decodeURIComponent(url.pathname.slice(target.pathname.length));
       const destination=!relative||relative.endsWith('/')?relative+'index.html':relative;
       check(expectedFiles.has(destination),'Link targets an unpublished file from '+file+': '+destination);
     }
-    if(file==='project-reviews/index.html'){
+    if(file.endsWith('project-reviews/index.html')){
       check(document.querySelector('meta[name="robots"]')?.content==='noindex','Legacy redirect must remain noindex.');
       check(document.querySelector('meta[http-equiv="refresh"]')?.content==='0;url=../','Legacy project-review route must redirect to the homepage.');
     }
     dom.window.close();
   }
-  check(htmlCount===routes.length+1,'Artifact HTML count does not match content routes plus the legacy redirect.');
+  check(htmlCount===routes.length+locales.length,'Artifact HTML count does not match content routes plus the legacy redirect.');
   if(failures.length){
     console.error('Website artifact verification failed:\n'+[...new Set(failures)].map(message=>' - '+message).join('\n'));
     process.exitCode=1;
   }else{
-    console.log(`Website artifact verified: ${files.length} files, ${routes.length} content routes + 1 redirect, ${expectedInputs.size} current input hashes; Git ${head}${allowDirty?' (local dirty preparation allowed)':''}.`);
+    console.log(`Website artifact verified: ${files.length} files, ${routes.length} content routes + 2 redirects, ${expectedInputs.size} current input hashes; Git ${head}${allowDirty?' (local dirty preparation allowed)':''}.`);
     console.log('Artifact SHA-256: '+artifactDigest.digest('hex'));
   }
 }catch(error){

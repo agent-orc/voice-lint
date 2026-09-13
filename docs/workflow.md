@@ -134,7 +134,7 @@ rejected when the source adapter cannot preserve the structure safely.
 Feedback, source tasks, proposals and semantic run history remain associated with the project.
 A stale source version cannot be overwritten. A source change can make an older
 note or semantic result stale; the UI labels that state instead of presenting it
-as a current finding. The original source backup/recovery journal remains in use.
+as a current finding. Before applying a proposal, the backend backs up the source and records the pending write in a transaction journal.
 
 ## Local project checks after apply
 

@@ -14,7 +14,7 @@ and its cost to the reader, in EN and DE. Names include **Development diary**,
 The positive `title` and `prompt` describe how to review or remedy it.
 
 A pattern is a contextual criticism, not proof that AI wrote the passage. A real
-comparison, useful history, justified uncertainty or deliberate style choice can
+comparison, useful history, uncertainty caused by missing or conflicting evidence or deliberate style choice can
 remain. `relatedRuleIds` identifies overlap: a laundry list concerns relevance
 and priority; formatting overload concerns presentation; a forced template can
 repeat form even when its facts differ.

@@ -25,6 +25,7 @@ requirements are in the [main README](../README.md).
 | `npm run test:json-viewer` | Check JSON dialogs with an isolated loopback fixture | Browser report under `test-results/voice-website/`; no Studio access |
 | `npm run test:writing-patterns` | Check the published writing catalogue, EN/DE filters, examples and absence of executable writing tools | Browser report; local preview by default, or the fixed public target below |
 | `npm run test:website` | Browser-check routes, EN/DE, mobile layout and the supplied HTML-annotation example | Ignored screenshots/report; local preview by default, or the fixed public target below |
+| `npm run test:website-seo` | Check 48 static EN/DE routes, language coverage and SEO metadata | Read-only local-preview or fixed public-target requests; report under ignored `test-results/` |
 | `npm run test:research` | Check bilingual Research records, source/API links and JSON dialogs | Ignored browser report; local preview by default, or the fixed public target below |
 | `npm run test:library-types` | Compile isolated TS/JS consumers and check real IntelliSense completions/hover documentation | Offline package fixtures; no VS Code UI automation |
 | `npm run test:session` | Backend browser trust, expiry, restart and revocation contracts | Isolated temporary session state; no live backend |

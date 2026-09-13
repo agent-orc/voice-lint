@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "configured-awaiting-first-deployment",
+  "status": "published",
   "target": "https://agent-orchestrator.dev/voice/",
   "buildCommand": "npm run website:build",
   "artifactDirectory": "website/dist/voice",
@@ -8,32 +8,56 @@
   "runtimeRequired": false,
   "routes": [
     "/voice/research/",
+    "/voice/de/research/",
     "/voice/writing-patterns/",
+    "/voice/de/writing-patterns/",
     "/voice/",
+    "/voice/de/",
     "/voice/studio/",
+    "/voice/de/studio/",
     "/voice/library/",
+    "/voice/de/library/",
     "/voice/docs/",
+    "/voice/de/docs/",
     "/voice/guides/writing-rules/",
+    "/voice/de/guides/writing-rules/",
     "/voice/guides/ai-text-signals/",
+    "/voice/de/guides/ai-text-signals/",
     "/voice/guides/workflow/",
+    "/voice/de/guides/workflow/",
     "/voice/guides/session/",
+    "/voice/de/guides/session/",
     "/voice/guides/usability/",
+    "/voice/de/guides/usability/",
     "/voice/guides/library/",
+    "/voice/de/guides/library/",
     "/voice/guides/library-types/",
+    "/voice/de/guides/library-types/",
     "/voice/guides/live-bridge/",
+    "/voice/de/guides/live-bridge/",
     "/voice/guides/runner-integration/",
+    "/voice/de/guides/runner-integration/",
     "/voice/guides/checks/",
+    "/voice/de/guides/checks/",
     "/voice/guides/agent-integration/",
+    "/voice/de/guides/agent-integration/",
     "/voice/guides/holistic-review/",
+    "/voice/de/guides/holistic-review/",
     "/voice/guides/maintaining/",
+    "/voice/de/guides/maintaining/",
     "/voice/guides/commands/",
+    "/voice/de/guides/commands/",
     "/voice/guides/verification/",
+    "/voice/de/guides/verification/",
     "/voice/guides/notices/",
+    "/voice/de/guides/notices/",
     "/voice/guides/writing-tools/",
-    "/voice/guides/review-benchmarks/"
+    "/voice/de/guides/writing-tools/",
+    "/voice/guides/review-benchmarks/",
+    "/voice/de/guides/review-benchmarks/"
   ],
   "ecosystemEntry": {
-    "name": "Voice",
+    "name": "Voice Lint",
     "kind": "Studio and two libraries",
     "description": "Local text review in Git project folders, with agent tooling and an independent HTML review library.",
     "href": "/voice/",
@@ -54,7 +78,6 @@
   "htmlGuideCount": 18,
   "pageCatalogue": "website/site.mjs",
   "guideCatalogue": "website/guides.mjs",
-  "guideContentLanguage": "en",
   "interfaceLanguages": [
     "en",
     "de"
@@ -63,6 +86,11 @@
     {
       "from": "/voice/project-reviews/",
       "to": "/voice/",
+      "kind": "static-html-refresh"
+    },
+    {
+      "from": "/voice/de/project-reviews/",
+      "to": "/voice/de/",
       "kind": "static-html-refresh"
     }
   ],
@@ -76,5 +104,10 @@
   "sourceBranch": "main",
   "deployBranch": "deploy",
   "deploymentMode": "Explicit static snapshot publication; existing host pull and symlink swap",
-  "automaticSourcePublication": "Not enabled; publish a verified static snapshot explicitly."
+  "automaticSourcePublication": "Not enabled; publish a verified static snapshot explicitly.",
+  "guideContentLanguages": [
+    "en",
+    "de"
+  ],
+  "localizedContentRouteCount": 48
 }

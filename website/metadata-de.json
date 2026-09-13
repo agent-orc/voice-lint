@@ -1,0 +1,26 @@
+{
+  "": {
+    "title": "Voice Lint · Textreviews in Git mit Studio und Libraries",
+    "description": "Prüfe Texte auf deiner Website mit Voice Studio. Zwei TypeScript-Libraries liefern Regeln, Prüf-Prompts und HTML-Markierungen. Quellen und Review-Daten liegen im Projekt."
+  },
+  "studio": {
+    "title": "Voice Studio · Texte auf deiner Website prüfen",
+    "description": "Starte Voice Studio lokal, prüfe Textstellen im Seitenkontext und vergleiche Vorschläge mit der Quelldatei. Passe die Breite von Website und Review am Splitter an."
+  },
+  "library": {
+    "title": "Voice Libraries · Schreibregeln und HTML-Reviews",
+    "description": "Binde Schreibregeln, Prüf-Prompts und lokale Musterprüfungen als Agent-Tools ein. Eine zweite TypeScript-Library zeigt Befunde und Textauswahl im HTML."
+  },
+  "research": {
+    "title": "Voice Forschung · KI-Texte, Review-Qualität und Kosten",
+    "description": "Forschung zu KI-Texten mit Methoden, Ergebnissen und Grenzen. Sieh, wie Studien und Praxisbeispiele in Voice-Regeln, Prompts und reproduzierbare Benchmarks einfließen."
+  },
+  "writing-patterns": {
+    "title": "Voice · 20 KI-Schreibmuster mit Beispielen und Prüf-Prompts",
+    "description": "Prüfe Floskeln, künstliche Gegensätze und unnötige Erklärungen. 20 Regeln mit deutschen und englischen Beispielen zeigen, wann du Text ändern oder beibehalten solltest."
+  },
+  "docs": {
+    "title": "Voice-Dokumentation · Start, Libraries und Schnittstellen",
+    "description": "Starte Studio, binde die Libraries ein und verbinde einen Agent-Ablauf. Die Anleitungen zeigen Befehle, Dateibäume, JSON und die Grenzen der Schnittstellen."
+  }
+}

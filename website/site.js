@@ -1,15 +1,22 @@
-let locale='en';
-try{if(localStorage.getItem('voice-site:locale')==='de')locale='de'}catch{}
+let locale=document.documentElement.lang==='de'?'de':'en';
 let review;
 function setLanguage(value){
   locale=value==='de'?'de':'en';document.documentElement.lang=locale;
   document.querySelectorAll('[data-language]').forEach(el=>{el.hidden=el.dataset.language!==locale});
-  document.querySelectorAll('[data-locale]').forEach(el=>el.setAttribute('aria-pressed',String(el.dataset.locale===locale)));
+  document.querySelectorAll('[data-locale]').forEach(el=>{if(el.dataset.locale===locale)el.setAttribute('aria-current','true');else el.removeAttribute('aria-current')});
   document.querySelectorAll('[data-en][data-de]').forEach(el=>el.textContent=el.dataset[locale]);
   try{localStorage.setItem('voice-site:locale',locale)}catch{}
   mountDemo();
 }
-document.querySelectorAll('[data-locale]').forEach(el=>el.addEventListener('click',()=>setLanguage(el.dataset.locale)));
+document.querySelectorAll('a[data-locale]').forEach(link=>link.addEventListener('click',()=>{
+  if(location.hash){
+    const id=location.hash.slice(1);
+    if(location.pathname.includes('/writing-patterns/'))link.hash=link.dataset.locale+'-'+id.replace(/^(en|de)-/,'');
+    else if(location.pathname.includes('/research/'))link.hash=(link.dataset.locale==='de'?'de-':'')+id.replace(/^de-/,'');
+    else link.hash=id;
+  }
+  if(['127.0.0.1','localhost'].includes(location.hostname))link.search=location.search;
+}));
 function mountDemo(){
   review?.dispose();review=undefined;
   const slot=document.querySelector(`[data-language="${locale}"] [data-demo-slot]`);if(!slot||!window.VoiceReview)return;

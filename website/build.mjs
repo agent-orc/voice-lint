@@ -1,4 +1,6 @@
 import fs from 'node:fs/promises';
+import {JSDOM} from 'jsdom';
+import {locales,localizedRoute,localizeDocument} from './localization.mjs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {execFileSync} from 'node:child_process';
@@ -17,6 +19,7 @@ const output=path.join(stageRoot,'voice');
 const origin='https://agent-orchestrator.dev';
 await fs.mkdir(output,{recursive:true});
 const inputs={}, sourceTargets=new Map(), routes=[];
+const baseRoutes=[...guides.map(guide=>`guides/${guide.slug}/`),...pages.map(page=>page.slug?page.slug+'/':'')];
 async function read(source){
   const absolute=path.resolve(root,source),resolved=await fs.realpath(absolute);
   if(!absolute.startsWith(root+path.sep)||resolved!==absolute||(await fs.lstat(absolute)).isSymbolicLink())throw new Error('Publication input outside source tree or symlink: '+source);
@@ -61,26 +64,63 @@ for(const entry of evidenceEntries){
 }
 await copy(`${evidenceRoot}/manifest.json`,'sources/verification/manifest.json');
 for(const guide of guides)sourceTargets.set(guide.source,`guides/${guide.slug}/`);
+const translationSources=JSON.parse(await read('website/guides/de/source-revisions.json'));
+if(translationSources.schemaVersion!==1||translationSources.language!=='de'||translationSources.normalization!=='utf8-lf')throw new Error('Unsupported translation source record');
+const germanMetadata={...JSON.parse(await read('website/guides/de/catalogue-a.json')),...JSON.parse(await read('website/guides/de/catalogue-b.json'))};
+const germanGuides=guides.map(guide=>{
+  const translated=germanMetadata[guide.slug];
+  if(!translated?.title||!translated?.description)throw new Error('Missing German guide metadata: '+guide.slug);
+  return {...guide,...translated,linkSource:guide.source,source:'website/guides/de/'+guide.slug+'.md'};
+});
 for(const guide of guides){
+  const route='guides/'+guide.slug+'/';
   const markdown=(await read(guide.source)).toString('utf8');
-  await write(`sources/${guide.slug}.md`,markdown);
-  await write(`guides/${guide.slug}/index.html`,renderGuide(guide,markdown,sourceTargets));
-  routes.push(`guides/${guide.slug}/`);
+  if(translationSources.sources[guide.slug]?.source!==guide.source||translationSources.sources[guide.slug]?.sha256!==createHash('sha256').update(markdown.replaceAll('\r\n','\n')).digest('hex'))throw new Error('German translation requires source review: '+guide.slug);
+  await write('sources/'+guide.slug+'.md',markdown);
+  const englishHtml=renderGuide(guide,markdown,sourceTargets);
+  const english=new JSDOM(englishHtml);
+  const headings=[...english.window.document.querySelectorAll('.guide-content :is(h1,h2,h3,h4,h5,h6)')];
+  const headingIds=headings.map(heading=>heading.id);
+  const headingLevels=headings.map(heading=>heading.tagName);
+  const codes=[...english.window.document.querySelectorAll('pre code')].map(code=>code.textContent);
+  for(const locale of locales){
+    const localized=localizedRoute(route,locale);
+    let html=englishHtml;
+    if(locale==='de'){
+      const translated=germanGuides.find(item=>item.slug===guide.slug);
+      const text=(await read(translated.source)).toString('utf8');
+      await write('sources/de/'+guide.slug+'.md',text);
+      html=renderGuide(translated,text,sourceTargets,{locale,catalogue:germanGuides,headingIds});
+      const german=new JSDOM(html);
+      const levels=[...german.window.document.querySelectorAll('.guide-content :is(h1,h2,h3,h4,h5,h6)')].map(heading=>heading.tagName);
+      const translatedCodes=[...german.window.document.querySelectorAll('pre code')].map(code=>code.textContent);
+      if(JSON.stringify(levels)!==JSON.stringify(headingLevels))throw new Error('Translated heading hierarchy differs: '+guide.slug);
+      if(JSON.stringify(translatedCodes)!==JSON.stringify(codes))throw new Error('Translated code examples differ: '+guide.slug);
+      german.window.close();
+    }
+    await write(localized+'index.html',localizeDocument(html,route,locale,baseRoutes));
+    routes.push(localized);
+  }
+  english.window.close();
 }
 function decoratePublic(html){return html.replace(/<pre><code(?: class="language-([^"]+)")?>([\s\S]*?)<\/code><\/pre>/g,(_all,lang,content)=>{
   const language=lang||'shell';const text=content.replaceAll('&lt;','<').replaceAll('&gt;','>').replaceAll('&quot;','"').replaceAll('&amp;','&');
   return '<figure class="code-block"><figcaption><span>'+language+'</span><button type="button" class="copy-code" data-en="Copy" data-de="Kopieren" hidden>Copy</button></figcaption><pre tabindex="0"><code>'+highlightCode(text,language)+'</code></pre></figure>';
 })}
-for(const page of pages){
-  await write((page.slug?page.slug+'/':'')+'index.html',documentPage({title:page.title,description:page.description,slug:page.slug,content:`<article data-language="en">${decoratePublic(page.en)}</article><article data-language="de" hidden>${decoratePublic(page.de)}</article>${page.shared||''}`,demo:page.slug==='library'}));
-  routes.push(page.slug?page.slug+'/':'');
+const productMetadataDe=JSON.parse(await read('website/metadata-de.json'));
+for(const page of pages)for(const locale of locales){
+  const route=page.slug?page.slug+'/':'';
+  const localized=localizedRoute(route,locale);
+  const html=documentPage({title:page.title,description:page.description,slug:page.slug,content:'<article data-language="'+locale+'">'+decoratePublic(page[locale])+'</article>'+(page.shared||''),demo:page.slug==='library'});
+  await write(localized+'index.html',localizeDocument(html,route,locale,baseRoutes,locale==='de'?productMetadataDe[page.slug]:{}));
+  routes.push(localized);
 }
 // Preserve existing bookmarks without a separate product page or sitemap entry.
-await write('project-reviews/index.html','<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=../"><meta name="robots" content="noindex"><link rel="canonical" href="https://agent-orchestrator.dev/voice/"><title>Voice · Git-backed review</title></head><body><p><a href="../">Git-backed review is on the Voice homepage.</a></p></body></html>');
-for(const source of ['website/site.mjs','website/content/studio.json','website/research.mjs','website/review-economics.mjs','website/library-analysis.mjs','website/tooling-library.mjs','website/writing-patterns.mjs','website/studio-tour.mjs','website/docs-index.mjs','website/build.mjs','website/guides.mjs','website/render-guide.mjs','website/template.mjs','package-lock.json'])await read(source);
+for(const locale of locales)await write(localizedRoute('project-reviews/',locale)+'index.html','<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=../"><meta name="robots" content="noindex"><link rel="canonical" href="https://agent-orchestrator.dev/voice/"><title>Voice · Git-backed review</title></head><body><p><a href="../">Git-backed review is on the Voice homepage.</a></p></body></html>'.replace('lang="en"','lang="'+locale+'"').replace('https://agent-orchestrator.dev/voice/"','https://agent-orchestrator.dev/voice/'+(locale==='de'?'de/':'')+'"').replace('Git-backed review is on the Voice homepage.',locale==='de'?'Reviews mit Git sind auf der Voice-Startseite beschrieben.':'Git-backed review is on the Voice homepage.'));
+for(const source of ['website/site.mjs','website/content/studio.json','website/research.mjs','website/review-economics.mjs','website/library-analysis.mjs','website/tooling-library.mjs','website/writing-patterns.mjs','website/studio-tour.mjs','website/docs-index.mjs','website/build.mjs','website/guides.mjs','website/render-guide.mjs','website/template.mjs','website/localization.mjs','package-lock.json'])await read(source);
 let git={available:false};
 try{const run=args=>execFileSync('git',args,{cwd:root,encoding:'utf8',timeout:5000,windowsHide:true}).trim();git={available:true,commit:run(['rev-parse','HEAD']),branch:run(['branch','--show-current']),sourcePath:run(['rev-parse','--show-prefix']),workingTreeDirty:!!run(['status','--porcelain','--untracked-files=normal','--','.'])}}catch{}
-await write('build-info.json',JSON.stringify({schemaVersion:1,product:'Voice public website',deploymentTarget:origin+'/voice/',builtAt:new Date().toISOString(),git,inputs,routes,published:false},null,2)+'\n');
+await write('build-info.json',JSON.stringify({schemaVersion:1,product:'Voice public website',deploymentTarget:origin+'/voice/',builtAt:new Date().toISOString(),git,inputs,routes,locales,published:false},null,2)+'\n');
 await write('sitemap.xml',`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${routes.map(route=>`<url><loc>${origin}/voice/${route}</loc></url>`).join('')}</urlset>`);
 async function renameOutput(from,to){
   for(let attempt=0;;attempt++){try{return await fs.rename(from,to)}catch(error){if(!['EPERM','EACCES','EBUSY'].includes(error.code)||attempt>=12)throw error;await new Promise(resolve=>setTimeout(resolve,150))}}
@@ -96,4 +136,4 @@ try{
   if(resolvedStage!==stageRoot||!resolvedStage.startsWith(path.join(root,'.local','website-build-')))throw new Error('Unexpected generated staging cleanup target');
   await fs.rm(resolvedStage,{recursive:true,force:true});
 }catch(error){console.error('Website swap failed; staged build retained at a local maintenance path.');throw error}
-console.log(`Built ${pages.length} product pages + ${guides.length} HTML guides in website/dist/voice. Deployment target only; no publication performed.`);
+console.log(`Built ${pages.length} product pages + ${guides.length} HTML guides in ${locales.length} languages in website/dist/voice. Deployment target only; no publication performed.`);
