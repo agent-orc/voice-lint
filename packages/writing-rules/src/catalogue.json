@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "version": "voice-writing-rules/0.2.1",
-  "reviewedAt": "2026-09-12",
+  "version": "voice-writing-rules/0.2.2",
+  "reviewedAt": "2026-09-13",
   "purpose": "Contextual editorial review and prompt preparation. No authorship detection, automatic findings, source edits or model execution.",
   "sources": [
     {
@@ -792,19 +792,21 @@
         "en": "Match the claim to its evidence",
         "de": "Aussage und Beleg aufeinander abstimmen"
       },
-      "trigger": "A count, superlative, guarantee or release claim exceeds the observed scope, or plausible source text is treated as verified product behavior.",
+      "trigger": "A count, superlative, guarantee, release claim or evaluative modifier exceeds the observed scope, omits its decision criterion, or treats plausible source text as verified product behavior.",
       "cues": [
         "all pages verified",
         "production-ready",
         "guaranteed improvement",
-        "percentages without conditions"
+        "percentages without conditions",
+        "valid exceptions without a stated criterion"
       ],
       "prompt": {
-        "en": "Name the evidence and its actual scope. Flag missing support without declaring the claim false; preserve valid bounded measurements.",
-        "de": "Benenne Beleg und tatsächlichen Umfang. Markiere fehlende Unterstützung, ohne die Aussage deshalb für falsch zu erklären; erhalte gültige begrenzte Messungen."
+        "en": "Name the evidence and its actual scope. Flag missing support without declaring the claim false; preserve valid bounded measurements. When an evaluative modifier such as valid, justified or legitimate adds a judgment, check for a stated criterion that helps the reader decide. If it is missing, name the condition or remove the modifier. For example, replace valid exceptions with cases where the text should stay when the surrounding rule supplies those conditions. Keep valid JSON when syntax validity is the actual requirement; distinguish syntax validity from schema validation. Do not ban an adjective based on word-list membership.",
+        "de": "Benenne Beleg und tatsächlichen Umfang. Markiere fehlende Unterstützung, ohne die Aussage deshalb für falsch zu erklären; erhalte gültige begrenzte Messungen. Prüfe bei wertenden Zusätzen wie berechtigt, begründet oder sinnvoll, ob ein genanntes Kriterium die Entscheidung nachvollziehbar macht. Fehlt es, benenne die Bedingung oder entferne den Zusatz. Ersetze zum Beispiel berechtigte Ausnahmen durch Fälle, in denen der Text bleiben sollte, wenn die zugehörige Regel diese Bedingungen nennt. Erhalte gültiges JSON, wenn syntaktische Gültigkeit die Anforderung ist; unterscheide sie von einer Schema-Prüfung. Verbiete kein Adjektiv aufgrund einer Wortliste."
       },
       "falsePositives": [
-        "An exact API invariant or properly scoped measurement can support absolute wording."
+        "An exact API invariant or properly scoped measurement can support absolute wording.",
+        "A stated decision criterion can justify a modifier. For example, valid JSON names a syntactic requirement; it does not mean that a schema was checked. Exception criteria may be supplied by the adjacent rule instead of repeated in every heading."
       ],
       "examples": {
         "en": {
@@ -824,6 +826,10 @@
         {
           "sourceId": "anthropic-readable",
           "relation": "editorial-derivation"
+        },
+        {
+          "sourceId": "microsoft-words",
+          "relation": "editorial-derivation"
         }
       ],
       "antiPattern": {
@@ -832,8 +838,8 @@
           "de": "Behauptung ohne Beleg"
         },
         "symptom": {
-          "en": "A guarantee, measurement or readiness claim exceeds the evidence actually provided.",
-          "de": "Eine Garantie, Messung oder Freigabeaussage geht über die vorhandenen Belege hinaus."
+          "en": "A guarantee, measurement, readiness claim or evaluative modifier asserts more than the evidence or stated criteria support.",
+          "de": "Eine Garantie, Messung, Freigabeaussage oder wertende Ergänzung geht über die vorhandenen Belege oder genannten Kriterien hinaus."
         },
         "readerCost": {
           "en": "The apparent certainty hides what was and was not checked.",

@@ -41,13 +41,21 @@ response. It defaults to six public-docs rules and asks for at most five finding
 The count is a requested format, not a guaranteed inference budget. Audience and
 goal are trusted host configuration; source documents belong in separate input.
 
-Catalogue 0.2.1 applies research and editorial guidance to informational headings through
+The catalogue applies research and editorial guidance to informational headings through
 the existing `word-choice`, `format-fit` and `meta-framing` rules. Their EN/DE prompts
 ask for the concrete subject or task, compare added interpretation with the brief,
 and preserve genuine reader questions, explanatory metaphors and accepted positioning.
 Select these IDs explicitly for this combined scope. Source records distinguish
 research context from editorial derivation. These are instructions for a contextual
 reviewer; the lexical scanner has no new heading detector.
+
+Catalogue 0.2.2 adds contextual review of evaluative modifiers to `claims-evidence`.
+For example, “valid exceptions” needs a criterion; “valid JSON” can name a
+syntactic requirement. The EN/DE prompts ask the reviewer to retain that
+distinction. This is an editorial application of the cited word-choice guidance,
+not a measured model capability or a new lexical detector. Prompt text changed;
+compare new model runs under this version and keep older benchmark records pinned
+to their original catalogue version.
 
 Selection is deterministic. Explicit IDs outside a selected profile throw rather
 than silently change the requested coverage. Public data and results are frozen.

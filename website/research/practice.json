@@ -243,7 +243,7 @@
     "kind": "practice",
     "observation": "A commercial catalogue packages anti-pattern instructions as prompt or skill files. Its public examples use punctuation and rhetorical prohibitions; the FAQ acknowledges that prompts cannot guarantee compliance.",
     "limits": "Marketing claims about pattern counts, crawls and model coverage were not independently verified. No auditable evaluation supporting the advertised effect was established from the page; no paid material or product was tested.",
-    "voiceImplication": "Evaluate counter-prompts on preserved originals and legitimate exceptions. A larger instruction catalogue alone does not demonstrate better writing, and English claims do not qualify German behavior.",
+    "voiceImplication": "Evaluate counter-prompts on cases where the original already serves the reader task. A larger instruction catalogue alone does not demonstrate better writing, and English claims do not qualify German behavior.",
     "readingDepth": "Public examples, coverage claims and FAQ read on 2026-09-12. Publication date not established.",
     "relatedRuleIds": [
       "forced-template",

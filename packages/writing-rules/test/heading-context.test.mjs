@@ -10,7 +10,7 @@ test('heading review carries context and keep cases without turning them into le
       goal: 'Explain model selection and prompt structure without claiming an unmeasured winner',
       language, ruleIds,
     });
-    assert.equal(result.catalogueVersion, 'voice-writing-rules/0.2.1');
+    assert.equal(result.catalogueVersion, 'voice-writing-rules/0.2.2');
     assert.deepEqual(result.ruleIds, ruleIds);
     for (const id of ruleIds) {
       const rule = getWritingRule(id);

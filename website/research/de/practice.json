@@ -243,7 +243,7 @@
     "kind": "practice",
     "observation": "Ein kommerzieller Katalog bündelt Anweisungen gegen unerwünschte Sprachmuster als Prompt- oder Skill-Dateien. Die öffentlichen Beispiele verbieten bestimmte Satzzeichen und rhetorische Formen; die FAQ räumt ein, dass Prompts deren Einhaltung nicht garantieren können.",
     "limits": "Werbeaussagen zu Musterzahlen, Crawls und abgedeckten Modellen wurden nicht unabhängig überprüft. Auf der Seite ließ sich keine nachvollziehbare Evaluation für die beworbene Wirkung feststellen; kostenpflichtige Inhalte oder Produkte wurden nicht getestet.",
-    "voiceImplication": "Gegen-Prompts an erhaltenswerten Originalen und berechtigten Ausnahmen evaluieren. Ein größerer Anweisungskatalog allein belegt keine besseren Texte; Aussagen zu Englisch belegen keine Qualität im Deutschen.",
+    "voiceImplication": "Gegen-Prompts an Fällen prüfen, in denen das Original die Leseraufgabe bereits erfüllt. Ein größerer Anweisungskatalog allein belegt keine besseren Texte; Aussagen zu Englisch belegen keine Qualität im Deutschen.",
     "readingDepth": "Öffentliche Beispiele, Aussagen zur Abdeckung und FAQ am 2026-09-12 gelesen. Das Veröffentlichungsdatum ließ sich nicht feststellen.",
     "relatedRuleIds": [
       "forced-template",
