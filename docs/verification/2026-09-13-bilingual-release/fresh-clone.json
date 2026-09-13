@@ -1,0 +1,40 @@
+{
+  "startedAt": "2026-09-13T07:31:11.078Z",
+  "status": "passed",
+  "repository": "https://github.com/agent-orc/voice-lint.git",
+  "phases": [
+    {
+      "name": "fresh-clone",
+      "exitCode": 0,
+      "durationMs": 2137
+    },
+    {
+      "name": "npm ci",
+      "exitCode": 0,
+      "durationMs": 47714
+    },
+    {
+      "name": "npm run build",
+      "exitCode": 0,
+      "durationMs": 59560
+    },
+    {
+      "name": "npm run website:build",
+      "exitCode": 0,
+      "durationMs": 15985
+    },
+    {
+      "name": "npm run website:verify-artifact",
+      "exitCode": 0,
+      "durationMs": 5102
+    }
+  ],
+  "versions": {
+    "node": "v24.18.0",
+    "dotnet": "10.0.301"
+  },
+  "scope": "Fresh HTTPS clone; npm ci without copied dependencies, build all product workspaces and backend, build static website, strict artifact validation.",
+  "sourceCommit": "68f224dd3d285c6d87476269c1064fda9087e487",
+  "gitStatus": "",
+  "finishedAt": "2026-09-13T07:33:21.924Z"
+}

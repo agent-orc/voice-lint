@@ -161,7 +161,7 @@ npm run test:backend
 npm run test:writing-review-quality
 ```
 
-A fresh HTTPS clone of source `33063b5` passed dependency installation, the full
+A fresh HTTPS clone of source `68f224d` passed dependency installation, the full
 product build, the static website build and strict artifact validation on
 13 September 2026 with Node.js 24.18.0 and .NET SDK 10.0.301. Dependencies were
 restored through npm and NuGet; no local project dependencies, private session
@@ -175,3 +175,5 @@ controls. Browser scenarios require installed Chrome and their documented local
 fixture servers. See the [command catalogue](scripts/README.md),
 [layout checks](scripts/verify-split-layout.mjs) and
 [verification records](docs/verification.md) for scope and prerequisites.
+
+The [13 September bilingual release record](docs/verification/2026-09-13-bilingual-release/README.md) includes the fresh-clone build, byte-for-byte reproduction and public browser/SEO verification.

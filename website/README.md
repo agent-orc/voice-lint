@@ -158,7 +158,7 @@ Reports and screenshots are written to ignored `test-results/`. [Verification re
 
 ## Ecosystem hosting
 
-Published at [agent-orchestrator.dev/voice/](https://agent-orchestrator.dev/voice/). The [12 September 2026 release record](../docs/verification/2026-09-12-public-deployment/README.md) identifies the verified source, artifact and HTTP checks. Publishing remains a manual release step.
+Published at [agent-orchestrator.dev/voice/](https://agent-orchestrator.dev/voice/). The [13 September 2026 release record](../docs/verification/2026-09-13-bilingual-release/README.md) identifies the verified source, artifact and HTTP checks. Publishing remains a manual release step.
 
 | Role | Configuration |
 | --- | --- |

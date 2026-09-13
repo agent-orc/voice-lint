@@ -212,3 +212,7 @@ The compact private reports are .local/clean-clone-report.json and
 records their revision, command scope and limitations. Earlier statements above
 that the old remote was unchanged describe the 12 September local handoff; the
 13 September retirement supersedes that remote state while preserving history.
+
+## Bilingual release verified · 13 September 2026
+
+Source 68f224dd3d285c6d87476269c1064fda9087e487 passed a second fresh GitHub clone build and strict artifact validation. Artifact a074139716dc6d7273146428e391f33514f23642 is live with 142 files, 48 content routes and two redirects. Public file-byte, browser and SEO checks passed. Central source 13b0d3614f4a79e4d29b337bde07cd4a7e0f932a produced hub artifact 8572c52545df106d3739f50b4fa6257e1f79d140; Voice Lint is named in the card and header. The Caddy configuration was backed up, validated and reloaded with narrowly scoped revalidation headers. Unrelated hosting configuration and public HTML remain unchanged. The [retained release record](../verification/2026-09-13-bilingual-release/README.md) contains the exact revisions and check scope. Earlier records above retain their historical meaning.

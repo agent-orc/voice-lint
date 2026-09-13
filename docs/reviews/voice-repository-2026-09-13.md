@@ -82,15 +82,11 @@ backups and the isolated retirement clone are not active Voice product roots.
 
 ## Later language and release changes
 
-The source changes under review add 24 static English routes under `/voice/`
+The published source adds 24 static English routes under `/voice/`
 and 24 German routes under `/voice/de/`, including full German prose for all
 18 guides. Code examples and heading anchors remain aligned with English.
 Language-specific HTML, canonical URLs and `hreflang` links make the language
 variants accessible without JavaScript. Translation maintenance is documented in
 the [website README](../../website/README.md#maintain-guide-translations).
 
-These later changes are outside the fresh-clone result for `33063b5`. Record a
-new final source revision and repeat the clean build and strict artifact checks
-after committing them. Public HTTP and browser verification must then identify
-the artifact actually served; a successful local build alone does not establish
-that the current public website contains those changes.
+The second fresh HTTPS clone tested the committed language release at **68f224dd3d285c6d87476269c1064fda9087e487**. Dependency installation, the full product build, website build and strict artifact verification all passed with a clean source tree. Its 141 content/asset files match the deployed artifact byte for byte; build-info.json has identical source, input hashes and routes with its own build timestamp. Public HTTP, browser and SEO checks then passed for artifact **a074139716dc6d7273146428e391f33514f23642**. The [retained release record](../verification/2026-09-13-bilingual-release/README.md) contains the exact commands, timings, versions and machine-readable results.

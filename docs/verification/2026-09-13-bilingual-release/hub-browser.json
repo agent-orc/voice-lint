@@ -1,0 +1,42 @@
+{
+  "verifiedAt": "2026-09-13T07:39:53.869Z",
+  "views": [
+    {
+      "width": 1440,
+      "language": "en",
+      "target": "https://agent-orchestrator.dev/voice/",
+      "visible": true
+    },
+    {
+      "width": 1440,
+      "language": "de",
+      "target": "https://agent-orchestrator.dev/voice/de/",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "language": "en",
+      "target": "https://agent-orchestrator.dev/voice/",
+      "visible": true
+    },
+    {
+      "width": 390,
+      "language": "de",
+      "target": "https://agent-orchestrator.dev/voice/de/",
+      "visible": true
+    },
+    {
+      "width": 320,
+      "language": "en",
+      "target": "https://agent-orchestrator.dev/voice/",
+      "visible": true
+    },
+    {
+      "width": 320,
+      "language": "de",
+      "target": "https://agent-orchestrator.dev/voice/de/",
+      "visible": true
+    }
+  ],
+  "errors": []
+}

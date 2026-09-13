@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "status": "published-and-verified",
+  "sourceRepository": "https://github.com/agent-orc/voice-lint",
+  "sourceBranch": "main",
+  "sourceCommit": "68f224dd3d285c6d87476269c1064fda9087e487",
+  "artifactBranch": "deploy",
+  "artifactCommit": "a074139716dc6d7273146428e391f33514f23642",
+  "artifactSha256": "9ef829ad283ad4fb040c329049c84ca9fcb383c91cefd0ab3ab3e2fe88b1ea67",
+  "centralSource": "13b0d3614f4a79e4d29b337bde07cd4a7e0f932a",
+  "centralArtifact": "8572c52545df106d3739f50b4fa6257e1f79d140",
+  "caddySha256": "897ec8c21f21f9eae0eeb960bd1c58f4ee391f9f703a8ff5bcbdc8e612d6190c",
+  "verifiedAt": "2026-09-13T07:37:40.266Z",
+  "files": 142,
+  "contentRoutes": 48,
+  "redirects": 2,
+  "languages": [
+    "en",
+    "de"
+  ],
+  "modelCalls": 0
+}

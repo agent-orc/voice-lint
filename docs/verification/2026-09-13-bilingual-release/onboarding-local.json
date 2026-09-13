@@ -1,0 +1,14 @@
+{
+  "capturedAt": "2026-09-13T07:14:18.253Z",
+  "sourceDocuments": 45,
+  "checks": [
+    "Original EN/DE JSON heading maps to visible HTML",
+    "German umlauts and exact selected quote reach Studio",
+    "Local navigation retains the HTML bridge",
+    "Explicit original Markdown route maps to the actual HTML guide",
+    "No source/model writes or browser exceptions"
+  ],
+  "errors": [],
+  "writes": [],
+  "curation": "Local project identifier omitted; no source or model writes occurred."
+}

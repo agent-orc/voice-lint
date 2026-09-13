@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "curatedAt": "2026-09-13T07:43:58.113Z",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 3333,
+      "sha256": "beabf445c17a5e5c8ed907c837078c6e0ddb893b69946f1be5f9b1b8afb4549e"
+    },
+    {
+      "path": "deployment.json",
+      "bytes": 27544,
+      "sha256": "86f461d462426fd24203ff364ffb46b329736c733d772acaecb48e19b5bb5381"
+    },
+    {
+      "path": "fresh-clone.json",
+      "bytes": 975,
+      "sha256": "f4d615e1604009e5dad36dd6446d491778a419e0dec98c2f6c48b142756d7271"
+    },
+    {
+      "path": "hosting-isolation.json",
+      "bytes": 1486,
+      "sha256": "a3fccdcc797215a54985980245ecf69caf6205af8ff1570159a74be62505759e"
+    },
+    {
+      "path": "hub-browser.json",
+      "bytes": 907,
+      "sha256": "73b49908cd2382b93243d7994a9fd70f3939bc9295f9c8e94e110c4fbc08aef7"
+    },
+    {
+      "path": "json-viewer-local.json",
+      "bytes": 1237,
+      "sha256": "2e22b723d1a8bd131840389123a932287ae2f793f8d10e52b98ae6475cd80121"
+    },
+    {
+      "path": "onboarding-local.json",
+      "bytes": 495,
+      "sha256": "6465d39af0865c9c41e9f77a71fd1d3d8ac7a3ecbd10947ee113bf4db0bce95d"
+    },
+    {
+      "path": "release.json",
+      "bytes": 772,
+      "sha256": "09a396bcbc3ac926d4599404615fdb844c080d60fce6d567804d317d1c79886e"
+    },
+    {
+      "path": "repository-retirement.json",
+      "bytes": 988,
+      "sha256": "9d4834bb6a9577af460a9a84c83c3a4fc51f366db2d57f705b9e27024cb117ce"
+    },
+    {
+      "path": "reproduction.json",
+      "bytes": 257,
+      "sha256": "bdddd9b2eee970d193267874d02d57414dd14f5f9acad2d8d6cd805eb5b60fd2"
+    },
+    {
+      "path": "research-local.json",
+      "bytes": 15167,
+      "sha256": "62a25a59d3db8875aca763b3ed6a22fa923c472f5cd080ca91bde01f0448dd9b"
+    },
+    {
+      "path": "seo.json",
+      "bytes": 37717,
+      "sha256": "b88c9efa18edb6309f36537ef6a1395e243a26f7a3a8615ef31d6697170dbab2"
+    },
+    {
+      "path": "website.json",
+      "bytes": 22219,
+      "sha256": "0d8b13cb21ba879127c3b1596045abb89e3425d8ce5cbd60cfa79c0f851b0565"
+    },
+    {
+      "path": "writing-patterns-local.json",
+      "bytes": 14965,
+      "sha256": "a340d731845d03404427e8f1854b7a7483dd5f4154165e6df4a34db01da94626"
+    }
+  ]
+}
