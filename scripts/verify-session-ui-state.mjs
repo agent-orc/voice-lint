@@ -1,8 +1,6 @@
 // Session lifecycle on the real AppComponent with deferred fake HTTP only.
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import vm from 'node:vm';
-import ts from 'typescript';
+import { loadComponent } from './component-test-runtime.mjs';
 
 let checks=0;
 const check=(value,message)=>{assert.ok(value,message);checks++;};
@@ -10,14 +8,8 @@ const deferred=()=>{let resolve;const promise=new Promise(done=>resolve=done);re
 const reply=(status,body={})=>({status,ok:status>=200&&status<300,json:async()=>body});
 const session=(token='browser-token')=>({token,remembered:true,expiresAt:'2030-01-01T00:00:00Z'});
 function create(fetcher){
- const signal=initial=>{let value=initial;const get=()=>value;get.set=next=>value=next;get.update=change=>value=change(value);return get;};
- const decorator=()=>value=>value;
- const core={Component:decorator,ViewChild:decorator,HostListener:decorator,signal,computed:fn=>fn,inject:()=>({locale:()=> 'en',t:value=>value})};
- const source=fs.readFileSync(new URL('../frontend/src/app/app.component.ts',import.meta.url),'utf8');
- const output=ts.transpileModule(source,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS,experimentalDecorators:true}}).outputText;
- const module={exports:{}};
- vm.runInNewContext(output,{exports:module.exports,require:id=>id==='@angular/core'?core:{},fetch:fetcher,URLSearchParams,URL,Intl,location:{search:'',href:'http://127.0.0.1:5188/'},history:{state:null,replaceState(){}},setTimeout,clearTimeout,console});
- return new module.exports.AppComponent();
+ const { Component } = loadComponent('app.component.ts', 'AppComponent', { fetch: fetcher });
+ return new Component();
 }
 {
  let posts=0;const app=create(async(path,options)=>{check(options.credentials==='same-origin','Session calls explicitly use same-origin cookies.');check(options.headers['X-Voice-Studio-Session']==='1','Session calls carry the non-simple browser-intent header.');posts++;return reply(200,{paired:false});});

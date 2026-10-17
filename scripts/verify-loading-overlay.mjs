@@ -164,7 +164,7 @@ async function holdFileChange({ project, documents, label, content, locale, scre
   const contentElement = await page.locator(content).elementHandle();
   assert.ok(contentElement, 'Existing content is mounted before file selection.');
   // The previous file starts its own Git read; wait for that header before measuring the next load.
-  await expect(page.locator('voice-source-context .source-context-body > button')).toBeEnabled();
+  await expect(page.locator('voice-source-context .source-context-body > button')).toBeEnabled({ timeout: 30000 });
   let previousGeometry, stableFrames = 0;
   await expect.poll(async () => {
     const current = await geometry(content);

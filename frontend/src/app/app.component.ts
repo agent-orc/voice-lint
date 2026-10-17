@@ -33,6 +33,7 @@ import { KnowledgeService } from './knowledge.service';
 import { KnowledgeWikiComponent } from './knowledge-wiki.component';
 import { SourceTasksComponent, type SourceTaskDocumentApplied } from './source-tasks.component';
 import { ProjectChecksComponent } from './project-checks.component';
+import { ProjectActivityComponent } from './project-activity.component';
 
 import { SelectionReviewComponent } from './selection-review.component';
 import { SourceContextComponent } from './source-context.component';
@@ -45,11 +46,12 @@ function savedNavigation(): NavigationMode {
 }
 
 type StudioTab = "preview" | "source" | "file" | "project";
+type WorkArea = 'review' | 'tasks' | 'history';
 
 @Component({
   selector: "voice-studio",
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe, SourceContextComponent, SelectionReviewComponent, LiveBrowserComponent, SemanticReviewComponent, KnowledgeWikiComponent, SourceTasksComponent, ProjectChecksComponent],
+  imports: [CommonModule, FormsModule, TranslatePipe, SourceContextComponent, SelectionReviewComponent, LiveBrowserComponent, SemanticReviewComponent, KnowledgeWikiComponent, SourceTasksComponent, ProjectChecksComponent, ProjectActivityComponent],
   templateUrl: "./app.component.html",
   styleUrl: "./app.component.css",
   host: { '[class.compact-navigation]': 'navigationMode() === "compact"', '[class.focus-navigation]': 'focusNavigation()', '[class.navigation-open]': 'navigationOpen()' },
@@ -58,7 +60,7 @@ export class AppComponent implements OnDestroy, OnInit {
   readonly i18n = inject(I18nService);
   readonly navigationMode = signal<NavigationMode>(savedNavigation());
   readonly navigationOpen = signal(false);
-  readonly focusNavigation = computed(() => this.connected() && this.navigationMode() === 'focus' && this.tab() === 'preview');
+  readonly focusNavigation = computed(() => this.connected() && this.navigationMode() === 'focus' && this.workArea() === 'review' && this.tab() === 'preview');
   @ViewChild(LiveBrowserComponent) liveBrowser?: LiveBrowserComponent;
   private returnNavigationFocus: HTMLElement | null = null;
 
@@ -350,6 +352,11 @@ export class AppComponent implements OnDestroy, OnInit {
   readonly document = signal<DocumentDetail | null>(null);
   readonly projectReport = signal<ProjectReport | null>(null);
   readonly tab = signal<StudioTab>("preview");
+  readonly workArea = signal<WorkArea>('review');
+  readonly taskDocumentActive = signal(false);
+  readonly requestedTaskId = signal<string | null>(null);
+  readonly composingTask = signal(false);
+  private activityNavigationSequence = 0;
   readonly selected = signal<SelectionTarget | null>(null);
   readonly activeFinding = signal<Finding | null>(null);
   readonly activeFeedback = signal<Feedback | null>(null);
@@ -440,11 +447,20 @@ export class AppComponent implements OnDestroy, OnInit {
     const projects = await this.api<ProjectSummary[]>("/api/projects");
     if (sequence !== this.sessionSequence || !this.connected()) return;
     this.projects.set(projects);
-    const requested = new URLSearchParams(location.search).get('project');
+    const params = new URLSearchParams(location.search);
+    const requested = params.get('project');
     let remembered: string | null = null;
     try { remembered = localStorage.getItem('voice-studio:last-project'); } catch { /* Storage is optional. */ }
     const first = this.projects().find(project => project.id === (requested ?? remembered)) ?? this.projects()[0];
-    if (first) await this.openProject(first);
+    const requestedArea = params.get('view');
+    if (requestedArea === 'tasks' || requestedArea === 'history') this.workArea.set(requestedArea);
+    const opening = first ? this.openProject(first) : Promise.resolve();
+    const openingSequence = this.activityNavigationSequence;
+    await opening;
+    if (first?.id === requested && openingSequence === this.activityNavigationSequence) {
+      const documentId = params.get('document');
+      if (documentId && this.documents().some(item => item.id === documentId)) await this.openDocument(documentId);
+    }
     this.notice.set("");
   }
 
@@ -497,11 +513,15 @@ export class AppComponent implements OnDestroy, OnInit {
 
   async openProject(project: ProjectSummary): Promise<void> {
     this.disposeReview();
-    ++this.loadSequence;
+    const sequence = ++this.loadSequence;
+    ++this.activityNavigationSequence;
     this.selectedProject.set(project);
+    this.taskDocumentActive.set(false);
+    this.requestedTaskId.set(null);
     try { localStorage.setItem('voice-studio:last-project', project.id); } catch { /* Storage is optional. */ }
     const projectUrl = new URL(location.href);
     projectUrl.searchParams.set('project', project.id);
+    projectUrl.searchParams.delete('document');
     history.replaceState(history.state, '', projectUrl);
     this.sidebarCollapsed.set(!!project.liveUrl);
     this.reviewOpen.set(false);
@@ -525,7 +545,7 @@ export class AppComponent implements OnDestroy, OnInit {
           `/api/projects/${encodeURIComponent(project.id)}/report`,
         ),
       ]);
-      if (this.selectedProject()?.id !== project.id) return;
+      if (sequence !== this.loadSequence || this.selectedProject()?.id !== project.id) return;
       this.documents.set(documents);
       this.projectReport.set(report);
       const initialPath = project.sourceRoutes?.['/'] ?? 'index.html';
@@ -536,14 +556,16 @@ export class AppComponent implements OnDestroy, OnInit {
         this.tab.set("project");
       }
     } catch (error) {
-      this.handleError(error);
-      this.loading.set(false);
+      if (sequence === this.loadSequence) {
+        this.handleError(error);
+        this.loading.set(false);
+      }
     }
   }
 
-  async openDocument(id: string, nextTab?: StudioTab): Promise<void> {
+  async openDocument(id: string, nextTab?: StudioTab): Promise<boolean> {
     const project = this.selectedProject();
-    if (!project) return;
+    if (!project) return false;
     this.disposeReview();
     const sequence = ++this.loadSequence;
     this.loading.set(true);
@@ -560,7 +582,7 @@ export class AppComponent implements OnDestroy, OnInit {
         sequence !== this.loadSequence ||
         project.id !== this.selectedProject()?.id
       )
-        return;
+        return false;
       this.clearSelection();
       this.semanticFindings.set([]);
       this.lastRequest.set(null);
@@ -569,8 +591,12 @@ export class AppComponent implements OnDestroy, OnInit {
       this.savedRequests.set(requests);
       this.stale.set(false);
       if (nextTab) this.tab.set(nextTab);
+      if (nextTab) this.workArea.set('review');
+      this.syncWorkspaceUrl();
+      return true;
     } catch (error) {
-      this.handleError(error);
+      if (sequence === this.loadSequence) this.handleError(error);
+      return false;
     } finally {
       if (sequence === this.loadSequence) this.loading.set(false);
     }
@@ -601,6 +627,77 @@ export class AppComponent implements OnDestroy, OnInit {
   changeTab(tab: StudioTab): void {
     if (tab !== "preview") this.disposeReview();
     this.tab.set(tab);
+    this.workArea.set('review');
+    this.syncWorkspaceUrl();
+  }
+
+  setWorkArea(area: WorkArea): void {
+    ++this.activityNavigationSequence;
+    if (this.workArea() !== area) this.disposeReview();
+    this.workArea.set(area);
+    this.taskDocumentActive.set(false);
+    this.navigationOpen.set(false);
+    this.syncWorkspaceUrl();
+  }
+
+  selectProjectId(id: string): void {
+    const project = this.projects().find(item => item.id === id);
+    if (project && project.id !== this.selectedProject()?.id) void this.openProject(project);
+  }
+
+  private syncWorkspaceUrl(): void {
+    const url = new URL(location.href);
+    url.searchParams.set('view', this.workArea());
+    const id = this.document()?.id;
+    if (id) url.searchParams.set('document', id);
+    else url.searchParams.delete('document');
+    history.replaceState(history.state, '', url);
+  }
+
+  async openActivityDocument(event: { documentId: string; taskId?: string; proposalId?: string }): Promise<void> {
+    const sequence = ++this.activityNavigationSequence;
+    const projectId = this.selectedProject()?.id;
+    const loaded = await this.openDocument(event.documentId);
+    if (!loaded || sequence !== this.activityNavigationSequence || projectId !== this.selectedProject()?.id || this.document()?.id !== event.documentId) return;
+    this.tab.set('file');
+    if (event.taskId) {
+      this.workArea.set('tasks');
+      this.taskDocumentActive.set(true);
+      this.composingTask.set(false);
+      this.requestedTaskId.set(event.taskId);
+    } else {
+      this.workArea.set('review');
+      this.reviewOpen.set(true);
+      if (event.proposalId) {
+        const proposal = this.savedProposals().find(item => item.id === event.proposalId);
+        if (proposal) this.openSavedProposal(proposal);
+      }
+    }
+    this.syncWorkspaceUrl();
+  }
+
+  createSourceTask(): void {
+    if (!this.document() || this.loading()) return;
+    ++this.activityNavigationSequence;
+    this.workArea.set('tasks');
+    this.taskDocumentActive.set(true);
+    this.composingTask.set(true);
+    this.requestedTaskId.set(null);
+    this.syncWorkspaceUrl();
+  }
+
+  editSelection(): void {
+    requestAnimationFrame(() => {
+      const details = window.document.querySelector<HTMLDetailsElement>('#wording-editor');
+      if (details) details.open = true;
+      window.document.querySelector<HTMLTextAreaElement>('#replacement')?.focus();
+    });
+  }
+
+  passageParts(selection: SelectionTarget): { before: string; quote: string; after: string } {
+    const text = this.unitFor(selection.unitId)?.text;
+    if (!text || !Number.isInteger(selection.start) || !Number.isInteger(selection.end) || selection.start < 0 || selection.end <= selection.start || selection.end > text.length || text.slice(selection.start, selection.end) !== selection.quote) return { before: '', quote: selection.quote, after: '' };
+    return { before: text.slice(0, selection.start), quote: text.slice(selection.start, selection.end), after: text.slice(selection.end) };
   }
 
   previewLoaded(): void {

@@ -21,7 +21,7 @@ export interface DocumentDetail extends DocumentSummary { source: string; render
 export interface ProjectReport { projectId: string; documents: DocumentSummary[]; totalWords: number; findingCount: number; openFeedbackCount: number; categories: Record<string, number>; rules: Record<string, number>; }
 export interface FeedbackInput { unitId: string; quote: string; start: number; end: number; comment: string; category: string; expectedVersion: string; expectedReviewRevision: number; requestId: string; }
 export interface ProposalInput { unitId: string; start: number; end: number; replacement: string; expectedVersion: string; feedbackId?: string; }
-export interface Proposal { id: string; documentId: string; before: string; after: string; replacement: string; sourceBefore: string; sourceAfter: string; expectedVersion: string; sourceSpan: SourceSpan; feedbackId: string | null; reason: string; state: string; taskId?: string | null; runId?: string | null; edits?: ProposalEdit[] | null; }
+export interface Proposal { id: string; documentId: string; before: string; after: string; replacement: string; sourceBefore: string; sourceAfter: string; expectedVersion: string; sourceSpan: SourceSpan; feedbackId: string | null; reason: string; state: string; taskId?: string | null; runId?: string | null; edits?: ProposalEdit[] | null; createdAt?: string | null; appliedAt?: string | null; }
 export interface ImprovementRequest { id: string; projectId: string; documentId: string; feedbackIds: string[]; instruction: string; expectedVersion: string; status: string; createdAt: string; }
 export interface SelectionTarget { unitId: string; quote: string; start: number; end: number; }
 export interface ReviewClient {
@@ -32,6 +32,25 @@ export interface ReviewClient {
 export interface ProposalEdit { unitId: string; start: number; end: number; quote: string; replacement: string; reason: string; }
 export type ImprovementTaskStatus = 'queued' | 'running' | 'cancelling' | 'ready' | 'failed' | 'cancelled' | 'applied' | 'stale' | 'interrupted' | 'completed' | 'needs_review';
 export interface ImprovementTask { id: string; projectId: string; documentId: string; instruction: string; feedbackIds: string[]; sourceVersion: string; reviewRevision: number; revision: number; status: ImprovementTaskStatus; createdAt: string; updatedAt: string; runId: string | null; proposalId: string | null; error: string | null; proposal: Proposal | null; notes?: string[] | null; resolution?: 'agent_no_changes' | 'manual' | null; }
+/** Persisted project activity, read without task refresh, model calls, source writes
+ * or metadata reconciliation. Covers only currently configured, existing source files. */
+export interface ProjectActivity { projectId: string; documentCount: number; tasks: ProjectActivityTask[]; changes: ProjectActivityChange[]; }
+/** Exact current-file comparison only; not a task start/apply permission or context check.
+ * Applied records compare the result; other records compare their recorded input. */
+export type ActivitySourceStatus = 'current' | 'changed';
+export interface ProjectActivityTask {
+  id: string; documentId: string; documentPath: string; documentTitle: string;
+  instruction: string; status: ImprovementTaskStatus; createdAt: string; updatedAt: string;
+  proposalId: string | null; sourceVersion: string; currentVersion: string;
+  sourceStatus: ActivitySourceStatus; resolution: string | null;
+}
+export interface ProjectActivityChange {
+  id: string; documentId: string; documentPath: string; documentTitle: string;
+  before: string; after: string; reason: string; state: string; taskId: string | null;
+  /** Null when a legacy record did not persist this date. Never inferred from file times. */
+  createdAt: string | null; appliedAt: string | null;
+  expectedVersion: string; resultVersion: string; currentVersion: string; sourceStatus: ActivitySourceStatus;
+}
 export interface ImprovementTaskInput { instruction: string; feedbackIds: string[]; expectedVersion: string; expectedReviewRevision: number; requestId: string; }
 export interface TaskStartInput { expectedTaskRevision: number; expectedVersion: string; expectedReviewRevision: number; requestId: string; }
 export interface TaskPrompt { prompt: string; sourceVersion: string; reviewRevision: number; }

@@ -39,6 +39,8 @@ using (var f = new Fixture())
     await Reject(() => f.Tasks.ApplyAsync(f.Project, f.DocId, task.Id, new(1, d.Version, d.ReviewRevision)), "stale task revision rejects apply");
     var result = await f.Tasks.ApplyAsync(f.Project, f.DocId, task.Id, new(task.Revision, d.Version, d.ReviewRevision));
     Check(result.Task.Status == "applied" && result.Document.Source.Contains("# Clear heading.") && result.Document.Source.Contains("[specific tools](guide.md)"), "composite apply preserves Markdown structure and link target");
+    Check(result.Task.Proposal?.CreatedAt is not null && result.Task.Proposal.AppliedAt is not null,
+        "task result retains the canonical proposal creation and application timestamps");
     Check(result.Document.Feedback.All(note => note.Status != "resolved"), "applying task does not silently resolve human feedback");
     Check((await f.Tasks.ApplyAsync(f.Project, f.DocId, task.Id, new(task.Revision, d.Version, d.ReviewRevision))).Task.Status == "applied", "apply retry is idempotent");
     using var restartedReviews = new RunnerReviewService(new ProjectStore(f.Home, false), Fixture.Options, Path.Combine(f.Home, "restart-runtime"), new TaskFake());

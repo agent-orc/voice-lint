@@ -6,11 +6,13 @@ import { appMessages } from './messages.app';
 import { browserMessages } from './messages.browser';
 import { workflowMessages } from './messages.workflows';
 import { wikiMessages } from './messages.wiki';
+import { orientationMessages } from './messages.orientation';
+import { activityMessages } from './messages.activity';
 
 export type StudioLocale = 'en' | 'de';
 export type TranslationParams = Record<string, string | number>;
 const storageKey = 'voice-studio:locale';
-const messages: Record<string, string> = { ...appMessages, ...contextMessages, ...selectionMessages, ...browserMessages, ...workflowMessages, ...wikiMessages };
+const messages: Record<string, string> = { ...appMessages, ...contextMessages, ...selectionMessages, ...browserMessages, ...workflowMessages, ...wikiMessages, ...orientationMessages, ...activityMessages };
 const normalize = (text: string) => text.replace(/\s+/g, ' ').trim();
 const normalizedMessages = new Map(Object.entries(messages).map(([key, value]) => [normalize(key), value]));
 

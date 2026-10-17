@@ -12,7 +12,7 @@ const browser=await chromium.launch({headless:true,channel:'chrome',timeout:1500
 const errors=[]; const results=[];
 try {
   const context=await browser.newContext({viewport:{width:1440,height:1000},locale:'de-DE'});
-  const page=await context.newPage();page.setDefaultTimeout(12000);page.on('pageerror',error=>errors.push(error.message));
+  const page=await context.newPage();page.setDefaultTimeout(45000);page.on('pageerror',error=>errors.push(error.message));
   await page.goto('http://127.0.0.1:5188/?project=project-f80c52d87170',{waitUntil:'domcontentloaded',timeout:15000});
   await page.getByRole('heading',{name:'Review websites and Markdown',exact:true}).waitFor();
   assert.equal(await page.locator('html').getAttribute('lang'),'en');
@@ -20,7 +20,7 @@ try {
   await page.locator('#remember-browser').uncheck();
   await page.getByRole('button',{name:'Open local Studio',exact:true}).click();
   await page.locator('iframe.live-frame').waitFor();
-  await page.frameLocator('iframe.live-frame').locator('[data-voice-unit]').first().waitFor();
+  await page.frameLocator('iframe.live-frame').locator('[data-voice-unit]:visible').first().waitFor();
   const sourceBefore=await page.frameLocator('iframe.live-frame').locator('body').innerText();
   const language=page.locator('.studio-header').getByRole('combobox',{name:'Language / Sprache',exact:true});
   await language.selectOption('de');

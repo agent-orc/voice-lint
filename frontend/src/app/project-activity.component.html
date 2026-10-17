@@ -1,0 +1,158 @@
+<section class="project-activity" aria-labelledby="project-activity-title" [attr.aria-busy]="loading()">
+  <header class="activity-heading">
+    <div>
+      <h1 id="project-activity-title">{{ (mode === 'tasks' ? 'Aufgaben im Projekt' : 'Änderungsverlauf') | t }}</h1>
+      <p class="activity-lead">{{ (mode === 'tasks'
+        ? 'Alle Aufgaben der Projektdateien: Was läuft und was braucht deine Entscheidung?'
+        : 'Vorschläge und übernommene Änderungen aller Projektdateien, auch ohne verknüpfte Aufgabe.') | t }}</p>
+    </div>
+    <button type="button" class="activity-refresh" (click)="reload()" [disabled]="loading()">{{ 'Stand aktualisieren' | t }}</button>
+  </header>
+
+  @if (error()) {
+    <div class="error-state" role="alert">
+      <strong>{{ 'Übersicht konnte nicht aktualisiert werden' | t }}</strong>
+      <p>{{ error() | t }}</p>
+      @if (activity()) { <p>{{ 'Die angezeigten Daten stammen vom letzten erfolgreichen Laden.' | t }}</p> }
+      <button type="button" (click)="reload()" [disabled]="loading()">{{ 'Erneut laden' | t }}</button>
+    </div>
+  }
+  @if (loading()) { <p class="loading-state" role="status">{{ 'Projektaktivität wird geladen …' | t }}</p> }
+
+  @if (activity(); as data) {
+    <div class="activity-summary" [attr.aria-label]="'Projektübersicht in Zahlen' | t">
+      @if (mode === 'tasks') {
+        <div><strong>{{ tasks().length }}</strong><span>{{ 'Aufgaben insgesamt' | t }}</span></div>
+        <div><strong>{{ activeCount() }}</strong><span>{{ 'Bereit oder in Bearbeitung' | t }}</span></div>
+        <div class="attention-summary"><strong>{{ attentionCount() }}</strong><span>{{ 'Nächster Schritt nötig' | t }}</span></div>
+        <div><strong>{{ finishedCount() }}</strong><span>{{ 'Abgeschlossen' | t }}</span></div>
+      } @else {
+        <div><strong>{{ appliedCount() }}</strong><span>{{ 'Änderungen übernommen' | t }}</span></div>
+        <div><strong>{{ pendingCount() }}</strong><span>{{ 'Vorschläge offen' | t }}</span></div>
+        <div><strong>{{ changes().length }}</strong><span>{{ 'Einträge insgesamt' | t }}</span></div>
+      }
+    </div>
+
+    @if (mode === 'tasks') {
+      <ol class="workflow-guide" [attr.aria-label]="'Von der Aufgabe zur Änderung' | t">
+        <li><span>1</span>{{ 'Aufgabe speichern' | t }}</li>
+        <li><span>2</span>{{ 'Bearbeitung starten' | t }}</li>
+        <li><span>3</span>{{ 'Ergebnis prüfen' | t }}</li>
+        <li><span>4</span>{{ 'Bewusst übernehmen' | t }}</li>
+        <li><span>5</span>{{ 'Nachprüfen' | t }}</li>
+      </ol>
+    } @else {
+      <p class="history-note">{{ 'Übernommene Änderungen sind lokal gespeichert. Prüfung und Veröffentlichung erfolgen separat.' | t }}</p>
+    }
+
+    <div class="activity-toolbar">
+      <label class="search-field" for="project-activity-search">
+        <span>{{ (mode === 'tasks' ? 'Aufgaben durchsuchen' : 'Änderungen durchsuchen') | t }}</span>
+        <input id="project-activity-search" type="search" [ngModel]="search()" (ngModelChange)="search.set($event)"
+          [placeholder]="(mode === 'tasks' ? 'Auftrag oder Datei suchen' : 'Datei, Begründung oder Text suchen') | t" />
+      </label>
+      <label class="filter-field" for="project-activity-filter">
+        <span>{{ 'Anzeigen' | t }}</span>
+        @if (mode === 'tasks') {
+          <select id="project-activity-filter" [ngModel]="taskFilter()" (ngModelChange)="taskFilter.set($event)">
+            <option value="all">{{ 'Alle Aufgaben' | t }}</option>
+            <option value="active">{{ 'Bereit oder in Bearbeitung' | t }}</option>
+            <option value="attention">{{ 'Nächster Schritt nötig' | t }}</option>
+            <option value="finished">{{ 'Abgeschlossen' | t }}</option>
+          </select>
+        } @else {
+          <select id="project-activity-filter" [ngModel]="changeFilter()" (ngModelChange)="changeFilter.set($event)">
+            <option value="applied">{{ 'Übernommene Änderungen' | t }}</option>
+            <option value="all">{{ 'Alle Vorschläge und Änderungen' | t }}</option>
+            <option value="pending">{{ 'Offene Vorschläge' | t }}</option>
+          </select>
+        }
+      </label>
+    </div>
+    <div class="list-meta">
+      <p role="status">{{ '{visible} von {total} Einträgen' | t: { visible: mode === 'tasks' ? visibleTasks().length : visibleChanges().length, total: mode === 'tasks' ? tasks().length : changes().length } }}</p>
+      <p>{{ '{count} Projektdateien · geladen: {date}' | t: { count: data.documentCount, date: formatDate(loadedAt()) } }}</p>
+    </div>
+
+    @if (mode === 'tasks') {
+      <div class="activity-list">
+        @for (task of visibleTasks(); track task.id) {
+          <article class="task-card" [attr.data-status]="task.status">
+            <div class="card-heading">
+              <div><p class="file-name">{{ task.documentTitle }}</p><p class="file-path">{{ task.documentPath }}</p></div>
+              <span class="status-pill" [attr.data-kind]="taskGroup(task)">{{ taskLabel(task) | t }}</span>
+            </div>
+            <h2>{{ heading(task.instruction) || ('Gespeicherte Aufgabe' | t) }}</h2>
+            <p class="next-step">{{ taskNextStep(task) | t }}</p>
+            @if (task.sourceStatus === 'changed') {
+              <p class="source-warning">{{ 'Die Quelle hat sich seit diesem Aufgabenstand geändert. Öffne die Datei, um den aktuellen Stand und die weiteren Schritte zu prüfen.' | t }}</p>
+            }
+            <div class="card-footer">
+              <p>{{ 'Aktualisiert: {date}' | t: { date: formatDate(task.updatedAt) } }}</p>
+              <button type="button" class="open-button" (click)="openTask(task)" [attr.aria-label]="'Aufgabe öffnen: {title}' | t: { title: heading(task.instruction) }">{{ 'Aufgabe in der Datei öffnen' | t }} <span aria-hidden="true">→</span></button>
+            </div>
+          </article>
+        } @empty {
+          <div class="empty-state">
+            @if (!tasks().length) {
+              <h2>{{ 'Noch keine Aufgaben in diesem Projekt' | t }}</h2>
+              <p>{{ 'Öffne eine Quelldatei und speichere dort einen Auftrag. Er erscheint anschließend in dieser Übersicht.' | t }}</p>
+            } @else {
+              <h2>{{ 'Keine passenden Aufgaben' | t }}</h2>
+              <p>{{ 'Versuche einen anderen Suchbegriff oder zeige alle Aufgaben an.' | t }}</p>
+              <button type="button" (click)="resetFilters()">{{ 'Suche und Filter zurücksetzen' | t }}</button>
+            }
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="activity-list history-list">
+        @for (change of visibleChanges(); track change.id; let first = $first) {
+          <article class="change-card" [attr.data-status]="change.state">
+            <div class="card-heading">
+              <div><h2>{{ change.documentTitle }}</h2><p class="file-path">{{ change.documentPath }}</p></div>
+              <span class="status-pill" [attr.data-kind]="change.state === 'applied' ? 'finished' : 'attention'">{{ changeLabel(change) | t }}</span>
+            </div>
+            <div class="change-context">
+              <span>{{ (change.taskId ? 'Mit Aufgabe verknüpft' : 'Ohne Aufgabenverknüpfung') | t }}</span>
+              <span>{{ (change.state === 'applied' ? 'Übernommen: {date}' : 'Vorgeschlagen: {date}') | t: { date: formatDate(change.state === 'applied' ? change.appliedAt : change.createdAt) } }}</span>
+            </div>
+            @if (change.sourceStatus === 'changed') {
+              <p class="source-warning">{{ (change.state === 'applied'
+                ? 'Die Quelle wurde seit der Übernahme geändert. Dieser Eintrag dokumentiert eine frühere Fassung.'
+                : 'Die Quelle wurde seit dem Vorschlag geändert. Prüfe vor einer Übernahme den aktuellen Stand.') | t }}</p>
+            }
+            <details class="change-detail" [open]="first || !!search().trim()">
+              <summary>{{ 'Vorher / Nachher' | t }}</summary>
+              <div class="text-comparison">
+                <div><h3>{{ 'Vorher' | t }}</h3><pre>{{ change.before || ('Kein Text' | t) }}</pre></div>
+                <div><h3>{{ (change.state === 'applied' ? 'Nachher · übernommen' : 'Nachher · vorgeschlagen') | t }}</h3><pre>{{ change.after || ('Text entfernt' | t) }}</pre></div>
+              </div>
+              <p class="stored-diff-note">{{ 'Vorher und Nachher zeigen den gespeicherten Vorschlag, nicht den aktuellen Git-Diff.' | t }}</p>
+              @if (change.reason) { <p class="change-reason">{{ change.reason }}</p> }
+            </details>
+            <div class="card-footer">
+              <p>{{ (change.sourceStatus === 'current' ? 'Quelle entspricht dem gespeicherten Stand.' : 'Historischer Stand · aktuelle Quelle prüfen.') | t }}</p>
+              <button type="button" class="open-button" (click)="openChange(change)" [attr.aria-label]="'Änderung öffnen: {title}' | t: { title: change.documentTitle }">{{ 'Änderung in der Datei öffnen' | t }} <span aria-hidden="true">→</span></button>
+            </div>
+          </article>
+        } @empty {
+          <div class="empty-state">
+            @if (!changes().length) {
+              <h2>{{ 'Noch keine gespeicherten Änderungen' | t }}</h2>
+              <p>{{ 'Sobald ein Textvorschlag gespeichert oder übernommen wird, findest du ihn hier mit Vorher und Nachher.' | t }}</p>
+            } @else if (changeFilter() === 'applied' && !search() && !appliedCount()) {
+              <h2>{{ 'Noch keine Änderung übernommen' | t }}</h2>
+              <p>{{ 'Gespeicherte Vorschläge sind noch keine Änderungen an der Quelle. Zeige alle Einträge an, um sie zu prüfen.' | t }}</p>
+              <button type="button" (click)="resetFilters()">{{ 'Alle Einträge anzeigen' | t }}</button>
+            } @else {
+              <h2>{{ 'Keine passenden Änderungen' | t }}</h2>
+              <p>{{ 'Versuche einen anderen Suchbegriff oder zeige alle Einträge an.' | t }}</p>
+              <button type="button" (click)="resetFilters()">{{ 'Suche und Filter zurücksetzen' | t }}</button>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+</section>

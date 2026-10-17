@@ -51,6 +51,8 @@ export class SourceTasksComponent implements OnChanges, OnDestroy {
   @Input({ required: true }) api!: StudioApi;
   @Input() activeFeedbackId: string | null = null;
   @Input() disabled = false;
+  @Input() requestedTaskId: string | null = null;
+  @Input() startComposing = false;
   @Output() documentApplied = new EventEmitter<SourceTaskDocumentApplied>();
   @Output() refreshSource = new EventEmitter<void>();
 
@@ -60,6 +62,8 @@ export class SourceTasksComponent implements OnChanges, OnDestroy {
   private documentKey = "";
   private currentDocument: DocumentDetail | null = null;
   private previousFeedbackId: string | null = null;
+  private previousRequestedTaskId: string | null = null;
+  private previousStartComposing = false;
   private pollTimer?: ReturnType<typeof setTimeout>;
   private createAttempt: { key: string; requestId: string } | null = null;
   private readonly startAttempts = new Map<string, string>();
@@ -84,9 +88,13 @@ export class SourceTasksComponent implements OnChanges, OnDestroy {
     if (!this.document) return;
     const key = this.projectId + ":" + this.document.id;
     const changedDocument = key !== this.documentKey;
-    if (changedDocument || this.currentDocument !== this.document) {
-      const previousTaskId = changedDocument
-        ? null
+    const changedRequest = this.requestedTaskId !== this.previousRequestedTaskId;
+    const changedCompose = this.startComposing !== this.previousStartComposing;
+    this.previousRequestedTaskId = this.requestedTaskId;
+    this.previousStartComposing = this.startComposing;
+    if (changedDocument || this.currentDocument !== this.document || changedRequest || changedCompose) {
+      const previousTaskId = changedDocument || changedRequest
+        ? this.requestedTaskId
         : (this.selectedTask()?.id ?? null);
       this.documentKey = key;
       this.currentDocument = this.document;
@@ -100,6 +108,7 @@ export class SourceTasksComponent implements OnChanges, OnDestroy {
       this.runnerLoading.set(false);
       this.tasks.set([]);
       this.legacyRequests.set([]);
+      if (changedCompose || changedRequest) this.composeOpen.set(this.startComposing);
       if (changedDocument) {
         this.instruction = "";
         this.resolutionNote = "";
@@ -171,7 +180,7 @@ export class SourceTasksComponent implements OnChanges, OnDestroy {
         tasks.find((item) => item.status === "ready") ??
         tasks[0];
       this.selectedTask.set(selected ?? null);
-      if (changedDocument && tasks.length) this.composeOpen.set(false);
+      if (changedDocument) this.composeOpen.set(this.startComposing || !tasks.length);
       this.schedulePoll(sequence, view);
     } catch (error) {
       if (this.current(sequence, view)) this.showError(error);

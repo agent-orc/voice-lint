@@ -21,6 +21,8 @@
     "test:runner": "dotnet run --project backend/VoiceStudio.RunnerTests",
     "test:live": "node scripts/verify-live.mjs",
     "test:ui-state": "node scripts/verify-ui-state.mjs",
+    "test:work-areas": "node scripts/verify-work-area-state.mjs && node scripts/verify-project-activity-ui.mjs && node scripts/verify-selection-actions.mjs",
+    "test:project-orientation": "node scripts/verify-project-orientation.mjs",
     "test:tasks": "dotnet run --project backend/VoiceStudio.TaskTests",
     "test:task-ui": "node scripts/verify-task-ui.mjs",
     "test:wiki-tasks": "node scripts/verify-wiki-tasks.mjs",

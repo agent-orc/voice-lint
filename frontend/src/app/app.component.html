@@ -202,7 +202,8 @@
 
           {{ sidebarCollapsed() ? ('Projekte und Dateien' | t) : ('Dateien ausblenden' | t) }}
         </button>
-        <span>{{ selectedProject()?.name }}</span>
+        <label class="project-switcher"><span>{{ 'Aktuelles Projekt' | t }}</span><select [attr.aria-label]="'Aktuelles Projekt' | t" [ngModel]="selectedProject()?.id" (ngModelChange)="selectProjectId($event)" [disabled]="busy() || loading()">@for (project of projects(); track project.id) { <option [value]="project.id">{{ project.name }}</option> }</select></label>
+        @if (workArea() === 'review') {
         <button
           class="button secondary"
           type="button"
@@ -212,7 +213,19 @@
 
           {{ reviewOpen() ? ('Review schließen' | t) : ('Review öffnen' | t) }}
         </button>
+        }
       </div>
+      <nav class="work-area-tabs" [attr.aria-label]="'Arbeitsbereiche' | t">
+        <button type="button" [class.active]="workArea() === 'review'" [attr.aria-current]="workArea() === 'review' ? 'page' : null" (click)="setWorkArea('review')">{{ 'Hinweise prüfen' | t }}</button>
+        <button type="button" [class.active]="workArea() === 'tasks'" [attr.aria-current]="workArea() === 'tasks' ? 'page' : null" (click)="setWorkArea('tasks')">{{ 'Aufgaben' | t }}</button>
+        <button type="button" [class.active]="workArea() === 'history'" [attr.aria-current]="workArea() === 'history' ? 'page' : null" (click)="setWorkArea('history')">{{ 'Änderungsverlauf' | t }}</button>
+      </nav>
+      <div class="workspace-context" aria-live="polite">
+        <span class="scope-label">{{ (workArea() === 'review' || taskDocumentActive() ? 'Aktuelle Datei' : 'Projektweiter Überblick') | t }}</span>
+        <strong>{{ workArea() === 'review' || taskDocumentActive() ? (document()?.path ?? ('Keine Datei ausgewählt' | t)) : selectedProject()?.name }}</strong>
+        @if (workArea() !== 'review' && !taskDocumentActive()) { <span>{{ 'Alle registrierten Textquellen' | t }}</span> }
+      </div>
+      @if (workArea() === 'review') {
       <div class="workspace-heading">
         <div>
           <div class="breadcrumb">
@@ -279,6 +292,7 @@
       </nav>
         @if (document(); as sourceDocument) { <voice-source-context [projectId]="selectedProject()!.id" [document]="sourceDocument" [api]="semanticApi" /> }
         @if (focusNavigation() && liveBrowser) { <form class="focus-address" (submit)="openFocusAddress(focusAddress.value); $event.preventDefault()"><label for="focus-website-address">{{ 'Website' | t }}</label><input #focusAddress id="focus-website-address" type="url" [value]="liveBrowser.address" required /><button type="submit" class="button primary">{{ 'Öffnen' | t }}</button><p class="small-muted">{{ liveBrowser.matchedFile() }}</p></form> }
+      }
       </div>
 
       <ng-template #loadingOverlay>
@@ -290,7 +304,22 @@
         }
       </ng-template>
 
-      @if (tab() === "project") {
+      @if (workArea() !== 'review') {
+        @if (workArea() === 'tasks' && taskDocumentActive() && document(); as taskDocument) {
+          <section class="task-workspace">
+            <button class="button secondary" type="button" (click)="setWorkArea('tasks')">{{ '← Alle Aufgaben im Projekt' | t }}</button>
+            <h1>{{ taskDocument.title }}</h1>
+            <p class="small-muted">{{ 'Speichern → Starten → Ergebnis prüfen → Übernehmen → Nachprüfen' | t }}</p>
+            <voice-source-tasks [projectId]="selectedProject()!.id" [document]="taskDocument" [api]="semanticApi" [requestedTaskId]="requestedTaskId()" [startComposing]="composingTask()" [activeFeedbackId]="activeFeedback()?.id ?? null" [disabled]="busy() || loading() || stale()" (documentApplied)="sourceTaskApplied($event)" (refreshSource)="openDocument(taskDocument.id)" />
+            <details class="supporting-details"><summary>{{ 'Projekt nachprüfen' | t }}</summary><voice-project-checks [projectId]="selectedProject()!.id" [api]="semanticApi" [sourceSnapshot]="taskDocument" [disabled]="busy()" /></details>
+          </section>
+        } @else if (selectedProject(); as project) {
+          @if (workArea() === 'tasks' && document(); as taskSource) {
+            <div class="task-create-bar"><span>{{ 'Neue Aufgabe für:' | t }} <strong>{{ taskSource.path }}</strong></span><button class="button secondary" type="button" (click)="createSourceTask()" [disabled]="loading() || busy()">{{ 'Aufgabe erstellen' | t }}</button></div>
+          }
+          <voice-project-activity [projectId]="project.id" [projectName]="project.name" [api]="semanticApi" [mode]="workArea() === 'history' ? 'history' : 'tasks'" (openDocument)="openActivityDocument($event)" />
+        }
+      } @else if (tab() === "project") {
         <div class="document-loading-surface" [class.initial-document-surface]="!projectReport()">
         @if (projectReport(); as report) {
           <section class="report project-report" [attr.aria-busy]="loading()" [attr.inert]="loading() ? '' : null">
@@ -530,8 +559,8 @@
                       ><span>{{ 'Offenes Feedback' | t }}</span>
                     </div>
                   </div>
-                  <div class="coverage-card">
-                    <h3>{{ 'Prüfabdeckung' | t }}</h3>
+                  <details class="coverage-card coverage-disclosure">
+                    <summary>{{ 'Prüfabdeckung und Grenzen' | t }} · {{ current.coverage.checkedUnits }}/{{ current.coverage.totalUnits }}</summary>
                     <p>
                       <strong
                         >{{ current.coverage.checkedUnits }} {{ 'von' | t }}
@@ -544,7 +573,7 @@
                     @for (note of current.coverage.notes; track $index) {
                       <p class="small-muted">{{ (note) | t }}</p>
                     }
-                  </div>
+                  </details>
                   <div class="finding-list">
                     @for (finding of current.findings; track finding.id) {
                       <button
@@ -563,8 +592,8 @@
                           >
                         </div>
                         <h3>{{ (finding.message) | t }}</h3>
-                        <blockquote>{{ finding.quote }}</blockquote>
-                        <p>{{ findingExplanation(finding) }}</p>
+                        @let passage = passageParts(finding);
+                        <blockquote>{{ passage.before }}<mark>{{ passage.quote }}</mark>{{ passage.after }}</blockquote>
                         <div class="finding-foot">
                           <span
                             >{{ finding.severity === "error"
@@ -585,8 +614,8 @@
                       </div>
                     }
                   </div>
-                  <div class="report-card">
-                    <h3>{{ 'Alle Textabschnitte' | t }}</h3>
+                  <details class="report-card">
+                    <summary>{{ 'Alle Textabschnitte' | t }}</summary>
                     <p class="small-muted">
 
                       {{ 'Auch unauffällige Stellen lassen sich zur Überarbeitung auswählen.' | t }}
@@ -611,7 +640,7 @@
                         <span aria-hidden="true">↗</span>
                       </button>
                     }
-                  </div>
+                  </details>
                 </div>
                 <ng-container *ngTemplateOutlet="loadingOverlay" />
                 </div>
@@ -623,10 +652,10 @@
               <aside id="voice-review-panel" class="review-panel" [attr.aria-label]="'Analyse und Feedback' | t">
                 <div class="review-panel-heading">
                   <div>
-                    <div class="eyebrow">{{ 'DEVELOPER REVIEW' | t }}</div>
+                    <div class="eyebrow">{{ 'Textprüfung' | t }}</div>
                     <h2>
 
-                      {{ selected() ? ('Diese Textstelle' | t) : ('Sprache im Detail' | t) }}
+                      {{ (activeFinding()?.message ?? (selected() ? 'Diese Textstelle' : 'Sprache im Detail')) | t }}
                     </h2>
                   </div>
                   <span class="count">{{ current.findings.length }}</span>
@@ -660,7 +689,8 @@
                         ×
                       </button>
                     </div>
-                    <blockquote>{{ selection.quote }}</blockquote>
+                    @let passage = passageParts(selection);
+                    <blockquote>{{ passage.before }}<mark>{{ passage.quote }}</mark>{{ passage.after }}</blockquote>
                     <span class="small-muted"
                       >{{ unitFor(selection.unitId)?.kind }} {{ '· Zeile' | t }}
                       {{ sourceLine(
@@ -677,13 +707,12 @@
                         ></i
                         >{{ (categoryLabel(finding.category)) | t }}</span
                       >
-                      <h3>{{ (finding.message) | t }}</h3>
-                      <p>{{ findingExplanation(finding) }}</p>
                       @if (knowledge.entry(finding.ruleId); as rule) {
                         <p class="finding-question"><strong>{{ 'Prüffrage:' | t }}</strong>  {{ rule.question }}</p>
                       }
-                      <details class="finding-context"><summary>{{ 'Text im Kontext' | t }}</summary><p>{{ unitFor(finding.unitId)?.text }}</p></details>
+                      <details class="finding-context"><summary>{{ 'Warum dieser Hinweis?' | t }}</summary><p>{{ findingExplanation(finding) }}</p>
                       <button class="button small" type="button" (click)="openWiki(finding.ruleId)">{{ 'Regel, Beispiele und Grenzen ansehen →' | t }}</button>
+                      </details>
                     </div>
                   }
                   @if (activeFeedback(); as feedback) {
@@ -702,7 +731,7 @@
                       }
                     </div>
                   }
-                  <voice-selection-review [projectId]="selectedProject()!.id" [document]="current" [selection]="selection" [finding]="activeFinding()" [api]="semanticApi" [disabled]="busy() || loading() || stale() || !canEditSelection()" (proposalCreated)="selectionProposalCreated($event)" (decisionSaved)="selectionDecisionSaved($event)" />
+                  <voice-selection-review [projectId]="selectedProject()!.id" [document]="current" [selection]="selection" [finding]="activeFinding()" [api]="semanticApi" [disabled]="busy() || loading() || stale() || !canEditSelection()" (proposalCreated)="selectionProposalCreated($event)" (decisionSaved)="selectionDecisionSaved($event)" (editRequested)="editSelection()" (taskRequested)="createSourceTask()" />
                   <details class="optional-review-input"><summary>{{ 'Eigenes Feedback (optional)' | t }}</summary><form class="panel-form" (ngSubmit)="saveFeedback()">
                     <h3>{{ 'Feedback festhalten' | t }}</h3>
                     <label for="feedback-category">{{ 'Kategorie' | t }}</label
@@ -739,7 +768,7 @@
                       {{ 'Bleibt als Metadatei bei der Quelldatei.' | t }}
                     </p>
                   </form></details>
-                  <details class="optional-review-input"><summary>{{ 'Eigene Formulierung (optional)' | t }}</summary><form
+                  <details id="wording-editor" class="optional-review-input"><summary>{{ 'Eigene Formulierung (optional)' | t }}</summary><form
                     class="panel-form proposal-form"
                     (ngSubmit)="createProposal()"
                   >
@@ -860,7 +889,8 @@
                   </section>
                 }
 
-                <voice-source-tasks
+                <div class="related-work"><button class="button secondary" type="button" (click)="setWorkArea('tasks')">{{ 'Alle Aufgaben im Projekt →' | t }}</button><button class="button secondary" type="button" (click)="setWorkArea('history')">{{ 'Alle Änderungen im Projekt →' | t }}</button></div>
+                <details class="supporting-details"><summary>{{ 'Aufgaben zu dieser Datei' | t }}</summary><voice-source-tasks
                   [projectId]="selectedProject()!.id"
                   [document]="current"
                   [api]="semanticApi"
@@ -868,15 +898,16 @@
                   [disabled]="busy() || stale()"
                   (documentApplied)="sourceTaskApplied($event)"
                   (refreshSource)="openDocument(current.id)"
-                ></voice-source-tasks>
+                ></voice-source-tasks></details>
+                <details class="supporting-details"><summary>{{ 'Projekt nachprüfen' | t }}</summary>
                 <voice-project-checks
                   [projectId]="selectedProject()!.id"
                   [api]="semanticApi"
                   [sourceSnapshot]="current"
                   [disabled]="busy()">
-                </voice-project-checks>
+                </voice-project-checks></details>
 
-                <section class="saved-proposals">
+                <details class="saved-proposals supporting-details"><summary>{{ 'Vorschläge zu dieser Datei' | t }} · {{ savedProposals().length }}</summary>
                   <div class="panel-section-heading">
                     <h3>
 
@@ -917,8 +948,8 @@
                       {{ 'Noch keine Vorschläge für diese Datei gespeichert.' | t }}
                     </p>
                   }
-                </section>
-                <section class="saved-feedback">
+                </details>
+                <details class="saved-feedback supporting-details"><summary>{{ 'Gespeichertes Feedback' | t }} · {{ feedbackTotal() }}</summary>
                   <div class="panel-section-heading">
                     <h3>
 
@@ -979,18 +1010,18 @@
                           : ('Kein offenes Feedback.' | t) }}
                     </p>
                   }
-                </section>
+                </details>
                 <div class="review-footer">
                   <span>{{ 'Quelle' | t }} {{ current.version.slice(0, 8) }}</span
                   ><span>Review {{ current.reviewRevision }}</span>
                 </div>
-                <voice-semantic-review
+                <details class="supporting-details"><summary>{{ 'Semantische Prüfung' | t }}</summary><voice-semantic-review
                   [projectId]="selectedProject()!.id"
                   [document]="current"
                   [api]="semanticApi"
                   (chooseFinding)="selectFinding($event)"
                   (findingsChange)="updateSemanticFindings($event)"
-                />
+                /></details>
               </aside>
             }
           </div>

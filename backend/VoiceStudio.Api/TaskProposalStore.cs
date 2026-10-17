@@ -63,7 +63,7 @@ public sealed partial class ProjectStore
             var proposal = new Proposal(id, documentId, string.Join("\n", edits.Select(e => e.Quote)), string.Join("\n", edits.Select(e => e.Replacement)),
                 string.Join("\n", edits.Select(e => e.Replacement)), detail.Source, after, detail.Version,
                 new(mapped[0].Span.Start, mapped[^1].Span.End), null, "Agent-Task: " + string.Join("; ", edits.Select(e => e.Reason)),
-                "pending", taskId, runId, edits);
+                "pending", taskId, runId, edits, CreatedAt: Now());
             review.Proposals.Add(proposal); review.SourceVersion = detail.Version; SaveReview(project, doc, review);
             return proposal;
         }

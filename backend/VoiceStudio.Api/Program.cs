@@ -116,6 +116,7 @@ app.MapPost("/api/projects/register", (RegisterInput input, ProjectStore store) 
 app.MapPatch("/api/projects/{projectId}/browser", (string projectId, BrowserInput input, ProjectStore store) => store.SetBrowser(projectId, input));
 app.MapDelete("/api/projects/{projectId}", (string projectId, ProjectStore store) => { store.Unregister(projectId); return Results.NoContent(); });
 app.MapGet("/api/projects/{projectId}/report", (string projectId, ProjectStore store) => store.Report(projectId));
+app.MapGet("/api/projects/{projectId}/activity", (string projectId, ProjectStore store) => store.Activity(projectId));
 app.MapGet("/api/projects/{projectId}/documents", (string projectId, ProjectStore store) => store.ListDocuments(projectId));
 app.MapGet("/api/projects/{projectId}/documents/{documentId}", (string projectId, string documentId, ProjectStore store) => store.GetDocument(projectId, documentId));
 app.MapGet("/api/projects/{projectId}/documents/{documentId}/proposals", (string projectId, string documentId, ProjectStore store) => store.ListProposals(projectId, documentId));

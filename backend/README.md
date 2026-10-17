@@ -94,3 +94,40 @@ evidence with an older map becomes stale.
 ## Local project checks
 
 Explicit project build/test checks are configured only in the private host session directory. See [CHECKS.md](CHECKS.md) for the fixed-command configuration, guarded source fingerprint, API, bounded logs and isolated tests. They are independent of semantic agent runs and never start automatically after applying a proposal.
+
+## Read-only project activity
+
+`GET /api/projects/{projectId}/activity` returns
+`{ projectId, documentCount, tasks, changes }` for the registered project's
+currently configured, existing source files. `tasks` includes every persisted
+editorial task for those files, without the document task list's 100-row limit.
+`changes` includes pending and applied proposals, including manual proposals
+with no task. Findings and feedback are not converted into tasks. Deleted or
+excluded source files are outside this view's coverage.
+
+Each entry carries its document ID, path and current title. Task summaries expose
+the saved instruction, status, timestamps, proposal link and resolution. Change
+summaries contain before/after prose, reason, state, optional task link and source
+versions. Open the document's saved proposal to inspect the full source diff.
+An applied proposal is a historical record, not a claim that its result remains
+the current source or passed a project check.
+
+`sourceStatus` is `current` or `changed`, determined by exact source hashes. An
+applied proposal, or an applied task with its matching applied proposal, compares
+the recorded result against the current file. Other records compare their input
+version. This comparison does not validate review revisions, parser mappings or
+component context and does not authorize task execution or application.
+
+This endpoint does not refresh task or runner state, recover interrupted apply
+transactions, reanchor feedback, create metadata directories or write any source
+or metadata. It reports saved task status as saved; the normal guarded task
+operations remain responsible for refresh and transitions.
+
+New proposals persist optional `createdAt` and `appliedAt` timestamps. A matching
+completed apply journal may supply its explicitly recorded application time.
+Legacy missing dates remain `null`; file modification times, task update times
+and the current clock are not substitutes. These optional fields are backward
+compatible with existing review files; no review schema or rule version changes.
+`ProjectActivityChecks` exercises bilingual source handling, all-record coverage,
+exact freshness, legacy dates, interrupted transactions and byte/timestamp
+preservation through `dotnet run --project backend/VoiceStudio.Tests`.

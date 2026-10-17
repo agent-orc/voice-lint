@@ -12,7 +12,7 @@ public record ProjectReport(string ProjectId, DocumentSummary[] Documents, int T
 public record FeedbackInput(string UnitId, string Quote, int Start, int End, string Comment, string Category, string ExpectedVersion, int ExpectedReviewRevision, string RequestId);
 public record FeedbackStatusInput(string Status, int ExpectedReviewRevision);
 public record ProposalInput(string UnitId, int Start, int End, string Replacement, string ExpectedVersion, string? FeedbackId);
-public record Proposal(string Id, string DocumentId, string Before, string After, string Replacement, string SourceBefore, string SourceAfter, string ExpectedVersion, SourceSpan SourceSpan, string? FeedbackId, string Reason, string State, string? TaskId = null, string? RunId = null, ProposalEdit[]? Edits = null);
+public record Proposal(string Id, string DocumentId, string Before, string After, string Replacement, string SourceBefore, string SourceAfter, string ExpectedVersion, SourceSpan SourceSpan, string? FeedbackId, string Reason, string State, string? TaskId = null, string? RunId = null, ProposalEdit[]? Edits = null, string? CreatedAt = null, string? AppliedAt = null);
 public record ApplyInput(string ExpectedVersion);
 public record ImprovementInput(string[] FeedbackIds, string Instruction, string ExpectedVersion, string RequestId);
 public record ImprovementRequest(string Id, string ProjectId, string DocumentId, string[] FeedbackIds, string Instruction, string ExpectedVersion, string Status, string CreatedAt);
@@ -52,3 +52,9 @@ public record TaskApplyResult(ImprovementTask Task, DocumentDetail Document);
 public record ImprovementTask(string Id, string ProjectId, string DocumentId, string Instruction, string[] FeedbackIds, string SourceVersion, int ReviewRevision, int Revision, string Status, string CreatedAt, string UpdatedAt, string? RunId = null, string? ProposalId = null, string? Error = null, Proposal? Proposal = null, string[]? Notes = null, string? Resolution = null);
 
 public record TaskResolveInput(int ExpectedTaskRevision, string ExpectedVersion, int ExpectedReviewRevision, string Note);
+
+// SourceStatus compares only the current file with the recorded input/result.
+// It is not an execution precondition or a claim that the full task context is current.
+public record ProjectActivity(string ProjectId, ProjectActivityTask[] Tasks, ProjectActivityChange[] Changes, int DocumentCount);
+public record ProjectActivityTask(string Id, string DocumentId, string DocumentPath, string DocumentTitle, string Instruction, string Status, string CreatedAt, string UpdatedAt, string? ProposalId, string SourceVersion, string CurrentVersion, string SourceStatus, string? Resolution);
+public record ProjectActivityChange(string Id, string DocumentId, string DocumentPath, string DocumentTitle, string Before, string After, string Reason, string State, string? TaskId, string? CreatedAt, string? AppliedAt, string ExpectedVersion, string ResultVersion, string CurrentVersion, string SourceStatus);

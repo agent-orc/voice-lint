@@ -358,7 +358,7 @@ public sealed partial class ProjectStore
             if (detail.Format is "typescript" or "json") DocumentParser.Parse(after, detail.Format);
             var doc = Document(project, documentId); var review = Review(project, doc);
             if (input.FeedbackId is not null && !review.Feedback.Any(f => f.Id == input.FeedbackId)) throw new ApiError(404, "Zugehöriges Feedback nicht gefunden.");
-            var proposal = new Proposal(Guid.NewGuid().ToString("N"), documentId, unit.Text[input.Start..input.End], input.Replacement, input.Replacement, detail.Source, after, detail.Version, span, input.FeedbackId, "Manueller Textvorschlag; Anwendung erfolgt erst nach bestätigtem Quelldiff.", "pending");
+            var proposal = new Proposal(Guid.NewGuid().ToString("N"), documentId, unit.Text[input.Start..input.End], input.Replacement, input.Replacement, detail.Source, after, detail.Version, span, input.FeedbackId, "Manueller Textvorschlag; Anwendung erfolgt erst nach bestätigtem Quelldiff.", "pending", CreatedAt: Now());
             review.Proposals.Add(proposal); review.SourceVersion = detail.Version;
             SaveReview(project, doc, review);
             return proposal;
@@ -390,7 +390,9 @@ public sealed partial class ProjectStore
             EnsureNoLinks(doc.FullPath);
             CheckVersion(Hash(ReadSource(doc.FullPath).Source), proposal.ExpectedVersion);
             WriteSource(doc.FullPath, proposal.SourceAfter, bom);
-            review.Proposals[index] = proposal with { State = "applied" };
+            journal = journal with { AppliedAt = Now() };
+            AtomicWrite(journalPath, JsonSerializer.Serialize(journal, Json));
+            review.Proposals[index] = proposal with { State = "applied", AppliedAt = journal.AppliedAt };
             Reanchor(review, DocumentParser.Parse(proposal.SourceAfter, detail.Format), journal.AfterVersion);
             SaveReview(project, doc, review);
             AtomicWrite(journalPath, JsonSerializer.Serialize(journal with { State = "completed" }, Json));
@@ -398,7 +400,7 @@ public sealed partial class ProjectStore
         }
     }
 
-    private record ApplyJournal(string DocumentId, string ProposalId, string BeforeVersion, string AfterVersion, string BackupPath, string State);
+    private record ApplyJournal(string DocumentId, string ProposalId, string BeforeVersion, string AfterVersion, string BackupPath, string State, string? AppliedAt = null);
     private void RecoverTransactions(RegisteredProject project, SourceDocument doc, ReviewFile review, string version)
     {
         var folder = Contained(project.Root, ".voice-lint/transactions");
@@ -412,7 +414,7 @@ public sealed partial class ProjectStore
             if (version == journal.AfterVersion)
             {
                 var index = review.Proposals.FindIndex(p => p.Id == journal.ProposalId);
-                if (index >= 0) review.Proposals[index] = review.Proposals[index] with { State = "applied" };
+                if (index >= 0) review.Proposals[index] = review.Proposals[index] with { State = "applied", AppliedAt = review.Proposals[index].AppliedAt ?? journal.AppliedAt };
                 SaveReview(project, doc, review);
                 AtomicWrite(path, JsonSerializer.Serialize(journal with { State = "completed" }, Json));
             }

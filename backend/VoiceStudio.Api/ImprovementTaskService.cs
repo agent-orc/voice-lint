@@ -55,6 +55,10 @@ public sealed class ImprovementTaskService(ProjectStore store, RunnerReviewServi
             throw new ApiError(409, "Gespeicherter Task verletzt den Task-Vertrag; keine Ausführung oder Änderung.");
         return record;
     }
+    // Project history must inspect persisted state without Refresh, which can
+    // reconcile runner status and write task metadata.
+    internal static ImprovementTask ReadStoredTask(string path, string projectId, string documentId)
+        => Read(path, projectId, documentId).Task;
     private static void Save(string path, Record record)
     {
         var folder = Path.GetDirectoryName(path)!;
@@ -206,7 +210,8 @@ public sealed class ImprovementTaskService(ProjectStore store, RunnerReviewServi
             if (task.Status != "ready" || task.ProposalId is null) throw new ApiError(409, "Dieser Task hat keinen aktuellen übernehmbaren Vorschlag.");
             if (task.SourceVersion != input.ExpectedVersion || task.ReviewRevision != input.ExpectedReviewRevision) throw new ApiError(409, "Quelle oder Feedbackstand stimmen nicht mit dem geprüften Task überein.");
             var document = store.ApplyTaskProposal(projectId, documentId, id, task.ProposalId, input.ExpectedVersion, input.ExpectedReviewRevision, record.ContextFingerprint);
-            Update(path, record, task with { Status = "applied", Proposal = task.Proposal! with { State = "applied" }, Error = null });
+            var appliedProposal = store.ListProposals(projectId, documentId).Single(proposal => proposal.Id == task.ProposalId);
+            Update(path, record, task with { Status = "applied", Proposal = appliedProposal, Error = null });
             return new(record.Task, document);
         }
         finally { gate.Release(); }

@@ -1,5 +1,38 @@
 # Decisions and source versions
 
+## Find your project, tasks and changes
+
+The project selector remains visible in Full and Compact layouts. The context
+strip names the current file when reviewing, and explicitly says **Project
+overview** when showing all registered text sources. Website focus keeps these
+controls inside its Navigation dialog.
+
+The three work areas are **Review findings**, **Tasks** and **Change history**.
+Review findings retains website, source, file-report and project-report views.
+Finding cards and the selected passage show the full mapped text unit, with the
+exact phrase highlighted. Coverage, rule details and optional tools expand on demand.
+
+Tasks lists saved tasks across the project's configured, existing source files.
+Search by instruction or file and filter by the next step. Opening a task selects
+that exact task in its file. **Create task** opens the existing explicit save/start
+workflow; simply opening a work area does not start a runner. The lifecycle is
+save, start, review the result, apply, then verify. Verification is a separate
+project-check action; an applied task is not proof of a passing check.
+
+Change history includes proposals with and without linked tasks. It defaults to
+applied changes; choose all entries to include pending proposals. Search also
+matches the before/after text, so you do not need to know its filename. The first
+entry and search results expose the comparison immediately. A source-change
+notice identifies historical snapshots; the recorded diff is not today's Git diff.
+**Applied** means saved locally, not verified or published. Unknown legacy dates
+are labelled unknown. Refresh reloads persisted records; the overview does not
+automatically poll. Deleted or no-longer-configured source files are outside this view.
+
+The URL preserves the selected project, file and work area. Existing saved
+proposals and tasks remain compatible; there is no metadata migration or rule-score
+change. The activity API's source freshness compares content versions only;
+opening a task performs its existing complete source/feedback checks.
+
 ## Keep a passage or review a change
 
 Select a mapped passage or open a finding. **Keep as written** saves the exact

@@ -1,11 +1,19 @@
 <section class="selection-review" [attr.aria-label]="'Ausgewählte Textstelle prüfen' | t">
+  <div class="next-step">
+    <h4>{{ 'Nächster Schritt' | t }}</h4>
+    <div class="next-step-actions">
+      <button type="button" class="button primary" [disabled]="disabled || busy() || !validSelection()" (click)="requestEdit()">{{ 'Text selbst ändern' | t }}</button>
+      <button type="button" class="button secondary" [disabled]="disabled || busy() || !validSelection()" (click)="requestTask()">{{ 'Aufgabe erstellen' | t }}</button>
+    </div>
+    <p class="small-muted">{{ 'Änderungen prüfst du vor der Übernahme. Eine Aufgabe hält den Arbeitsauftrag fest.' | t }}</p>
+  </div>
   <div class="keep-choice">
     @if (savedDecision(); as decision) {
       <p class="saved-decision" role="status">✓ {{ 'Als passend gespeichert' | t }}</p>
-      <p class="small-muted">{{ 'Für diese Textstelle und Quellversion gespeichert. Regeln und CI-Prüfungen bleiben aktiv.' | t }}</p>
+      <p class="small-muted">{{ 'Deine Entscheidung ist für diesen Textstand gespeichert. Der Prüfhinweis bleibt sichtbar.' | t }}</p>
       @if (decision.note) { <p class="decision-note">{{ decision.note }}</p> }
     } @else {
-      <button type="button" class="button primary wide" [disabled]="disabled || busy() || !validSelection()" (click)="keep()">{{ 'So beibehalten' | t }}</button>
+      <button type="button" class="button secondary keep-button" [disabled]="disabled || busy() || !validSelection()" (click)="keep()">{{ 'So beibehalten' | t }}</button>
       <details class="optional-details">
         <summary>{{ 'Begründung ergänzen' | t }} <span class="optional">{{ 'optional' | t }}</span></summary>
         <label for="selection-keep-note">{{ 'Warum passt die Formulierung?' | t }}</label>
@@ -25,15 +33,17 @@
           } @else {
             <p class="replacement" [attr.lang]="document.language">{{ alternative.replacement }}</p>
           }
-          <p class="alternative-reason">{{ alternative.reason }}</p>
+          <details class="optional-details alternative-explanation"><summary>{{ 'Warum dieser Vorschlag?' | t }}</summary><p class="alternative-reason">{{ alternative.reason }}</p></details>
           <button type="button" class="button secondary wide" [disabled]="disabled || busy() || !validSelection() || chosenId() === alternative.id" (click)="choose(alternative)">{{ (chosenId() === alternative.id ? 'Quelldiff vorbereitet' : 'Diese Änderung prüfen') | t }}</button>
         </li>
       }
     </ol>
-    <p class="small-muted">{{ 'Die Auswahl bereitet einen Quelldiff vor. Du prüfst ihn vor der Übernahme.' | t }}</p>
+    <p class="small-muted">{{ 'Du siehst zuerst Vorher und Nachher. Erst nach deiner Übernahme wird die Datei geändert.' | t }}</p>
   }
 
-  <div class="generate-choice">
+  <details class="generate-choice" [open]="!!pendingRequest()">
+    <summary>{{ 'Alternativen mit KI' | t }}</summary>
+    <div class="generate-content">
     <details class="optional-details">
       <summary>{{ 'Richtung für Alternativen' | t }} <span class="optional">{{ 'optional' | t }}</span></summary>
       <label for="selection-suggestion-instruction">{{ 'Was soll anders werden?' | t }}</label>
@@ -48,12 +58,14 @@
       @if (route.available) {
         <p class="small-muted">{{ 'Startet einen Modellaufruf für die Auswahl über' | t }} <strong>{{ route.cli }} · {{ route.model }} · {{ route.thinkingLevel }}</strong>.</p>
       } @else {
-        <p class="small-muted">{{ 'Für Alternativen muss eine verfügbare Modellroute eingerichtet sein.' | t }} {{ route.message | t }}</p>
+        <p class="small-muted">{{ 'KI-Alternativen sind noch nicht verfügbar. Du kannst den Text selbst ändern oder eine Aufgabe anlegen.' | t }}</p>
+        <details class="optional-details model-details"><summary>{{ 'Modell-Einstellungen' | t }}</summary><p class="small-muted">{{ route.message | t }}</p></details>
       }
     } @else if (loading()) {
       <p class="small-muted" role="status">{{ 'Gespeicherte Alternativen und Modellroute werden geladen …' | t }}</p>
     }
-  </div>
+    </div>
+  </details>
 
   @for (active of activeRuns(); track active.id) {
     <div class="suggestion-status" [attr.data-status]="active.status">
@@ -70,7 +82,7 @@
   @if (run(); as current) { @if (!isActive(current)) {
     <div class="suggestion-status" [attr.data-status]="current.status">
       <p role="status">{{ label(current) | t }}</p>
-      @if (current.error) { <p class="error-detail">{{ current.error | t }}</p> }
+      @if (current.error) { <details class="optional-details"><summary>{{ 'Fehlerdetails' | t }}</summary><p class="error-detail">{{ current.error | t }}</p></details> }
       @if (current.status === 'completed' && isCurrent(current) && !current.alternatives.length) {
         <p>{{ 'Der Lauf enthält keine verwendbaren Alternativen.' | t }}</p>
       }

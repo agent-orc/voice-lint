@@ -9,6 +9,7 @@ void Reject(int status, Action action, string name) { count++; try { action(); }
 try
 {
     ProjectRegistryChecks.Run(root, Check, Reject);
+    ProjectActivityChecks.Run(root, Check, Reject);
     const string html = "<html lang=\"en\"><head><title>Hidden</title><script>alert(1)</script></head><h1>Quality &amp; speed.</h1><p>Hello &#x1F680; &lt;world&gt;.</p><button onclick=\"alert(2)\">Launch</button><iframe src=evil>Hidden</iframe></html>";
     var parsed = DocumentParser.Parse(html, "html");
     Check(parsed.Language == "en" && parsed.Units.Length == 3, "HTML language/exclusions");

@@ -28,6 +28,8 @@ export class SelectionReviewComponent implements OnChanges, OnDestroy {
   @Input() disabled = false;
   @Output() proposalCreated = new EventEmitter<Proposal>();
   @Output() decisionSaved = new EventEmitter<DocumentDetail>();
+  @Output() editRequested = new EventEmitter<void>();
+  @Output() taskRequested = new EventEmitter<void>();
 
   readonly i18n = inject(I18nService);
   private readonly knowledge = inject(KnowledgeService);
@@ -115,6 +117,12 @@ export class SelectionReviewComponent implements OnChanges, OnDestroy {
     const unit = this.document?.units.find(item => item.id === this.selection?.unitId);
     return !!unit && this.selection.start >= 0 && this.selection.end > this.selection.start && this.selection.end <= unit.text.length &&
       unit.text.slice(this.selection.start, this.selection.end) === this.selection.quote;
+  }
+  requestEdit(): void {
+    if (!this.disabled && !this.busy() && this.validSelection()) this.editRequested.emit();
+  }
+  requestTask(): void {
+    if (!this.disabled && !this.busy() && this.validSelection()) this.taskRequested.emit();
   }
   savedDecision(): SelectionDecision | undefined {
     const decisions = [this.saved(), ...(this.document.decisions ?? [])];
